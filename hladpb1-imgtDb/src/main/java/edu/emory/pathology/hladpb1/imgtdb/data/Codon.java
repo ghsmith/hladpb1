@@ -1,21 +1,21 @@
 package edu.emory.pathology.hladpb1.imgtdb.data;
 
 /**
- *
+ * Data class for a codon.
  * @author ghsmith
  */
 public class Codon {
 
-    private Integer position;
+    private Integer codonNumber;
     private String hypervariableRegionName;
     private String aminoAcid;
 
-    public Integer getPosition() {
-        return position;
+    public Integer getCodonNumber() {
+        return codonNumber;
     }
 
-    public void setPosition(Integer position) {
-        this.position = position;
+    public void setCodonNumber(Integer codonNumber) {
+        this.codonNumber = codonNumber;
     }
 
     public String getHypervariableRegionName() {

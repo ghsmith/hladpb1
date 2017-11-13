@@ -18,10 +18,10 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/imgt/*.xsd</include>
+                                <include>jaxb/imgt/hla.xsd</include>
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-imgt.episode</episodeFile>
-                            <generatePackage>edu.emory.pathology.hladpb1.imgtdb.jaxb</generatePackage>
+                            <generatePackage>edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt</generatePackage>
                         </configuration>
                         <id>jaxb-generate-imgt</id>
                     </execution>
@@ -31,12 +31,12 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/imgt/*.xsd</include>
+                                <include>jaxb/imgt/hladpb1HypervariableRegion.xsd</include>
                             </schemaIncludes>
-                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-imgt.episode</episodeFile>
-                            <generatePackage>jaxb.imgt</generatePackage>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-emory.episode</episodeFile>
+                            <generatePackage>edu.emory.pathology.hladpb1.imgtdb.jaxb.emory</generatePackage>
                         </configuration>
-                        <id>jaxb-generate-imgt_1</id>
+                        <id>jaxb-generate-emory</id>
                     </execution>
                 </executions>
                 <configuration>

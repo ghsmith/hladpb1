@@ -5,7 +5,7 @@
  */
 package edu.emory.pathology.hladpb1.imgtdb;
 
-import edu.emory.pathology.hladpb1.imgtdb.jaxb.Alleles;
+import edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles;
 import javax.xml.bind.JAXBException;
 import org.junit.After;
 import org.junit.AfterClass;

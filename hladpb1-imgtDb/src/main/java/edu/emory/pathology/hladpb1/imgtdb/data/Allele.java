@@ -3,7 +3,7 @@ package edu.emory.pathology.hladpb1.imgtdb.data;
 import java.util.SortedMap;
 
 /**
- *
+ * Data class for an allele.
  * @author ghsmith
  */
 public class Allele {

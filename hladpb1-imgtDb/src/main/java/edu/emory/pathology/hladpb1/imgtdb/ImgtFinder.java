@@ -1,6 +1,6 @@
 package edu.emory.pathology.hladpb1.imgtdb;
 
-import edu.emory.pathology.hladpb1.imgtdb.jaxb.Alleles;
+import edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
@@ -22,7 +22,7 @@ public class ImgtFinder {
     
     public Alleles getAlleles() throws JAXBException {
         if(alleles == null) {
-            JAXBContext jc0 = JAXBContext.newInstance("edu.emory.pathology.hladpb1.imgtdb.jaxb");
+            JAXBContext jc0 = JAXBContext.newInstance("edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt");
             alleles = (Alleles)jc0.createUnmarshaller().unmarshal(new File("data/hla.xml"));            
             LOG.info(String.format("%d alleles loaded from IMGT XML database", alleles.getAllele().size()));
             LOG.info(String.format("IMGT XML database version is %s", alleles.getAllele().get(0).getReleaseversions().getCurrentrelease()));
