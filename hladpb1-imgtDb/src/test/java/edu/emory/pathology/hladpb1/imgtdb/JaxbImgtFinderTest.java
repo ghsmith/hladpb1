@@ -5,8 +5,7 @@
  */
 package edu.emory.pathology.hladpb1.imgtdb;
 
-import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
-import java.util.List;
+import edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles;
 import javax.xml.bind.JAXBException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -19,9 +18,9 @@ import static org.junit.Assert.*;
  *
  * @author ghsmith
  */
-public class AlleleFinderTest {
+public class JaxbImgtFinderTest {
     
-    public AlleleFinderTest() {
+    public JaxbImgtFinderTest() {
     }
     
     @BeforeClass
@@ -47,18 +46,10 @@ public class AlleleFinderTest {
     // public void hello() {}
     
     @Test
-    public void getAlleleList() throws JAXBException {
-        AlleleFinder alleleFinder = new AlleleFinder();
-        List<Allele> alleleList = alleleFinder.getAlleleList();
-        assertTrue(alleleList.size() > 0);
-        System.out.println();
-        /*alleleList.stream().forEach((allele) -> {
-            System.out.print(String.format("%-25s: ", allele.getAlleleName()));
-            for(int i = 1; i <= 100; i++) {
-                System.out.print(allele.getCodonMap().get(i) != null ? allele.getCodonMap().get(i).getAminoAcid() : "*");
-            }
-            System.out.println();
-        });*/
+    public void getAlleles() throws JAXBException {
+        JaxbImgtFinder imgtFinder = new JaxbImgtFinder();
+        Alleles alleles = imgtFinder.getAlleles();
+        assertTrue(alleles.getAllele().size() > 0);
     }
     
 }

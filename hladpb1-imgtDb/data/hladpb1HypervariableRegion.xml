@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<reagentLots xmlns="http://www.digipath.info/hladpb1HypervariableRegion" xmlns:xs="http://www.w3.org/2001/XMLSchema" xs:noNamespaceSchemaLocation="http://www.digipath.info/hladpb1HypervariableRegion.xsd">
+<reagentLots xmlns="http://pathology.emory.edu/hladpb1HypervariableRegion" xmlns:xs="http://www.w3.org/2001/XMLSchema" xs:noNamespaceSchemaLocation="http://pathology.emory.edu/hladpb1HypervariableRegion.xsd">
 
   <reagentLot lotNumber="10">
 

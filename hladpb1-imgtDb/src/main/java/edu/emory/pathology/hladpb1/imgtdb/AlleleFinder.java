@@ -24,7 +24,7 @@ public class AlleleFinder {
     public List<Allele> getAlleleList() throws JAXBException {
         if(alleleList == null) {
             alleleList = new ArrayList();
-            ImgtFinder imgtFinder = new ImgtFinder();
+            JaxbImgtFinder imgtFinder = new JaxbImgtFinder();
             edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles imgtAlleles = imgtFinder.getAlleles();
             // Process each IMGT HLA-DPB1 allele that has a sequence element.
             imgtAlleles.getAllele().stream().filter(

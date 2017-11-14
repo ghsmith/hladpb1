@@ -5,7 +5,7 @@
  */
 package edu.emory.pathology.hladpb1.imgtdb;
 
-import edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles;
+import edu.emory.pathology.hladpb1.imgtdb.jaxb.emory.ReagentLots;
 import javax.xml.bind.JAXBException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -18,9 +18,9 @@ import static org.junit.Assert.*;
  *
  * @author ghsmith
  */
-public class ImgtFinderTest {
+public class JaxbEmoryFinderTest {
     
-    public ImgtFinderTest() {
+    public JaxbEmoryFinderTest() {
     }
     
     @BeforeClass
@@ -44,12 +44,12 @@ public class ImgtFinderTest {
     //
     // @Test
     // public void hello() {}
-    
+
     @Test
-    public void getAlleles() throws JAXBException {
-        ImgtFinder imgtFinder = new ImgtFinder();
-        Alleles alleles = imgtFinder.getAlleles();
-        assertTrue(alleles.getAllele().size() > 0);
+    public void getReagentLots() throws JAXBException {
+        JaxbEmoryFinder emoryFinder = new JaxbEmoryFinder();
+        ReagentLots reagentLots = emoryFinder.getReagentLots();
+        assertTrue(reagentLots.getReagentLot().size() > 0);
     }
-    
+
 }
