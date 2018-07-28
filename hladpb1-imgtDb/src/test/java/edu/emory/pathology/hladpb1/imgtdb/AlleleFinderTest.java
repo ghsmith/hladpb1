@@ -6,6 +6,7 @@
 package edu.emory.pathology.hladpb1.imgtdb;
 
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
+import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import org.junit.After;
@@ -52,13 +53,29 @@ public class AlleleFinderTest {
         List<Allele> alleleList = alleleFinder.getAlleleList();
         assertTrue(alleleList.size() > 0);
         System.out.println();
-        /*alleleList.stream().forEach((allele) -> {
+        alleleList.stream().forEach((allele) -> {
             System.out.print(String.format("%-25s: ", allele.getAlleleName()));
             for(int i = 1; i <= 100; i++) {
                 System.out.print(allele.getCodonMap().get(i) != null ? allele.getCodonMap().get(i).getAminoAcid() : "*");
             }
             System.out.println();
-        });*/
+        });
+    }
+
+    @Test
+    public void assignHypervariableRegionVariantIds() throws JAXBException {
+        AlleleFinder alleleFinder = new AlleleFinder();
+        List<Allele> alleleList = alleleFinder.getAlleleList();
+        HypervariableRegionFinder hypervariableRegionFinder = new HypervariableRegionFinder();
+        List<HypervariableRegion> hypervariableRegionList = hypervariableRegionFinder.getHypervariableRegionList();
+        alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionList);
+        alleleList.stream().forEach((allele) -> {
+            System.out.print(String.format("%-25s %-20s: ", allele.getAlleleName(), allele.getHvrVariantMap().values()));
+            for(int i = 1; i <= 100; i++) {
+                System.out.print(allele.getCodonMap().get(i) != null ? allele.getCodonMap().get(i).getAminoAcid() : "*");
+            }
+            System.out.println();
+        });
     }
     
 }

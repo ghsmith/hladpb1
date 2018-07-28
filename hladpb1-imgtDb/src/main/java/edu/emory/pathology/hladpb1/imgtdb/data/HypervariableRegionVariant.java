@@ -9,9 +9,9 @@ import java.util.List;
  */
 public class HypervariableRegionVariant {
     
-    public String variantId;
-    public List<String> proteinSequenceList;
-    public List<String> beadAlleleNameList;
+    private String variantId;
+    private List<String> proteinSequenceList;
+    private List<String> beadAlleleNameList;
 
     public String getVariantId() {
         return variantId;

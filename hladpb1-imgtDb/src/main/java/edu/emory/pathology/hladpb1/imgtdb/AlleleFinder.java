@@ -2,6 +2,7 @@ package edu.emory.pathology.hladpb1.imgtdb;
 
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
 import edu.emory.pathology.hladpb1.imgtdb.data.Codon;
+import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,29 +28,17 @@ public class AlleleFinder {
             JaxbImgtFinder imgtFinder = new JaxbImgtFinder();
             edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles imgtAlleles = imgtFinder.getAlleles();
             // Process each IMGT HLA-DPB1 allele that has a sequence element.
-            imgtAlleles.getAllele().stream().filter(
-                (imgtAllele) -> (
-                    imgtAllele.getName().startsWith("HLA-DPB1"))
-                    && imgtAllele.getSequence() != null
-                ).forEach((imgtAllele) ->
-            {
+            imgtAlleles.getAllele().stream().filter((imgtAllele) -> (imgtAllele.getName().startsWith("HLA-DPB1")) && imgtAllele.getSequence() != null).forEach((imgtAllele) -> {
                 Allele allele = new Allele();
                 alleleList.add(allele);
                 allele.setVersion(imgtAllele.getReleaseversions().getCurrentrelease());
                 allele.setAlleleName(imgtAllele.getName());
                 allele.setCodonMap(new TreeMap());
-                final Iterator translationIterator = imgtAllele.getSequence().getFeature().stream().filter(
-                    (feature) -> (
-                        feature.getFeaturetype().equals("Protein"))
-                    ).findFirst().get().getTranslation().chars().iterator();
+                final Iterator translationIterator = imgtAllele.getSequence().getFeature().stream().filter((feature) -> (feature.getFeaturetype().equals("Protein"))).findFirst().get().getTranslation().chars().iterator();
                 // Process each each IMGT exon. The codon position is deduced
                 // from the CDNA coordinate and the reading frame. Note that
                 // NULL alleles will not have protein sequence for all codons.
-                imgtAllele.getSequence().getFeature().stream().filter(
-                    (feature) -> (
-                        feature.getFeaturetype().equals("Exon"))
-                    ).forEach((feature) ->
-                {
+                imgtAllele.getSequence().getFeature().stream().filter((feature) -> (feature.getFeaturetype().equals("Exon"))).forEach((feature) ->  {
                     for(int cdnaCoordinate = feature.getCDNACoordinates().getStart().intValueExact(); cdnaCoordinate <= feature.getCDNACoordinates().getEnd().intValueExact(); cdnaCoordinate++) {
                         int codonNumber = ((cdnaCoordinate - 1) / 3) + 1; // codon number starts at one (not zero)
                         int positionInCodon = (cdnaCoordinate - 1) - (((cdnaCoordinate - 1) / 3) * 3) + 1; // position in codon starts at one (not zero)
@@ -87,6 +76,25 @@ public class AlleleFinder {
             LOG.info(String.format("version is %s", alleleList.get(0).getVersion()));
         }
         return alleleList;
+    }
+
+    public void assignHypervariableRegionVariantIds(List<HypervariableRegion> hypervariableRegionList) {
+        alleleList.stream().forEach((allele) -> {
+            allele.setHvrVariantMap(new TreeMap<>());
+            hypervariableRegionList.stream().forEach((hypervariableRegion) -> {
+                StringBuilder alleleProteinSequence = new StringBuilder();
+                hypervariableRegion.getCodonNumberList().stream().forEach((codonNumber) -> {
+                    Codon codon = allele.getCodonMap().get(codonNumber);
+                    alleleProteinSequence.append(codon == null ? "*" : codon.getAminoAcid());
+                });
+                allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), alleleProteinSequence.toString()); // default if the protein sequence does not match an established hypervariable region variant
+                hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
+                    hvrVariant.getProteinSequenceList().stream().filter((proteinSequence) -> (alleleProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
+                        allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), hvrVariant.getVariantId());
+                    });
+                });
+            });
+        });
     }
     
 }

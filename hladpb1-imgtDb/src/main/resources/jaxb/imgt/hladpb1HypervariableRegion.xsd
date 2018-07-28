@@ -13,7 +13,7 @@
 			<xs:sequence>
 				<xs:element ref="hypervariableRegions"/>
 			</xs:sequence>
-			<xs:attribute type="xs:byte" name="lotNumber"/>
+			<xs:attribute type="xs:string" name="lotNumber"/>
 		</xs:complexType>
 	</xs:element>
 		
@@ -48,7 +48,7 @@
 			<xs:sequence>
 				<xs:element ref="beads"/>
 			</xs:sequence>
-			<xs:attribute type="xs:integer" name="variantId" use="optional"/>
+			<xs:attribute type="xs:string" name="variantId" use="optional"/>
 			<xs:attribute type="xs:string" name="proteinSequences" use="optional"/>
 		</xs:complexType>
 	</xs:element>

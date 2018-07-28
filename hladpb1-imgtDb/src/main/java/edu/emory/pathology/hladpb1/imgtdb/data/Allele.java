@@ -10,7 +10,7 @@ public class Allele {
 
     private String version;
     private String alleleName;
-    private SortedMap<String, String> hypervariableRegionMap;
+    private SortedMap<String, String> hvrVariantMap;
     private SortedMap<Integer, Codon> codonMap;
     private Boolean singleAntigenBead;
     private Boolean recipientAntibody;
@@ -33,12 +33,12 @@ public class Allele {
         this.alleleName = alleleName;
     }
 
-    public SortedMap<String, String> getHypervariableRegionMap() {
-        return hypervariableRegionMap;
+    public SortedMap<String, String> getHvrVariantMap() {
+        return hvrVariantMap;
     }
 
-    public void setHypervariableRegionMap(SortedMap<String, String> hypervariableRegionMap) {
-        this.hypervariableRegionMap = hypervariableRegionMap;
+    public void setHvrVariantMap(SortedMap<String, String> hvrVariantMap) {
+        this.hvrVariantMap = hvrVariantMap;
     }
 
     public SortedMap<Integer, Codon> getCodonMap() {

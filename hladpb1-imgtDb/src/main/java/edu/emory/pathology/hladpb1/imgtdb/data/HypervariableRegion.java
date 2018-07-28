@@ -1,7 +1,7 @@
 package edu.emory.pathology.hladpb1.imgtdb.data;
 
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * Data class for a hypervariable region.
@@ -11,8 +11,8 @@ import java.util.Map;
 public class HypervariableRegion {
    
     private String hypervariableRegionName;
-    private List codonNumberList;
-    private Map<String, HypervariableRegionVariant> variantMap;
+    private List<Integer> codonNumberList;
+    private SortedMap<String, HypervariableRegionVariant> variantMap;
 
     public String getHypervariableRegionName() {
         return hypervariableRegionName;
@@ -22,19 +22,19 @@ public class HypervariableRegion {
         this.hypervariableRegionName = hypervariableRegionName;
     }
 
-    public List getCodonNumberList() {
+    public List<Integer> getCodonNumberList() {
         return codonNumberList;
     }
 
-    public void setCodonNumberList(List codonNumberList) {
+    public void setCodonNumberList(List<Integer> codonNumberList) {
         this.codonNumberList = codonNumberList;
     }
 
-    public Map<String, HypervariableRegionVariant> getVariantMap() {
+    public SortedMap<String, HypervariableRegionVariant> getVariantMap() {
         return variantMap;
     }
 
-    public void setVariantMap(Map<String, HypervariableRegionVariant> variantMap) {
+    public void setVariantMap(SortedMap<String, HypervariableRegionVariant> variantMap) {
         this.variantMap = variantMap;
     }
     
