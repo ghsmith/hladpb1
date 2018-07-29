@@ -11,6 +11,7 @@ public class Allele {
     private String version;
     private String alleleName;
     private SortedMap<String, String> hvrVariantMap;
+    private Integer hvrMatchCount;
     private SortedMap<Integer, Codon> codonMap;
     private Boolean nullAllele;
     private String synonymousAlleleName;
@@ -42,6 +43,14 @@ public class Allele {
 
     public void setHvrVariantMap(SortedMap<String, String> hvrVariantMap) {
         this.hvrVariantMap = hvrVariantMap;
+    }
+
+    public Integer getHvrMatchCount() {
+        return hvrMatchCount;
+    }
+
+    public void setHvrMatchCount(Integer hvrMatchCount) {
+        this.hvrMatchCount = hvrMatchCount;
     }
 
     public SortedMap<Integer, Codon> getCodonMap() {

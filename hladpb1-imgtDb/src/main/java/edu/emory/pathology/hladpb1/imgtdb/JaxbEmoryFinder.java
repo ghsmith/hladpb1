@@ -24,7 +24,9 @@ public class JaxbEmoryFinder {
     }
 
     public JaxbEmoryFinder(String xmlFileName) {
-        this.xmlFileName = xmlFileName;
+        if(xmlFileName != null) {
+            this.xmlFileName = xmlFileName;
+        }
     }
     
     public ReagentLots getReagentLots() throws JAXBException {

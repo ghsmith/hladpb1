@@ -48,9 +48,9 @@ public class HypervariableRegionFinderTest {
     
     @Test
     public void getHypervariableRegionList() throws JAXBException {
-        HypervariableRegionFinder hypervariableRegionFinder = new HypervariableRegionFinder();
+        HypervariableRegionFinder hypervariableRegionFinder = new HypervariableRegionFinder("10");
         List<HypervariableRegion> hypervariableRegionList = hypervariableRegionFinder.getHypervariableRegionList();
-        for(HypervariableRegion hvRegion : hypervariableRegionList) {
+        /*for(HypervariableRegion hvRegion : hypervariableRegionList) {
             System.out.println(hvRegion.getHypervariableRegionName());
             for(Integer codon : hvRegion.getCodonNumberList()) {
                 System.out.println(codon);
@@ -60,7 +60,7 @@ public class HypervariableRegionFinderTest {
                 System.out.println(hvrVariant.getProteinSequenceList());
                 System.out.println(hvrVariant.getBeadAlleleNameList());
             }
-        }
+        }*/
     }
     
 }

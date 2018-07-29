@@ -23,12 +23,24 @@ public class AlleleFinder {
 
     private static final Logger LOG = Logger.getLogger(AlleleFinder.class.getName());
 
+    private String xmlFileName;
     private List<Allele> alleleList;
+
+    public AlleleFinder() {
+    }
+
+    public AlleleFinder(String xmlFileName) {
+        this.xmlFileName = xmlFileName;
+    }
+    
+    public Allele getAllele(String alleleName) throws JAXBException {
+        return getAlleleList().stream().filter((allele) -> (alleleName.equals(allele.getAlleleName()))).findFirst().get();
+    }
     
     public List<Allele> getAlleleList() throws JAXBException {
         if(alleleList == null) {
             alleleList = new ArrayList();
-            JaxbImgtFinder imgtFinder = new JaxbImgtFinder();
+            JaxbImgtFinder imgtFinder = new JaxbImgtFinder(xmlFileName);
             edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles imgtAlleles = imgtFinder.getAlleles();
             // Process each IMGT HLA-DPB1 allele that has a sequence element.
             imgtAlleles.getAllele().stream().filter((imgtAllele) -> (imgtAllele.getName().startsWith("HLA-DPB1")) && imgtAllele.getSequence() != null).forEach((imgtAllele) -> {
@@ -113,8 +125,8 @@ public class AlleleFinder {
         return alleleList;
     }
 
-    public void assignHypervariableRegionVariantIds(List<HypervariableRegion> hypervariableRegionList) {
-        alleleList.stream().forEach((allele) -> {
+    public void assignHypervariableRegionVariantIds(List<HypervariableRegion> hypervariableRegionList) throws JAXBException {
+        getAlleleList().stream().forEach((allele) -> {
             allele.setHvrVariantMap(new TreeMap<>());
             hypervariableRegionList.stream().forEach((hypervariableRegion) -> {
                 StringBuilder alleleProteinSequence = new StringBuilder();
@@ -133,6 +145,15 @@ public class AlleleFinder {
                     });
                 });
             });
+        });
+    }
+
+    public void assignHypervariableRegionVariantMatches(String referenceAlleleName) throws JAXBException {
+        Allele referenceAllele = getAllele(referenceAlleleName);
+        getAlleleList().stream().forEach((allele) -> {
+            allele.setHvrMatchCount((int)referenceAllele.getHvrVariantMap().keySet().stream().filter((hvrName) -> (
+                referenceAllele.getHvrVariantMap().get(hvrName).equals(allele.getHvrVariantMap().get(hvrName)))).count()
+            );
         });
     }
     

@@ -19,20 +19,23 @@ public class HypervariableRegionFinder {
 
     private static final Logger LOG = Logger.getLogger(HypervariableRegionFinder.class.getName());
     
-    private String reagentLotNumber = "10";
+    private String xmlFileName;
+    private String reagentLotNumber;
     private List<HypervariableRegion> hypervariableRegionList;
 
-    public HypervariableRegionFinder() {
-    }
-    
     public HypervariableRegionFinder(String reagentLotNumber) {
         this.reagentLotNumber = reagentLotNumber;
     }
-
+    
+    public HypervariableRegionFinder(String xmlFileName, String reagentLotNumber) {
+        this.xmlFileName = xmlFileName;
+        this.reagentLotNumber = reagentLotNumber;
+    }
+    
     public List<HypervariableRegion> getHypervariableRegionList() throws JAXBException {
         if(hypervariableRegionList == null) {
             hypervariableRegionList = new ArrayList();
-            JaxbEmoryFinder emoryFinder = new JaxbEmoryFinder();
+            JaxbEmoryFinder emoryFinder = new JaxbEmoryFinder(xmlFileName);
             edu.emory.pathology.hladpb1.imgtdb.jaxb.emory.ReagentLots emoryReagentLots = emoryFinder.getReagentLots();
             emoryReagentLots.getReagentLot().stream().filter((emoryReagentLot) -> (emoryReagentLot.getLotNumber().equals(reagentLotNumber)))
             .findFirst().get().getHypervariableRegions().getHypervariableRegion().forEach((emoryHypervariableRegion) -> {

@@ -25,7 +25,9 @@ public class JaxbImgtFinder {
     }
     
     public JaxbImgtFinder(String xmlFileName) {
-        this.xmlFileName = xmlFileName;
+        if(xmlFileName != null) {
+            this.xmlFileName = xmlFileName;
+        }
     }
     
     public Alleles getAlleles() throws JAXBException {
