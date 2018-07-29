@@ -12,6 +12,9 @@ public class Allele {
     private String alleleName;
     private SortedMap<String, String> hvrVariantMap;
     private SortedMap<Integer, Codon> codonMap;
+    private Boolean nullAllele;
+    private String synonymousAlleleName;
+    private Boolean synonymousAlleleProteinShorter;
     private Boolean singleAntigenBead;
     private Boolean recipientAntibody;
     private Boolean recipientType;
@@ -47,6 +50,30 @@ public class Allele {
 
     public void setCodonMap(SortedMap<Integer, Codon> codonMap) {
         this.codonMap = codonMap;
+    }
+
+    public Boolean getNullAllele() {
+        return nullAllele;
+    }
+
+    public void setNullAllele(Boolean nullAllele) {
+        this.nullAllele = nullAllele;
+    }
+
+    public String getSynonymousAlleleName() {
+        return synonymousAlleleName;
+    }
+
+    public void setSynonymousAlleleName(String synonymousAlleleName) {
+        this.synonymousAlleleName = synonymousAlleleName;
+    }
+
+    public Boolean getSynonymousAlleleProteinShorter() {
+        return synonymousAlleleProteinShorter;
+    }
+
+    public void setSynonymousAlleleProteinShorter(Boolean synonymousAlleleProteinShorter) {
+        this.synonymousAlleleProteinShorter = synonymousAlleleProteinShorter;
     }
 
     public Boolean getSingleAntigenBead() {

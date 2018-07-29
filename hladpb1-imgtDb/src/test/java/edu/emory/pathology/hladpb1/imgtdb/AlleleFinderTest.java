@@ -52,14 +52,14 @@ public class AlleleFinderTest {
         AlleleFinder alleleFinder = new AlleleFinder();
         List<Allele> alleleList = alleleFinder.getAlleleList();
         assertTrue(alleleList.size() > 0);
-        System.out.println();
+        /*System.out.println();
         alleleList.stream().forEach((allele) -> {
             System.out.print(String.format("%-25s: ", allele.getAlleleName()));
             for(int i = 1; i <= 100; i++) {
                 System.out.print(allele.getCodonMap().get(i) != null ? allele.getCodonMap().get(i).getAminoAcid() : "*");
             }
             System.out.println();
-        });
+        });*/
     }
 
     @Test
@@ -70,7 +70,7 @@ public class AlleleFinderTest {
         List<HypervariableRegion> hypervariableRegionList = hypervariableRegionFinder.getHypervariableRegionList();
         alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionList);
         alleleList.stream().forEach((allele) -> {
-            System.out.print(String.format("%-25s %-20s: ", allele.getAlleleName(), allele.getHvrVariantMap().values()));
+            System.out.print(String.format("%-25s %-30s %1s %-25s %1s %1s: ", allele.getAlleleName(), allele.getHvrVariantMap().values(), allele.getNullAllele() ? "Y" : "N", allele.getSynonymousAlleleName(), allele.getSynonymousAlleleProteinShorter() != null && allele.getSynonymousAlleleProteinShorter() ? "Y": "N", allele.getSingleAntigenBead() ? "Y" : "N"));
             for(int i = 1; i <= 100; i++) {
                 System.out.print(allele.getCodonMap().get(i) != null ? allele.getCodonMap().get(i).getAminoAcid() : "*");
             }

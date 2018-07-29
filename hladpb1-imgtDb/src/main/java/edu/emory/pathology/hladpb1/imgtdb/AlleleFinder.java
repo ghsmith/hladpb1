@@ -8,6 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -65,12 +68,44 @@ public class AlleleFinder {
                                         || "TAA".equals(imgtAllele.getSequence().getNucsequence().substring(feature.getSequenceCoordinates().getStart().intValueExact() + (cdnaCoordinate - feature.getCDNACoordinates().getStart().intValueExact() - positionInCodon)).substring(0, 3))
                                         || "TGA".equals(imgtAllele.getSequence().getNucsequence().substring(feature.getSequenceCoordinates().getStart().intValueExact() + (cdnaCoordinate - feature.getCDNACoordinates().getStart().intValueExact() - positionInCodon)).substring(0, 3))
                                     )    
-                                    : allele.getAlleleName() + " translation too short" + codonNumber;
+                                    : allele.getAlleleName() + " translation too short";
                             }
                         }
                     }
                 });
                 assert !translationIterator.hasNext() : allele.getAlleleName() + " translation too long"; // should not have any leftover translation
+                allele.setNullAllele(allele.getAlleleName().endsWith("N"));
+                // Synonymous logic requires alleles to be processed in order
+                // (i.e., the "master" allele first).
+                {
+                    Pattern pattern = Pattern.compile("(HLA-DPB1\\*[0-9]*:[0-9]*)[:0-9N]*");
+                    Matcher matcherThis = pattern.matcher(allele.getAlleleName());
+                    matcherThis.find();
+                    Allele synonymousAllele = null;
+                    for(Allele candidateSynonymousAllele : alleleList) {
+                        Matcher matcherSyn = pattern.matcher(candidateSynonymousAllele.getAlleleName());
+                        matcherSyn.find();
+                        if(allele != candidateSynonymousAllele && matcherThis.group(1).equals(matcherSyn.group(1))) {
+                            synonymousAllele = candidateSynonymousAllele;
+                            break;
+                        }
+                    }
+                    if(synonymousAllele != null) {
+                        String proteinSequenceThis = allele.getCodonMap().values().stream().map(Codon::getAminoAcid).collect(Collectors.joining());
+                        String proteinSequenceSyn = synonymousAllele.getCodonMap().values().stream().map(Codon::getAminoAcid).collect(Collectors.joining());
+                        if(allele.getNullAllele()) {
+                            if(proteinSequenceThis.endsWith("X")) {
+                                proteinSequenceThis = proteinSequenceThis.substring(0, proteinSequenceThis.length() - 1);
+                            }
+                        }
+                        assert
+                            proteinSequenceSyn.contains(proteinSequenceThis)
+                            || proteinSequenceThis.contains(proteinSequenceSyn)
+                            : allele.getAlleleName() + " is not really synonymous with " + synonymousAllele.getAlleleName();
+                        allele.setSynonymousAlleleName(synonymousAllele.getAlleleName());
+                        allele.setSynonymousAlleleProteinShorter(!proteinSequenceSyn.contains(proteinSequenceThis));
+                    }
+                }
             });
             LOG.info(String.format("%d HLA-DPB1 alleles loaded", alleleList.size()));
             LOG.info(String.format("version is %s", alleleList.get(0).getVersion()));
@@ -88,9 +123,13 @@ public class AlleleFinder {
                     alleleProteinSequence.append(codon == null ? "*" : codon.getAminoAcid());
                 });
                 allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), alleleProteinSequence.toString()); // default if the protein sequence does not match an established hypervariable region variant
+                allele.setSingleAntigenBead(false);
                 hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
                     hvrVariant.getProteinSequenceList().stream().filter((proteinSequence) -> (alleleProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
                         allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), hvrVariant.getVariantId());
+                        hvrVariant.getBeadAlleleNameList().stream().filter((beadAlleleName) -> (allele.getAlleleName().startsWith(beadAlleleName))).findFirst().ifPresent((beadAlleleName) -> {
+                            allele.setSingleAntigenBead(true);
+                        });
                     });
                 });
             });
