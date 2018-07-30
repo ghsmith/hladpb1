@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/hladpb1-webServices">
+    <Parameter name="imgtXmlFileName" value="/home/priam/Documents/java/hladpb1/hladpb1-imgtDb/data/hla.xml"/>
+    <Parameter name="emoryXmlFileName" value="/home/priam/Documents/java/hladpb1/hladpb1-imgtDb/data/hladpb1HypervariableRegion.xml"/>
+</Context>
