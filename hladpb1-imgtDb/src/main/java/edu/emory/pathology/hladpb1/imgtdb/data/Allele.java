@@ -17,6 +17,7 @@ public class Allele {
     private String synonymousAlleleName;
     private Boolean synonymousAlleleProteinShorter;
     private Boolean singleAntigenBead;
+    private Boolean referenceAllele;
     private Boolean recipientAntibody;
     private Boolean recipientType;
     private Boolean donorType;
@@ -91,6 +92,14 @@ public class Allele {
 
     public void setSingleAntigenBead(Boolean singleAntigenBead) {
         this.singleAntigenBead = singleAntigenBead;
+    }
+
+    public Boolean getReferenceAllele() {
+        return referenceAllele;
+    }
+
+    public void setReferenceAllele(Boolean referenceAllele) {
+        this.referenceAllele = referenceAllele;
     }
 
     public Boolean getRecipientAntibody() {

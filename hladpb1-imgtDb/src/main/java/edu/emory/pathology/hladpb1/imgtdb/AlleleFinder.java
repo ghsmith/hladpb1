@@ -64,7 +64,8 @@ public class AlleleFinder {
                             if(translationIterator.hasNext()) {
                                 if(allele.getCodonMap().size() > 0 || positionInCodon == 1) { // IMGT translation starts with first whole codon
                                     Codon codon = new Codon();
-                                    allele.getCodonMap().put(codonNumber, codon);
+                                    codon.setCodonNumber(codonNumber);
+                                    allele.getCodonMap().put(codon.getCodonNumber(), codon);
                                     codon.setAminoAcid(String.format("%c", translationIterator.next()));
                                 }
                             }
@@ -129,15 +130,18 @@ public class AlleleFinder {
         getAlleleList().stream().forEach((allele) -> {
             allele.setHvrVariantMap(new TreeMap<>());
             hypervariableRegionList.stream().forEach((hypervariableRegion) -> {
-                StringBuilder alleleProteinSequence = new StringBuilder();
+                StringBuilder hvrProteinSequence = new StringBuilder();
                 hypervariableRegion.getCodonNumberList().stream().forEach((codonNumber) -> {
                     Codon codon = allele.getCodonMap().get(codonNumber);
-                    alleleProteinSequence.append(codon == null ? "*" : codon.getAminoAcid());
+                    if(codon != null) {
+                        codon.setHypervariableRegionName(hypervariableRegion.getHypervariableRegionName());
+                    }
+                    hvrProteinSequence.append(codon == null ? "*" : codon.getAminoAcid());
                 });
-                allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), alleleProteinSequence.toString()); // default if the protein sequence does not match an established hypervariable region variant
+                allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), hvrProteinSequence.toString()); // default if the protein sequence does not match an established hypervariable region variant
                 allele.setSingleAntigenBead(false);
                 hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
-                    hvrVariant.getProteinSequenceList().stream().filter((proteinSequence) -> (alleleProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
+                    hvrVariant.getProteinSequenceList().stream().filter((proteinSequence) -> (hvrProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
                         allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), hvrVariant.getVariantId());
                         hvrVariant.getBeadAlleleNameList().stream().filter((beadAlleleName) -> (allele.getAlleleName().startsWith(beadAlleleName))).findFirst().ifPresent((beadAlleleName) -> {
                             allele.setSingleAntigenBead(true);
@@ -151,6 +155,7 @@ public class AlleleFinder {
     public void assignHypervariableRegionVariantMatches(String referenceAlleleName) throws JAXBException {
         Allele referenceAllele = getAllele(referenceAlleleName);
         getAlleleList().stream().forEach((allele) -> {
+            allele.setReferenceAllele(referenceAllele.equals(allele));
             allele.setHvrMatchCount((int)referenceAllele.getHvrVariantMap().keySet().stream().filter((hvrName) -> (
                 referenceAllele.getHvrVariantMap().get(hvrName).equals(allele.getHvrVariantMap().get(hvrName)))).count()
             );
