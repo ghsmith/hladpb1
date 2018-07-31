@@ -8,6 +8,7 @@ import java.util.SortedMap;
  */
 public class Allele {
 
+    private Integer sequenceNumber;
     private String version;
     private String alleleName;
     private SortedMap<String, String> hvrVariantMap;
@@ -22,6 +23,14 @@ public class Allele {
     private Boolean recipientType;
     private Boolean donorType;
 
+    public Integer getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public void setSequenceNumber(Integer sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
+    
     public String getVersion() {
         return version;
     }

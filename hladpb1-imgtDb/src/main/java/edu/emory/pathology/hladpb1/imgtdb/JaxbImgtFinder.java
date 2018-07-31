@@ -18,7 +18,7 @@ public class JaxbImgtFinder {
 
     private static final Logger LOG = Logger.getLogger(JaxbImgtFinder.class.getName());
 
-    private String xmlFileName = "data/hla.xml";
+    private String xmlFileName = "/tmp/hla.xml";
     private Alleles alleles;
 
     public JaxbImgtFinder() {

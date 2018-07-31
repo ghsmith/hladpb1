@@ -17,7 +17,7 @@ public class JaxbEmoryFinder {
 
     private static final Logger LOG = Logger.getLogger(JaxbEmoryFinder.class.getName());
 
-    private String xmlFileName = "data/hladpb1HypervariableRegion.xml";
+    private String xmlFileName = "/tmp/hladpb1HypervariableRegion.xml";
     private ReagentLots reagentLots;
 
     public JaxbEmoryFinder() {
