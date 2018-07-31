@@ -143,11 +143,13 @@ public class AlleleFinder {
                     }
                     hvrProteinSequence.append(codon == null ? "*" : codon.getAminoAcid());
                 });
-                allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), hvrProteinSequence.toString()); // default if the protein sequence does not match an established hypervariable region variant
+                Allele.HypervariableRegionVariantRef hvrvRef = new Allele.HypervariableRegionVariantRef();
+                allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), hvrvRef);
+                hvrvRef.variantId = hvrProteinSequence.toString(); // default if the protein sequence does not match an established hypervariable region variant
                 allele.setSingleAntigenBead(false);
                 hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
                     hvrVariant.getProteinSequenceList().stream().filter((proteinSequence) -> (hvrProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
-                        allele.getHvrVariantMap().put(hypervariableRegion.getHypervariableRegionName(), hvrVariant.getVariantId());
+                        hvrvRef.variantId = hvrVariant.getVariantId();
                         hvrVariant.getBeadAlleleNameList().stream().filter((beadAlleleName) -> (allele.getAlleleName().startsWith(beadAlleleName))).findFirst().ifPresent((beadAlleleName) -> {
                             allele.setSingleAntigenBead(true);
                         });
@@ -162,8 +164,24 @@ public class AlleleFinder {
         getAlleleList().stream().forEach((allele) -> {
             allele.setReferenceAllele(referenceAllele.equals(allele));
             allele.setHvrMatchCount((int)referenceAllele.getHvrVariantMap().keySet().stream().filter((hvrName) -> (
-                referenceAllele.getHvrVariantMap().get(hvrName).equals(allele.getHvrVariantMap().get(hvrName)))).count()
+                referenceAllele.getHvrVariantMap().get(hvrName).variantId.equals(allele.getHvrVariantMap().get(hvrName).variantId))).count()
             );
+            allele.getHvrVariantMap().keySet().stream().forEach((hvrName) -> {
+                allele.getHvrVariantMap().get(hvrName).matchesReference
+                    = referenceAllele.getHvrVariantMap().get(hvrName).variantId
+                    .equals(allele.getHvrVariantMap().get(hvrName).variantId);
+            });
+            allele.getCodonMap().keySet().stream().forEach((codonNumber) -> {
+                allele.getCodonMap().get(codonNumber).setMatchesReference(null);
+                if(allele.getCodonMap().get(codonNumber) != null) {
+                    if(referenceAllele.getCodonMap().get(codonNumber) != null) {
+                        allele.getCodonMap().get(codonNumber).setMatchesReference(
+                            referenceAllele.getCodonMap().get(codonNumber).getAminoAcid()
+                            .equals(allele.getCodonMap().get(codonNumber).getAminoAcid())
+                        );
+                    }
+                }
+            });
         });
     }
     

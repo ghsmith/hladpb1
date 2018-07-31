@@ -53,7 +53,7 @@ td.diff.hypervariable {
         <thead>
             <tr>
                 <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
-                <th></th>
+                <th>[<a id="sabFilter" href="javascript:void(0);">filter</a>]</th>
                 <th>[<a id="hvrMatchCountSort" href="javascript:void(0);">sort</a>]</th>
                 <th colspan="6" style="border-bottom: 1px solid black;">hypervariable<br/>region ID</th>
                 <th>&nbsp;</th>
@@ -63,12 +63,12 @@ td.diff.hypervariable {
                 <th data-name="allele.alleleName" class="alleleName">allele name</th>
                 <th data-name="allele.singleAntigenBead ? 'Y' : 'N'">SAB</th>
                 <th data-name="allele.hvrMatchCount">matches</th>
-                <th data-name="'a' + allele.hvrVariantMap['a']">a</th>
-                <th data-name="'b' + allele.hvrVariantMap['b']">b</th>
-                <th data-name="'c' + allele.hvrVariantMap['c']">c</th>
-                <th data-name="'d' + allele.hvrVariantMap['d']">d</th>
-                <th data-name="'e' + allele.hvrVariantMap['e']">e</th>
-                <th data-name="'f' + allele.hvrVariantMap['f']">f</th>
+                <th data-name="'a' + allele.hvrVariantMap['a'].variantId">a</th>
+                <th data-name="'b' + allele.hvrVariantMap['b'].variantId">b</th>
+                <th data-name="'c' + allele.hvrVariantMap['c'].variantId">c</th>
+                <th data-name="'d' + allele.hvrVariantMap['d'].variantId">d</th>
+                <th data-name="'e' + allele.hvrVariantMap['e'].variantId">e</th>
+                <th data-name="'f' + allele.hvrVariantMap['f'].variantId">f</th>
                 <th>&nbsp;</th>
                 <c:forEach var="codonNumber" begin="1" end="100">
                     <th data-name="allele.codonMap['${codonNumber}'] == undefined ? '' : allele.codonMap['${codonNumber}'].aminoAcid" class="codon ${codonNumber % 10 == 0 ? "index" : ""}">${codonNumber % 10 == 0 ? codonNumber : "&nbsp;"}</th>                
@@ -104,7 +104,7 @@ function putAllele(allele) {
 // Get all alleles and refresh the hypervariable region matches.
 function getAlleles() {
     $.ajax({
-        url: "/hladpb1-webServices/resources/alleles",
+        url: "/hladpb1-webServices/resources/alleles?synonymous=null", // filter out synonymous alleles
         dataType: "json"
     }).done(function(response) {
         alleles = response;
@@ -115,11 +115,12 @@ function getAlleles() {
     });
 }
 
+// Document ready! Let's go...
 $(document).ready(function() {
 
     // Initially populate the report table.
     $.ajax({
-        url: "/hladpb1-webServices/resources/alleles",
+        url: "/hladpb1-webServices/resources/alleles?synonymous=null", // filter out synonymous alleles
         dataType: "json"
     }).done(function(response) {
         alleles = response;
@@ -129,7 +130,7 @@ $(document).ready(function() {
             $("#columnNames th").each(function(index) {
                 var val = eval($(this).data("name"));
                 var classs = $(this).attr("class");
-                rowHtml.push("<td " + (classs == undefined ? "" : "class='" + classs + "'") + ">" + (val == undefined ? "" : val) + "</td>");
+                rowHtml.push("<td data-name=\"" + $(this).data("name") + "\" " + (classs == undefined ? "" : "class='" + classs + "'") + ">" + (val == undefined ? "" : val) + "</td>");
             });
             rowHtml.push("</tr>");
         });

@@ -7,8 +7,9 @@ package edu.emory.pathology.hladpb1.imgtdb.data;
 public class Codon {
 
     private Integer codonNumber;
-    private String hypervariableRegionName;
     private String aminoAcid;
+    private String hypervariableRegionName;
+    private Boolean matchesReference;
 
     public Integer getCodonNumber() {
         return codonNumber;
@@ -16,6 +17,14 @@ public class Codon {
 
     public void setCodonNumber(Integer codonNumber) {
         this.codonNumber = codonNumber;
+    }
+
+    public String getAminoAcid() {
+        return aminoAcid;
+    }
+
+    public void setAminoAcid(String aminoAcid) {
+        this.aminoAcid = aminoAcid;
     }
 
     public String getHypervariableRegionName() {
@@ -26,12 +35,12 @@ public class Codon {
         this.hypervariableRegionName = hypervariableRegionName;
     }
 
-    public String getAminoAcid() {
-        return aminoAcid;
+    public Boolean getMatchesReference() {
+        return matchesReference;
     }
 
-    public void setAminoAcid(String aminoAcid) {
-        this.aminoAcid = aminoAcid;
+    public void setMatchesReference(Boolean matchesReference) {
+        this.matchesReference = matchesReference;
     }
     
 }

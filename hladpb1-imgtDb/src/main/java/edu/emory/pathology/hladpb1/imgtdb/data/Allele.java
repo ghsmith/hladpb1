@@ -8,10 +8,17 @@ import java.util.SortedMap;
  */
 public class Allele {
 
+    // Inner class to make it convenient to reference hypervariable region with
+    // the matchesReference attribute.
+    public static class HypervariableRegionVariantRef {
+        public String variantId;
+        public Boolean matchesReference;
+    }
+    
     private Integer sequenceNumber;
     private String version;
     private String alleleName;
-    private SortedMap<String, String> hvrVariantMap;
+    private SortedMap<String, HypervariableRegionVariantRef> hvrVariantMap;
     private Integer hvrMatchCount;
     private SortedMap<Integer, Codon> codonMap;
     private Boolean nullAllele;
@@ -47,11 +54,11 @@ public class Allele {
         this.alleleName = alleleName;
     }
 
-    public SortedMap<String, String> getHvrVariantMap() {
+    public SortedMap<String, HypervariableRegionVariantRef> getHvrVariantMap() {
         return hvrVariantMap;
     }
 
-    public void setHvrVariantMap(SortedMap<String, String> hvrVariantMap) {
+    public void setHvrVariantMap(SortedMap<String, HypervariableRegionVariantRef> hvrVariantMap) {
         this.hvrVariantMap = hvrVariantMap;
     }
 
