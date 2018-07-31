@@ -1,69 +1,179 @@
 <!DOCTYPE html>
+<%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
+
 <html>
-    <head>
 
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+<head>
 
-        <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
-        <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 
-        <style>
+<style>
+           
+body {
+    font-family: monospace;
+}
+th.index, td.index {
+    border-left: 3px solid black;
+}
+th, td {
+    text-align: center;
+}
+th.alleleName, td.alleleName {
+    text-align: left;
+}
+th.codon, td.codon {
+    text-align: right;
+}
+td {
+    white-space: nowrap;
+}
+td.hypervariable {
+    border: 1px solid black;
+}
+td.diff {
+    color: yellow;
+    background-color: gray;
+}
+td.diff.hypervariable {
+    color: yellow;
+    background-color: black;
+}
             
-            td {
-                white-space: nowrap;
-            }
-            
-        </style>
+</style>
         
-    </head>
+</head>
 
-    <body>
+<body>
 
-        <div id="jsGrid"></div>
+    <h1>HLA-DPB1 Allele Difference Report (dynamic HTML version)</h1>
 
-    </body>
+    <table id="reportTable" cellspacing="0">
+        <thead>
+            <tr>
+                <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
+                <th></th>
+                <th>[<a id="hvrMatchCountSort" href="javascript:void(0);">sort</a>]</th>
+                <th colspan="6" style="border-bottom: 1px solid black;">hypervariable<br/>region ID</th>
+                <th>&nbsp;</th>
+                <th colspan="100" style="border-bottom: 1px solid black;">protein sequence (aligned to HLA-DPB1*01:01 codons 1-100)</th>
+            </tr>
+            <tr id="columnNames">
+                <th data-name="allele.alleleName" class="alleleName">allele name</th>
+                <th data-name="allele.singleAntigenBead ? 'Y' : 'N'">SAB</th>
+                <th data-name="allele.hvrMatchCount">matches</th>
+                <th data-name="'a' + allele.hvrVariantMap['a']">a</th>
+                <th data-name="'b' + allele.hvrVariantMap['b']">b</th>
+                <th data-name="'c' + allele.hvrVariantMap['c']">c</th>
+                <th data-name="'d' + allele.hvrVariantMap['d']">d</th>
+                <th data-name="'e' + allele.hvrVariantMap['e']">e</th>
+                <th data-name="'f' + allele.hvrVariantMap['f']">f</th>
+                <th>&nbsp;</th>
+                <c:forEach var="codonNumber" begin="1" end="100">
+                    <th data-name="allele.codonMap['${codonNumber}'] == undefined ? '' : allele.codonMap['${codonNumber}'].aminoAcid" class="codon ${codonNumber % 10 == 0 ? "index" : ""}">${codonNumber % 10 == 0 ? codonNumber : "&nbsp;"}</th>                
+                </c:forEach>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+        
+</body>
 
 </html>
 
 <script>
 
-    $("#jsGrid").jsGrid({
-        width: "100%",
-        height: "80vh",
+var alleles // The array of alleles.
 
-        sorting: true,
-        paging: false,
-        autoload: true,
-
-        controller: {
-            loadData: function() {
-                var d = $.Deferred();
-                $.ajax({
-                    url: "<%= request.getContextPath() %>/resources/alleles",
-                    dataType: "json"
-                }).done(function(response) {
-                    d.resolve(response);
-                });
-                return d.promise();
-            }
-        },
-        
-        fields: [
-            { name: "alleleName", title: "Allele Name", type: "text" },
-            { name: "c1", title: "1", type: "text" },
-            { name: "c10", title: "", type: "text" },
-            { name: "c20", title: "", type: "text" },
-            { name: "c30", title: "", type: "text" },
-            { name: "c40", title: "", type: "text" },
-            { name: "c50", title: "", type: "text" },
-            { name: "c60", title: "", type: "text" },
-            { name: "c70", title: "", type: "text" },
-            { name: "c80", title: "", type: "text" },
-            { name: "c90", title: "10", type: "text" }
-        ]
+// Put an allele. With this report, this is only used to set the current
+// reference allele.
+function putAllele(allele) {
+    $.ajax({
+        url: "/hladpb1-webServices/resources/alleles/" + allele.alleleName,
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(allele)
+    }).done(function(response) {
+        getAlleles();
     });
+}
+
+// Get all alleles and refresh the hypervariable region matches.
+function getAlleles() {
+    $.ajax({
+        url: "/hladpb1-webServices/resources/alleles",
+        dataType: "json"
+    }).done(function(response) {
+        alleles = response;
+        $("#reportTable tbody tr").each(function() {
+            var alleleName = $(this).data("value");
+            $(this).children("td").eq(2).html(alleles.find(function(allele) { return alleleName == allele.alleleName; }).hvrMatchCount);
+        });
+    });
+}
+
+$(document).ready(function() {
+
+    // Initially populate the report table.
+    $.ajax({
+        url: "/hladpb1-webServices/resources/alleles",
+        dataType: "json"
+    }).done(function(response) {
+        alleles = response;
+        var rowHtml = [];
+        alleles.forEach(function(allele) {
+            rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "'>");
+            $("#columnNames th").each(function(index) {
+                var val = eval($(this).data("name"));
+                var classs = $(this).attr("class");
+                rowHtml.push("<td " + (classs == undefined ? "" : "class='" + classs + "'") + ">" + (val == undefined ? "" : val) + "</td>");
+            });
+            rowHtml.push("</tr>");
+        });
+        $("#reportTable tbody").append(rowHtml.join(""));
+    });
+
+    // Click on a row to set it as the reference allele.
+    $("#reportTable tbody").on("click", "tr", function() {
+        var alleleName = $(this).data("value");
+        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+        allele.referenceAllele = true;
+        putAllele(allele);
+    });
+
+    // Click on sort.
+    $("#alleleNameSort").click(function() {
+        var rows = $('#reportTable tbody tr').get();
+        rows.sort(function(a, b) {
+            var A = $(a).data("sequence");
+            var B = $(b).data("sequence");
+            if(A < B)      { return -1; }
+            else if(A > B) { return  1; }
+            else           { return  0; }
+        });
+        $.each(rows, function(index, row) {
+          $('#reportTable').children('tbody').append(row);
+        });
+    });
+    
+    // Click on sort.
+    $("#hvrMatchCountSort").click(function() {
+        var rows = $('#reportTable tbody tr').get();
+        rows.sort(function(a, b) {
+            var A = $(a).children("td").eq(2).html();
+            var B = $(b).children("td").eq(2).html();
+            if(A < B)      { return  1; }
+            else if(A > B) { return -1; }
+            else           { return  0; }
+        });
+        $.each(rows, function(index, row) {
+          $('#reportTable').children('tbody').append(row);
+        });
+    });
+    
+});
 
 </script>
