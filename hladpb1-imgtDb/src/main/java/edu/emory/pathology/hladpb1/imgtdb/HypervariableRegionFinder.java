@@ -60,5 +60,9 @@ public class HypervariableRegionFinder {
         LOG.info(String.format("lot number %s", reagentLotNumber));
         return hypervariableRegionList;
     }
-    
+
+    public String getReagentLotNumber() {
+        return reagentLotNumber;
+    }
+
 }
