@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+
+<style>
+           
+body {
+    font-family: monospace;
+}
+tr.referenceAllele {
+    background-color: yellow;
+}
+th, td {
+    text-align: center;
+    white-space: nowrap;
+}
+th.index, td.index {
+    border-left: 3px solid black;
+}
+th.alleleName, td.alleleName {
+    text-align: left;
+}
+th.hvrId, td.hvrId {
+    text-align: center;
+}
+th.codon, td.codon {
+    text-align: right;
+}
+td.codon.hypervariableRegion {
+    font-weight: bold;
+    border: 1px solid black;
+}
+td.mismatch {
+    background-color: lightgray;
+}
+a.filterEnabled {
+    background-color: lightgreen;
+}
+
+</style>
+
+<title>HLA-DPB1 Allele Difference Report</title>
+        
+</head>
+
+<body>
+
+    <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white;">working...</div>
+
+    <h1>HLA-DPB1 Allele Difference Report</h1>
+    
+    <p>
+        The reference allele for hypervariable region matching is highlighted in
+        yellow. This report only shows the lowest allele number for synonymous
+        alleles. Click on a row to set that allele as the reference allele. By
+        default, this report only shows alleles where there are at least 4
+        hypervariable region matches to the reference allele, but you may toggle
+        this filter on and off.
+    </p>   
+    <p>
+        The IMGT allele database version is <span id="imgtDbVersion">...</span>
+        and the single antigen bead (SAB) reagent lot number is
+        <span id="reagentLotNumber">...</span>. This report is for research use
+        only.
+    </p>
+    <p>
+        <table>
+            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">alleles are loaded</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">alleles match filter criteria</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">alleles are not visible</td></tr>
+        </table>
+    </p>
+    
+    <table id="reportTable" cellspacing="0">
+        <thead>
+            <tr>
+                <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
+                <th>[<a id="sabFilter" href="javascript:void(0);">filter=Y</a>]</th>
+                <th>[<a id="hvrMatchCountGe4Filter" href="javascript:void(0);">filter&ge;4)</a>]<br/>[<a id="hvrMatchCountSort" href="javascript:void(0);">sort</a>]</th>
+                <th colspan="6" style="border-bottom: 1px solid black;">hypervariable<br/>region ID</th>
+                <th>&nbsp;</th>
+                <th colspan="100" style="border-bottom: 1px solid black;">protein sequence (aligned to HLA-DPB1*01:01 codons 1-100)</th>
+            </tr>
+            <tr id="columnNames">
+                <th data-name="allele.alleleName" class="alleleName">allele name</th>
+                <th data-name="allele.singleAntigenBead ? 'Y' : '&nbsp;'">SAB</th>
+                <th data-name="allele.hvrMatchCount">matches</th>
+                <th data-name="'a' + allele.hvrVariantMap['a'].variantId" data-container="allele.hvrVariantMap['a']" class="hvrId">a</th>
+                <th data-name="'b' + allele.hvrVariantMap['b'].variantId" data-container="allele.hvrVariantMap['b']" class="hvrId">b</th>
+                <th data-name="'c' + allele.hvrVariantMap['c'].variantId" data-container="allele.hvrVariantMap['c']" class="hvrId">c</th>
+                <th data-name="'d' + allele.hvrVariantMap['d'].variantId" data-container="allele.hvrVariantMap['d']" class="hvrId">d</th>
+                <th data-name="'e' + allele.hvrVariantMap['e'].variantId" data-container="allele.hvrVariantMap['e']" class="hvrId">e</th>
+                <th data-name="'f' + allele.hvrVariantMap['f'].variantId" data-container="allele.hvrVariantMap['f']" class="hvrId">f</th>
+                <th>&nbsp;</th>
+                <th data-name="allele.codonMap['1'] == undefined ? '&nbsp;' : allele.codonMap['1'].aminoAcid" data-container="allele.codonMap['1'] == undefined ? '' : allele.codonMap['1']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['2'] == undefined ? '&nbsp;' : allele.codonMap['2'].aminoAcid" data-container="allele.codonMap['2'] == undefined ? '' : allele.codonMap['2']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['3'] == undefined ? '&nbsp;' : allele.codonMap['3'].aminoAcid" data-container="allele.codonMap['3'] == undefined ? '' : allele.codonMap['3']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['4'] == undefined ? '&nbsp;' : allele.codonMap['4'].aminoAcid" data-container="allele.codonMap['4'] == undefined ? '' : allele.codonMap['4']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['5'] == undefined ? '&nbsp;' : allele.codonMap['5'].aminoAcid" data-container="allele.codonMap['5'] == undefined ? '' : allele.codonMap['5']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['6'] == undefined ? '&nbsp;' : allele.codonMap['6'].aminoAcid" data-container="allele.codonMap['6'] == undefined ? '' : allele.codonMap['6']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['7'] == undefined ? '&nbsp;' : allele.codonMap['7'].aminoAcid" data-container="allele.codonMap['7'] == undefined ? '' : allele.codonMap['7']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['8'] == undefined ? '&nbsp;' : allele.codonMap['8'].aminoAcid" data-container="allele.codonMap['8'] == undefined ? '' : allele.codonMap['8']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['9'] == undefined ? '&nbsp;' : allele.codonMap['9'].aminoAcid" data-container="allele.codonMap['9'] == undefined ? '' : allele.codonMap['9']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['10'] == undefined ? '&nbsp;' : allele.codonMap['10'].aminoAcid" data-container="allele.codonMap['10'] == undefined ? '' : allele.codonMap['10']" class="codon index">10</th><th data-name="allele.codonMap['11'] == undefined ? '&nbsp;' : allele.codonMap['11'].aminoAcid" data-container="allele.codonMap['11'] == undefined ? '' : allele.codonMap['11']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['12'] == undefined ? '&nbsp;' : allele.codonMap['12'].aminoAcid" data-container="allele.codonMap['12'] == undefined ? '' : allele.codonMap['12']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['13'] == undefined ? '&nbsp;' : allele.codonMap['13'].aminoAcid" data-container="allele.codonMap['13'] == undefined ? '' : allele.codonMap['13']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['14'] == undefined ? '&nbsp;' : allele.codonMap['14'].aminoAcid" data-container="allele.codonMap['14'] == undefined ? '' : allele.codonMap['14']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['15'] == undefined ? '&nbsp;' : allele.codonMap['15'].aminoAcid" data-container="allele.codonMap['15'] == undefined ? '' : allele.codonMap['15']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['16'] == undefined ? '&nbsp;' : allele.codonMap['16'].aminoAcid" data-container="allele.codonMap['16'] == undefined ? '' : allele.codonMap['16']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['17'] == undefined ? '&nbsp;' : allele.codonMap['17'].aminoAcid" data-container="allele.codonMap['17'] == undefined ? '' : allele.codonMap['17']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['18'] == undefined ? '&nbsp;' : allele.codonMap['18'].aminoAcid" data-container="allele.codonMap['18'] == undefined ? '' : allele.codonMap['18']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['19'] == undefined ? '&nbsp;' : allele.codonMap['19'].aminoAcid" data-container="allele.codonMap['19'] == undefined ? '' : allele.codonMap['19']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['20'] == undefined ? '&nbsp;' : allele.codonMap['20'].aminoAcid" data-container="allele.codonMap['20'] == undefined ? '' : allele.codonMap['20']" class="codon index">20</th><th data-name="allele.codonMap['21'] == undefined ? '&nbsp;' : allele.codonMap['21'].aminoAcid" data-container="allele.codonMap['21'] == undefined ? '' : allele.codonMap['21']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['22'] == undefined ? '&nbsp;' : allele.codonMap['22'].aminoAcid" data-container="allele.codonMap['22'] == undefined ? '' : allele.codonMap['22']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['23'] == undefined ? '&nbsp;' : allele.codonMap['23'].aminoAcid" data-container="allele.codonMap['23'] == undefined ? '' : allele.codonMap['23']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['24'] == undefined ? '&nbsp;' : allele.codonMap['24'].aminoAcid" data-container="allele.codonMap['24'] == undefined ? '' : allele.codonMap['24']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['25'] == undefined ? '&nbsp;' : allele.codonMap['25'].aminoAcid" data-container="allele.codonMap['25'] == undefined ? '' : allele.codonMap['25']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['26'] == undefined ? '&nbsp;' : allele.codonMap['26'].aminoAcid" data-container="allele.codonMap['26'] == undefined ? '' : allele.codonMap['26']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['27'] == undefined ? '&nbsp;' : allele.codonMap['27'].aminoAcid" data-container="allele.codonMap['27'] == undefined ? '' : allele.codonMap['27']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['28'] == undefined ? '&nbsp;' : allele.codonMap['28'].aminoAcid" data-container="allele.codonMap['28'] == undefined ? '' : allele.codonMap['28']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['29'] == undefined ? '&nbsp;' : allele.codonMap['29'].aminoAcid" data-container="allele.codonMap['29'] == undefined ? '' : allele.codonMap['29']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['30'] == undefined ? '&nbsp;' : allele.codonMap['30'].aminoAcid" data-container="allele.codonMap['30'] == undefined ? '' : allele.codonMap['30']" class="codon index">30</th><th data-name="allele.codonMap['31'] == undefined ? '&nbsp;' : allele.codonMap['31'].aminoAcid" data-container="allele.codonMap['31'] == undefined ? '' : allele.codonMap['31']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['32'] == undefined ? '&nbsp;' : allele.codonMap['32'].aminoAcid" data-container="allele.codonMap['32'] == undefined ? '' : allele.codonMap['32']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['33'] == undefined ? '&nbsp;' : allele.codonMap['33'].aminoAcid" data-container="allele.codonMap['33'] == undefined ? '' : allele.codonMap['33']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['34'] == undefined ? '&nbsp;' : allele.codonMap['34'].aminoAcid" data-container="allele.codonMap['34'] == undefined ? '' : allele.codonMap['34']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['35'] == undefined ? '&nbsp;' : allele.codonMap['35'].aminoAcid" data-container="allele.codonMap['35'] == undefined ? '' : allele.codonMap['35']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['36'] == undefined ? '&nbsp;' : allele.codonMap['36'].aminoAcid" data-container="allele.codonMap['36'] == undefined ? '' : allele.codonMap['36']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['37'] == undefined ? '&nbsp;' : allele.codonMap['37'].aminoAcid" data-container="allele.codonMap['37'] == undefined ? '' : allele.codonMap['37']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['38'] == undefined ? '&nbsp;' : allele.codonMap['38'].aminoAcid" data-container="allele.codonMap['38'] == undefined ? '' : allele.codonMap['38']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['39'] == undefined ? '&nbsp;' : allele.codonMap['39'].aminoAcid" data-container="allele.codonMap['39'] == undefined ? '' : allele.codonMap['39']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['40'] == undefined ? '&nbsp;' : allele.codonMap['40'].aminoAcid" data-container="allele.codonMap['40'] == undefined ? '' : allele.codonMap['40']" class="codon index">40</th><th data-name="allele.codonMap['41'] == undefined ? '&nbsp;' : allele.codonMap['41'].aminoAcid" data-container="allele.codonMap['41'] == undefined ? '' : allele.codonMap['41']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['42'] == undefined ? '&nbsp;' : allele.codonMap['42'].aminoAcid" data-container="allele.codonMap['42'] == undefined ? '' : allele.codonMap['42']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['43'] == undefined ? '&nbsp;' : allele.codonMap['43'].aminoAcid" data-container="allele.codonMap['43'] == undefined ? '' : allele.codonMap['43']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['44'] == undefined ? '&nbsp;' : allele.codonMap['44'].aminoAcid" data-container="allele.codonMap['44'] == undefined ? '' : allele.codonMap['44']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['45'] == undefined ? '&nbsp;' : allele.codonMap['45'].aminoAcid" data-container="allele.codonMap['45'] == undefined ? '' : allele.codonMap['45']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['46'] == undefined ? '&nbsp;' : allele.codonMap['46'].aminoAcid" data-container="allele.codonMap['46'] == undefined ? '' : allele.codonMap['46']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['47'] == undefined ? '&nbsp;' : allele.codonMap['47'].aminoAcid" data-container="allele.codonMap['47'] == undefined ? '' : allele.codonMap['47']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['48'] == undefined ? '&nbsp;' : allele.codonMap['48'].aminoAcid" data-container="allele.codonMap['48'] == undefined ? '' : allele.codonMap['48']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['49'] == undefined ? '&nbsp;' : allele.codonMap['49'].aminoAcid" data-container="allele.codonMap['49'] == undefined ? '' : allele.codonMap['49']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['50'] == undefined ? '&nbsp;' : allele.codonMap['50'].aminoAcid" data-container="allele.codonMap['50'] == undefined ? '' : allele.codonMap['50']" class="codon index">50</th><th data-name="allele.codonMap['51'] == undefined ? '&nbsp;' : allele.codonMap['51'].aminoAcid" data-container="allele.codonMap['51'] == undefined ? '' : allele.codonMap['51']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['52'] == undefined ? '&nbsp;' : allele.codonMap['52'].aminoAcid" data-container="allele.codonMap['52'] == undefined ? '' : allele.codonMap['52']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['53'] == undefined ? '&nbsp;' : allele.codonMap['53'].aminoAcid" data-container="allele.codonMap['53'] == undefined ? '' : allele.codonMap['53']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['54'] == undefined ? '&nbsp;' : allele.codonMap['54'].aminoAcid" data-container="allele.codonMap['54'] == undefined ? '' : allele.codonMap['54']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['55'] == undefined ? '&nbsp;' : allele.codonMap['55'].aminoAcid" data-container="allele.codonMap['55'] == undefined ? '' : allele.codonMap['55']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['56'] == undefined ? '&nbsp;' : allele.codonMap['56'].aminoAcid" data-container="allele.codonMap['56'] == undefined ? '' : allele.codonMap['56']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['57'] == undefined ? '&nbsp;' : allele.codonMap['57'].aminoAcid" data-container="allele.codonMap['57'] == undefined ? '' : allele.codonMap['57']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['58'] == undefined ? '&nbsp;' : allele.codonMap['58'].aminoAcid" data-container="allele.codonMap['58'] == undefined ? '' : allele.codonMap['58']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['59'] == undefined ? '&nbsp;' : allele.codonMap['59'].aminoAcid" data-container="allele.codonMap['59'] == undefined ? '' : allele.codonMap['59']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['60'] == undefined ? '&nbsp;' : allele.codonMap['60'].aminoAcid" data-container="allele.codonMap['60'] == undefined ? '' : allele.codonMap['60']" class="codon index">60</th><th data-name="allele.codonMap['61'] == undefined ? '&nbsp;' : allele.codonMap['61'].aminoAcid" data-container="allele.codonMap['61'] == undefined ? '' : allele.codonMap['61']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['62'] == undefined ? '&nbsp;' : allele.codonMap['62'].aminoAcid" data-container="allele.codonMap['62'] == undefined ? '' : allele.codonMap['62']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['63'] == undefined ? '&nbsp;' : allele.codonMap['63'].aminoAcid" data-container="allele.codonMap['63'] == undefined ? '' : allele.codonMap['63']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['64'] == undefined ? '&nbsp;' : allele.codonMap['64'].aminoAcid" data-container="allele.codonMap['64'] == undefined ? '' : allele.codonMap['64']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['65'] == undefined ? '&nbsp;' : allele.codonMap['65'].aminoAcid" data-container="allele.codonMap['65'] == undefined ? '' : allele.codonMap['65']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['66'] == undefined ? '&nbsp;' : allele.codonMap['66'].aminoAcid" data-container="allele.codonMap['66'] == undefined ? '' : allele.codonMap['66']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['67'] == undefined ? '&nbsp;' : allele.codonMap['67'].aminoAcid" data-container="allele.codonMap['67'] == undefined ? '' : allele.codonMap['67']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['68'] == undefined ? '&nbsp;' : allele.codonMap['68'].aminoAcid" data-container="allele.codonMap['68'] == undefined ? '' : allele.codonMap['68']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['69'] == undefined ? '&nbsp;' : allele.codonMap['69'].aminoAcid" data-container="allele.codonMap['69'] == undefined ? '' : allele.codonMap['69']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['70'] == undefined ? '&nbsp;' : allele.codonMap['70'].aminoAcid" data-container="allele.codonMap['70'] == undefined ? '' : allele.codonMap['70']" class="codon index">70</th><th data-name="allele.codonMap['71'] == undefined ? '&nbsp;' : allele.codonMap['71'].aminoAcid" data-container="allele.codonMap['71'] == undefined ? '' : allele.codonMap['71']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['72'] == undefined ? '&nbsp;' : allele.codonMap['72'].aminoAcid" data-container="allele.codonMap['72'] == undefined ? '' : allele.codonMap['72']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['73'] == undefined ? '&nbsp;' : allele.codonMap['73'].aminoAcid" data-container="allele.codonMap['73'] == undefined ? '' : allele.codonMap['73']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['74'] == undefined ? '&nbsp;' : allele.codonMap['74'].aminoAcid" data-container="allele.codonMap['74'] == undefined ? '' : allele.codonMap['74']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['75'] == undefined ? '&nbsp;' : allele.codonMap['75'].aminoAcid" data-container="allele.codonMap['75'] == undefined ? '' : allele.codonMap['75']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['76'] == undefined ? '&nbsp;' : allele.codonMap['76'].aminoAcid" data-container="allele.codonMap['76'] == undefined ? '' : allele.codonMap['76']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['77'] == undefined ? '&nbsp;' : allele.codonMap['77'].aminoAcid" data-container="allele.codonMap['77'] == undefined ? '' : allele.codonMap['77']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['78'] == undefined ? '&nbsp;' : allele.codonMap['78'].aminoAcid" data-container="allele.codonMap['78'] == undefined ? '' : allele.codonMap['78']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['79'] == undefined ? '&nbsp;' : allele.codonMap['79'].aminoAcid" data-container="allele.codonMap['79'] == undefined ? '' : allele.codonMap['79']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['80'] == undefined ? '&nbsp;' : allele.codonMap['80'].aminoAcid" data-container="allele.codonMap['80'] == undefined ? '' : allele.codonMap['80']" class="codon index">80</th><th data-name="allele.codonMap['81'] == undefined ? '&nbsp;' : allele.codonMap['81'].aminoAcid" data-container="allele.codonMap['81'] == undefined ? '' : allele.codonMap['81']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['82'] == undefined ? '&nbsp;' : allele.codonMap['82'].aminoAcid" data-container="allele.codonMap['82'] == undefined ? '' : allele.codonMap['82']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['83'] == undefined ? '&nbsp;' : allele.codonMap['83'].aminoAcid" data-container="allele.codonMap['83'] == undefined ? '' : allele.codonMap['83']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['84'] == undefined ? '&nbsp;' : allele.codonMap['84'].aminoAcid" data-container="allele.codonMap['84'] == undefined ? '' : allele.codonMap['84']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['85'] == undefined ? '&nbsp;' : allele.codonMap['85'].aminoAcid" data-container="allele.codonMap['85'] == undefined ? '' : allele.codonMap['85']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['86'] == undefined ? '&nbsp;' : allele.codonMap['86'].aminoAcid" data-container="allele.codonMap['86'] == undefined ? '' : allele.codonMap['86']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['87'] == undefined ? '&nbsp;' : allele.codonMap['87'].aminoAcid" data-container="allele.codonMap['87'] == undefined ? '' : allele.codonMap['87']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['88'] == undefined ? '&nbsp;' : allele.codonMap['88'].aminoAcid" data-container="allele.codonMap['88'] == undefined ? '' : allele.codonMap['88']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['89'] == undefined ? '&nbsp;' : allele.codonMap['89'].aminoAcid" data-container="allele.codonMap['89'] == undefined ? '' : allele.codonMap['89']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['90'] == undefined ? '&nbsp;' : allele.codonMap['90'].aminoAcid" data-container="allele.codonMap['90'] == undefined ? '' : allele.codonMap['90']" class="codon index">90</th><th data-name="allele.codonMap['91'] == undefined ? '&nbsp;' : allele.codonMap['91'].aminoAcid" data-container="allele.codonMap['91'] == undefined ? '' : allele.codonMap['91']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['92'] == undefined ? '&nbsp;' : allele.codonMap['92'].aminoAcid" data-container="allele.codonMap['92'] == undefined ? '' : allele.codonMap['92']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['93'] == undefined ? '&nbsp;' : allele.codonMap['93'].aminoAcid" data-container="allele.codonMap['93'] == undefined ? '' : allele.codonMap['93']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['94'] == undefined ? '&nbsp;' : allele.codonMap['94'].aminoAcid" data-container="allele.codonMap['94'] == undefined ? '' : allele.codonMap['94']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['95'] == undefined ? '&nbsp;' : allele.codonMap['95'].aminoAcid" data-container="allele.codonMap['95'] == undefined ? '' : allele.codonMap['95']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['96'] == undefined ? '&nbsp;' : allele.codonMap['96'].aminoAcid" data-container="allele.codonMap['96'] == undefined ? '' : allele.codonMap['96']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['97'] == undefined ? '&nbsp;' : allele.codonMap['97'].aminoAcid" data-container="allele.codonMap['97'] == undefined ? '' : allele.codonMap['97']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['98'] == undefined ? '&nbsp;' : allele.codonMap['98'].aminoAcid" data-container="allele.codonMap['98'] == undefined ? '' : allele.codonMap['98']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['99'] == undefined ? '&nbsp;' : allele.codonMap['99'].aminoAcid" data-container="allele.codonMap['99'] == undefined ? '' : allele.codonMap['99']" class="codon ">&nbsp;</th><th data-name="allele.codonMap['100'] == undefined ? '&nbsp;' : allele.codonMap['100'].aminoAcid" data-container="allele.codonMap['100'] == undefined ? '' : allele.codonMap['100']" class="codon index">100</th>
+            </tr>
+            <tr id="hypervariableRegionNames">
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th data-name="allele.codonMap['1'] == undefined ? '&nbsp;' : allele.codonMap['1'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['2'] == undefined ? '&nbsp;' : allele.codonMap['2'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['3'] == undefined ? '&nbsp;' : allele.codonMap['3'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['4'] == undefined ? '&nbsp;' : allele.codonMap['4'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['5'] == undefined ? '&nbsp;' : allele.codonMap['5'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['6'] == undefined ? '&nbsp;' : allele.codonMap['6'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['7'] == undefined ? '&nbsp;' : allele.codonMap['7'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['8'] == undefined ? '&nbsp;' : allele.codonMap['8'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['9'] == undefined ? '&nbsp;' : allele.codonMap['9'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['10'] == undefined ? '&nbsp;' : allele.codonMap['10'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['11'] == undefined ? '&nbsp;' : allele.codonMap['11'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['12'] == undefined ? '&nbsp;' : allele.codonMap['12'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['13'] == undefined ? '&nbsp;' : allele.codonMap['13'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['14'] == undefined ? '&nbsp;' : allele.codonMap['14'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['15'] == undefined ? '&nbsp;' : allele.codonMap['15'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['16'] == undefined ? '&nbsp;' : allele.codonMap['16'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['17'] == undefined ? '&nbsp;' : allele.codonMap['17'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['18'] == undefined ? '&nbsp;' : allele.codonMap['18'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['19'] == undefined ? '&nbsp;' : allele.codonMap['19'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['20'] == undefined ? '&nbsp;' : allele.codonMap['20'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['21'] == undefined ? '&nbsp;' : allele.codonMap['21'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['22'] == undefined ? '&nbsp;' : allele.codonMap['22'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['23'] == undefined ? '&nbsp;' : allele.codonMap['23'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['24'] == undefined ? '&nbsp;' : allele.codonMap['24'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['25'] == undefined ? '&nbsp;' : allele.codonMap['25'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['26'] == undefined ? '&nbsp;' : allele.codonMap['26'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['27'] == undefined ? '&nbsp;' : allele.codonMap['27'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['28'] == undefined ? '&nbsp;' : allele.codonMap['28'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['29'] == undefined ? '&nbsp;' : allele.codonMap['29'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['30'] == undefined ? '&nbsp;' : allele.codonMap['30'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['31'] == undefined ? '&nbsp;' : allele.codonMap['31'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['32'] == undefined ? '&nbsp;' : allele.codonMap['32'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['33'] == undefined ? '&nbsp;' : allele.codonMap['33'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['34'] == undefined ? '&nbsp;' : allele.codonMap['34'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['35'] == undefined ? '&nbsp;' : allele.codonMap['35'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['36'] == undefined ? '&nbsp;' : allele.codonMap['36'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['37'] == undefined ? '&nbsp;' : allele.codonMap['37'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['38'] == undefined ? '&nbsp;' : allele.codonMap['38'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['39'] == undefined ? '&nbsp;' : allele.codonMap['39'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['40'] == undefined ? '&nbsp;' : allele.codonMap['40'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['41'] == undefined ? '&nbsp;' : allele.codonMap['41'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['42'] == undefined ? '&nbsp;' : allele.codonMap['42'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['43'] == undefined ? '&nbsp;' : allele.codonMap['43'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['44'] == undefined ? '&nbsp;' : allele.codonMap['44'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['45'] == undefined ? '&nbsp;' : allele.codonMap['45'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['46'] == undefined ? '&nbsp;' : allele.codonMap['46'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['47'] == undefined ? '&nbsp;' : allele.codonMap['47'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['48'] == undefined ? '&nbsp;' : allele.codonMap['48'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['49'] == undefined ? '&nbsp;' : allele.codonMap['49'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['50'] == undefined ? '&nbsp;' : allele.codonMap['50'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['51'] == undefined ? '&nbsp;' : allele.codonMap['51'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['52'] == undefined ? '&nbsp;' : allele.codonMap['52'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['53'] == undefined ? '&nbsp;' : allele.codonMap['53'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['54'] == undefined ? '&nbsp;' : allele.codonMap['54'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['55'] == undefined ? '&nbsp;' : allele.codonMap['55'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['56'] == undefined ? '&nbsp;' : allele.codonMap['56'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['57'] == undefined ? '&nbsp;' : allele.codonMap['57'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['58'] == undefined ? '&nbsp;' : allele.codonMap['58'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['59'] == undefined ? '&nbsp;' : allele.codonMap['59'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['60'] == undefined ? '&nbsp;' : allele.codonMap['60'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['61'] == undefined ? '&nbsp;' : allele.codonMap['61'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['62'] == undefined ? '&nbsp;' : allele.codonMap['62'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['63'] == undefined ? '&nbsp;' : allele.codonMap['63'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['64'] == undefined ? '&nbsp;' : allele.codonMap['64'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['65'] == undefined ? '&nbsp;' : allele.codonMap['65'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['66'] == undefined ? '&nbsp;' : allele.codonMap['66'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['67'] == undefined ? '&nbsp;' : allele.codonMap['67'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['68'] == undefined ? '&nbsp;' : allele.codonMap['68'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['69'] == undefined ? '&nbsp;' : allele.codonMap['69'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['70'] == undefined ? '&nbsp;' : allele.codonMap['70'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['71'] == undefined ? '&nbsp;' : allele.codonMap['71'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['72'] == undefined ? '&nbsp;' : allele.codonMap['72'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['73'] == undefined ? '&nbsp;' : allele.codonMap['73'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['74'] == undefined ? '&nbsp;' : allele.codonMap['74'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['75'] == undefined ? '&nbsp;' : allele.codonMap['75'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['76'] == undefined ? '&nbsp;' : allele.codonMap['76'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['77'] == undefined ? '&nbsp;' : allele.codonMap['77'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['78'] == undefined ? '&nbsp;' : allele.codonMap['78'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['79'] == undefined ? '&nbsp;' : allele.codonMap['79'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['80'] == undefined ? '&nbsp;' : allele.codonMap['80'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['81'] == undefined ? '&nbsp;' : allele.codonMap['81'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['82'] == undefined ? '&nbsp;' : allele.codonMap['82'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['83'] == undefined ? '&nbsp;' : allele.codonMap['83'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['84'] == undefined ? '&nbsp;' : allele.codonMap['84'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['85'] == undefined ? '&nbsp;' : allele.codonMap['85'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['86'] == undefined ? '&nbsp;' : allele.codonMap['86'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['87'] == undefined ? '&nbsp;' : allele.codonMap['87'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['88'] == undefined ? '&nbsp;' : allele.codonMap['88'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['89'] == undefined ? '&nbsp;' : allele.codonMap['89'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['90'] == undefined ? '&nbsp;' : allele.codonMap['90'].hypervariableRegionName" class="codon index">&nbsp;</th><th data-name="allele.codonMap['91'] == undefined ? '&nbsp;' : allele.codonMap['91'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['92'] == undefined ? '&nbsp;' : allele.codonMap['92'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['93'] == undefined ? '&nbsp;' : allele.codonMap['93'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['94'] == undefined ? '&nbsp;' : allele.codonMap['94'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['95'] == undefined ? '&nbsp;' : allele.codonMap['95'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['96'] == undefined ? '&nbsp;' : allele.codonMap['96'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['97'] == undefined ? '&nbsp;' : allele.codonMap['97'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['98'] == undefined ? '&nbsp;' : allele.codonMap['98'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['99'] == undefined ? '&nbsp;' : allele.codonMap['99'].hypervariableRegionName" class="codon ">&nbsp;</th><th data-name="allele.codonMap['100'] == undefined ? '&nbsp;' : allele.codonMap['100'].hypervariableRegionName" class="codon index">&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+        
+</body>
+
+</html>
+
+<script>
+
+var reagentLotNumber; // the single antigen bead reagent lot number
+var alleles = []; // the array of alleles
+var sabOnly = false; // only show single antigen bead alleles
+var hvrMatchCountGe4Only = true; // only show alleles where the match count is ge 4
+
+// Get reagent lot number.
+function getReagentLotNumber() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1-webServices/resources/hypervariableRegions/reagentLotNumber",
+        dataType: "json"
+    }).then(function(response) {
+        reagentLotNumber = response;
+    });
+}
+
+// Get all alleles.
+function getAlleles() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1-webServices/resources/alleles?synonymous=false", // always filter out synonymous alleles
+        dataType: "json"
+    }).then(function(response) {
+        alleles = response;
+    });
+}
+
+// Put an allele. With this report, this is only used to set the current
+// reference allele.
+function putAllele(allele) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1-webServices/resources/alleles/" + allele.alleleName,
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(allele)
+    });
+}
+
+// Populate rows in the report table from the alleles array.
+function populateTableRows() {
+    $("#working").show();
+    $("#reportTable tbody tr").remove();
+    var rowHtml = [];
+    alleles.forEach(function(allele) {
+        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + (!isRowVisible(allele) ? " style='visibility: hidden;'" : "") + "'>");
+        $("#columnNames th").each(function(index) {
+            var name = $(this).data("name");
+            if(name == undefined) {
+                rowHtml.push("<td></td>");
+            }
+            else {
+                var val = eval(name);
+                var tagAttributes = $(this)[0].outerHTML;
+                tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));
+                rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "" : val) + "</td>");
+            }
+        });
+        rowHtml.push("</tr>");
+    });
+    $("#reportTable tbody").append(rowHtml.join(""));
+}
+
+// Set the UI state based on the hypervariable region matches.
+function setUiState() {
+    var dfr = $.Deferred();
+    $("#working").show();
+    setTimeout(function() {
+        $("#imgtDbVersion").html(alleles[0].version);
+        $("#reagentLotNumber").html(reagentLotNumber);
+        $("#sabFilter").removeClass("filterEnabled");
+        if(sabOnly) { $("#sabFilter").addClass("filterEnabled"); }
+        $("#hvrMatchCountGe4Filter").removeClass("filterEnabled");
+        if(hvrMatchCountGe4Only) { $("#hvrMatchCountGe4Filter").addClass("filterEnabled"); }
+        $("#hypervariableRegionNames").children("th").each(function() {
+            // This assumes that the first allele has all hypervariable regions
+            // represented.
+            var allele = alleles[0];
+            $(this).html(eval($(this).data("name")));
+        });
+        $("#reportTable tbody tr").each(function() {
+            var alleleName = $(this).data("value");
+            var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+            if(isRowVisible(allele)) { $(this).show(); }
+            else                     { $(this).hide(); }
+            $(this).removeClass("referenceAllele");
+            if(allele.referenceAllele) {
+                $(this).addClass("referenceAllele");
+            }
+            $(this).children("td").each(function() {
+                if($(this).data("name") == "allele.hvrMatchCount") {
+                    $(this).html(allele.hvrMatchCount);
+                }
+                if($(this).hasClass("hvrId")) {
+                    $(this).removeClass("mismatch");
+                    if(!eval($(this).data("container") + ".matchesReference")) {
+                        $(this).addClass("mismatch");
+                    }
+                }
+                if($(this).hasClass("codon") && $(this).html() != "&nbsp;") {
+                    $(this).removeClass("mismatch");
+                    if(!eval($(this).data("container") + ".matchesReference")) {
+                        $(this).addClass("mismatch");
+                    }
+                    if(eval($(this).data("container") + ".hypervariableRegionName") != null) {
+                        $(this).addClass("hypervariableRegion");
+                    }
+                }
+            });
+        });
+        $("#allelesLoaded").html($("#reportTable tbody tr").length);
+        $("#allelesShown").html($("#reportTable tbody tr:visible").length);
+        $("#allelesFiltered").html($("#reportTable tbody tr:hidden").length);
+        dfr.resolve();
+    }, 1);
+    return dfr.promise();
+}
+
+// Row filtering function.
+function isRowVisible(allele) {
+    rowVisible = true;
+    if(sabOnly && !allele.singleAntigenBead)             { rowVisible = false; }
+    if(hvrMatchCountGe4Only && allele.hvrMatchCount < 4) { rowVisible = false; }
+    return rowVisible;
+}
+
+// Sort function.
+function alleleNameSort(a, b) {
+    var A = $(a).data("sequence");
+    var B = $(b).data("sequence");
+    if(A < B)      { return -1; }
+    else if(A > B) { return  1; }
+    else           { return  0; }
+};
+
+// Sort function.
+function hvrMatchCountSort(a, b) {
+    var A = $(a).children("td").eq(2).html();
+    var B = $(b).children("td").eq(2).html();
+    if(A < B)      { return  1; }
+    else if(A > B) { return -1; }
+    else           { return alleleNameSort(a, b); }
+}
+
+// Document ready! Let's go...
+$(document).ready(function() {
+
+    // Initial population of report table.
+    getReagentLotNumber().then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+
+    // Click on a row to set it as the reference allele. Handled by web service.
+    $("#reportTable tbody").on("click", "tr", function() {
+        var alleleName = $(this).data("value");
+        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+        allele.referenceAllele = true;
+        putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
+    });
+
+    // Single antigen bead filter toggle on/off. This is handled locally.
+    $("#sabFilter").click(function() {
+        sabOnly = !sabOnly;
+        setUiState().done(function() { $("#working").hide(); });
+    });
+
+    // Match count filter toggle on/off. This is handled locally.
+    $("#hvrMatchCountGe4Filter").click(function() {
+        hvrMatchCountGe4Only = !hvrMatchCountGe4Only;
+        setUiState().done(function() { $("#working").hide(); });
+    });
+
+    // Click on sort. This is handled locally.
+    $("#alleleNameSort").click(function() {
+        $("#working").show();
+        setTimeout(function() {
+            var rows = $('#reportTable tbody tr').get();
+            rows.sort(alleleNameSort);
+            $.each(rows, function(index, row) {
+              $('#reportTable').children('tbody').append(row);
+            });
+            $("#working").hide();
+        }, 1);
+    });
+    
+    // Click on sort. This is handled locally.
+    $("#hvrMatchCountSort").click(function() {
+        $("#working").show();
+        setTimeout(function() {
+            var rows = $('#reportTable tbody tr').get();
+            rows.sort(hvrMatchCountSort);
+            $.each(rows, function(index, row) {
+              $('#reportTable').children('tbody').append(row);
+            });
+            $("#working").hide();
+        }, 1);
+    });
+    
+});
+
+</script>
+

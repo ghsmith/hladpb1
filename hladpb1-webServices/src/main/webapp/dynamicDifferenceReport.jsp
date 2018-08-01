@@ -65,10 +65,17 @@ a.filterEnabled {
         this filter on and off.
     </p>   
     <p>
-        The IMGT allele database version is <span id="imgtDbVersion"></span> and
-        the single antigen bead (SAB) reagent lot number is
-        <span id="reagentLotNumber"></span>. This report is for research use
+        The IMGT allele database version is <span id="imgtDbVersion">...</span>
+        and the single antigen bead (SAB) reagent lot number is
+        <span id="reagentLotNumber">...</span>. This report is for research use
         only.
+    </p>
+    <p>
+        <table>
+            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">alleles are loaded</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">alleles match filter criteria</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">alleles are not visible</td></tr>
+        </table>
     </p>
     
     <table id="reportTable" cellspacing="0">
@@ -138,7 +145,7 @@ function getReagentLotNumber() {
 function getAlleles() {
     $("#working").show();
     return $.ajax({
-        url: "/hladpb1-webServices/resources/alleles?synonymous=false&sab=" + sabOnly + "&hvrMatchCount=" + (hvrMatchCountGe4Only ? 4 : 0), // always filter out synonymous alleles
+        url: "/hladpb1-webServices/resources/alleles?synonymous=false", // always filter out synonymous alleles
         dataType: "json"
     }).then(function(response) {
         alleles = response;
@@ -164,7 +171,7 @@ function populateTableRows() {
     $("#reportTable tbody tr").remove();
     var rowHtml = [];
     alleles.forEach(function(allele) {
-        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "'>");
+        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + (!isRowVisible(allele) ? " style='visibility: hidden;'" : "") + "'>");
         $("#columnNames th").each(function(index) {
             var name = $(this).data("name");
             if(name == undefined) {
@@ -186,48 +193,63 @@ function populateTableRows() {
 function setUiState() {
     var dfr = $.Deferred();
     $("#working").show();
-    $("#imgtDbVersion").html(alleles[0].version);
-    $("#reagentLotNumber").html(reagentLotNumber);
-    $("#sabFilter").removeClass("filterEnabled");
-    if(sabOnly) { $("#sabFilter").addClass("filterEnabled"); }
-    $("#hvrMatchCountGe4Filter").removeClass("filterEnabled");
-    if(hvrMatchCountGe4Only) { $("#hvrMatchCountGe4Filter").addClass("filterEnabled"); }
-    $("#hypervariableRegionNames").children("th").each(function() {
-        // This assumes that the first allele has all hypervariable regions
-        // represented.
-        var allele = alleles[0];
-        $(this).html(eval($(this).data("name")));
-    });
-    $("#reportTable tbody tr").each(function() {
-        var alleleName = $(this).data("value");
-        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
-        $(this).removeClass("referenceAllele");
-        if(allele.referenceAllele) {
-            $(this).addClass("referenceAllele");
-        }
-        $(this).children("td").each(function() {
-            if($(this).data("name") == "allele.hvrMatchCount") {
-                $(this).html(allele.hvrMatchCount);
-            }
-            if($(this).hasClass("hvrId")) {
-                $(this).removeClass("mismatch");
-                if(!eval($(this).data("container") + ".matchesReference")) {
-                    $(this).addClass("mismatch");
-                }
-            }
-            if($(this).hasClass("codon") && $(this).html() != "&nbsp;") {
-                $(this).removeClass("mismatch");
-                if(!eval($(this).data("container") + ".matchesReference")) {
-                    $(this).addClass("mismatch");
-                }
-                if(eval($(this).data("container") + ".hypervariableRegionName") != null) {
-                    $(this).addClass("hypervariableRegion");
-                }
-            }
+    setTimeout(function() {
+        $("#imgtDbVersion").html(alleles[0].version);
+        $("#reagentLotNumber").html(reagentLotNumber);
+        $("#sabFilter").removeClass("filterEnabled");
+        if(sabOnly) { $("#sabFilter").addClass("filterEnabled"); }
+        $("#hvrMatchCountGe4Filter").removeClass("filterEnabled");
+        if(hvrMatchCountGe4Only) { $("#hvrMatchCountGe4Filter").addClass("filterEnabled"); }
+        $("#hypervariableRegionNames").children("th").each(function() {
+            // This assumes that the first allele has all hypervariable regions
+            // represented.
+            var allele = alleles[0];
+            $(this).html(eval($(this).data("name")));
         });
-    });
-    dfr.resolve();
+        $("#reportTable tbody tr").each(function() {
+            var alleleName = $(this).data("value");
+            var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+            if(isRowVisible(allele)) { $(this).show(); }
+            else                     { $(this).hide(); }
+            $(this).removeClass("referenceAllele");
+            if(allele.referenceAllele) {
+                $(this).addClass("referenceAllele");
+            }
+            $(this).children("td").each(function() {
+                if($(this).data("name") == "allele.hvrMatchCount") {
+                    $(this).html(allele.hvrMatchCount);
+                }
+                if($(this).hasClass("hvrId")) {
+                    $(this).removeClass("mismatch");
+                    if(!eval($(this).data("container") + ".matchesReference")) {
+                        $(this).addClass("mismatch");
+                    }
+                }
+                if($(this).hasClass("codon") && $(this).html() != "&nbsp;") {
+                    $(this).removeClass("mismatch");
+                    if(!eval($(this).data("container") + ".matchesReference")) {
+                        $(this).addClass("mismatch");
+                    }
+                    if(eval($(this).data("container") + ".hypervariableRegionName") != null) {
+                        $(this).addClass("hypervariableRegion");
+                    }
+                }
+            });
+        });
+        $("#allelesLoaded").html($("#reportTable tbody tr").length);
+        $("#allelesShown").html($("#reportTable tbody tr:visible").length);
+        $("#allelesFiltered").html($("#reportTable tbody tr:hidden").length);
+        dfr.resolve();
+    }, 1);
     return dfr.promise();
+}
+
+// Row filtering function.
+function isRowVisible(allele) {
+    rowVisible = true;
+    if(sabOnly && !allele.singleAntigenBead)             { rowVisible = false; }
+    if(hvrMatchCountGe4Only && allele.hvrMatchCount < 4) { rowVisible = false; }
+    return rowVisible;
 }
 
 // Sort function.
@@ -262,16 +284,16 @@ $(document).ready(function() {
         putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     });
 
-    // Single antigen bead filter toggle on/off. Handled by web service.
+    // Single antigen bead filter toggle on/off. This is handled locally.
     $("#sabFilter").click(function() {
         sabOnly = !sabOnly;
-        getAlleles().then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+        setUiState().done(function() { $("#working").hide(); });
     });
 
-    // Match count filter toggle on/off. Handled by web service.
+    // Match count filter toggle on/off. This is handled locally.
     $("#hvrMatchCountGe4Filter").click(function() {
         hvrMatchCountGe4Only = !hvrMatchCountGe4Only;
-        getAlleles().then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+        setUiState().done(function() { $("#working").hide(); });
     });
 
     // Click on sort. This is handled locally.
