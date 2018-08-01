@@ -58,6 +58,8 @@ public class SessionFilter implements Filter {
         }
         Alleles.alleleFinder.set(alleleFinder);
         Alleles.hypervariableRegionFinder.set(hypervariableRegionFinder);
+        HypervariableRegions.alleleFinder.set(alleleFinder);
+        HypervariableRegions.hypervariableRegionFinder.set(hypervariableRegionFinder);
         
     }    
     

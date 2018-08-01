@@ -28,12 +28,19 @@ public class Alleles {
 
     @GET
     @Produces("application/json")
-    public List<Allele> getJson(@QueryParam("synonymous") String synonymous) throws JAXBException {
+    public List<Allele> getJson(@QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int hvrMatchCount) throws JAXBException {
+        List<Allele> alleles = alleleFinder.get().getAlleleList();
         // Implementing some rudimentary filtering.
-        if("null".equals(synonymous)) {
-            return alleleFinder.get().getAlleleList().stream().filter((allele) -> (allele.getSynonymousAlleleName() == null)).collect(Collectors.toList());
+        if("false".equals(synonymous)) {
+            alleles = alleles.stream().filter((allele) -> (allele.getSynonymousAlleleName() == null)).collect(Collectors.toList());
         }
-        return alleleFinder.get().getAlleleList();
+        if("true".equals(sab)) {
+            alleles = alleles.stream().filter((allele) -> (allele.getSingleAntigenBead())).collect(Collectors.toList());
+        }
+        if(hvrMatchCount > 0) {
+            alleles = alleles.stream().filter((allele) -> (allele.getHvrMatchCount() >= hvrMatchCount)).collect(Collectors.toList());
+        }
+        return alleles;
     }
 
     @GET
