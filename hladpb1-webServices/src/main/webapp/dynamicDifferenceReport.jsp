@@ -14,31 +14,31 @@
 body {
     font-family: monospace;
 }
-th.index, td.index {
-    border-left: 3px solid black;
+tr.referenceAllele {
+    background-color: yellow;
 }
 th, td {
     text-align: center;
+    white-space: nowrap;
+}
+th.index, td.index {
+    border-left: 3px solid black;
 }
 th.alleleName, td.alleleName {
     text-align: left;
 }
+th.hvrId, td.hvrId {
+    text-align: center;
+}
 th.codon, td.codon {
     text-align: right;
 }
-td {
-    white-space: nowrap;
-}
-td.hypervariable {
+td.codon.hypervariableRegion {
+    font-weight: bold;
     border: 1px solid black;
 }
-td.diff {
-    color: yellow;
-    background-color: gray;
-}
-td.diff.hypervariable {
-    color: yellow;
-    background-color: black;
+td.mismatch {
+    background-color: lightgray;
 }
             
 </style>
@@ -63,15 +63,15 @@ td.diff.hypervariable {
                 <th data-name="allele.alleleName" class="alleleName">allele name</th>
                 <th data-name="allele.singleAntigenBead ? 'Y' : 'N'">SAB</th>
                 <th data-name="allele.hvrMatchCount">matches</th>
-                <th data-name="'a' + allele.hvrVariantMap['a'].variantId">a</th>
-                <th data-name="'b' + allele.hvrVariantMap['b'].variantId">b</th>
-                <th data-name="'c' + allele.hvrVariantMap['c'].variantId">c</th>
-                <th data-name="'d' + allele.hvrVariantMap['d'].variantId">d</th>
-                <th data-name="'e' + allele.hvrVariantMap['e'].variantId">e</th>
-                <th data-name="'f' + allele.hvrVariantMap['f'].variantId">f</th>
+                <th data-name="'a' + allele.hvrVariantMap['a'].variantId" data-container="allele.hvrVariantMap['a']" class="hvrId">a</th>
+                <th data-name="'b' + allele.hvrVariantMap['b'].variantId" data-container="allele.hvrVariantMap['b']" class="hvrId">b</th>
+                <th data-name="'c' + allele.hvrVariantMap['c'].variantId" data-container="allele.hvrVariantMap['c']" class="hvrId">c</th>
+                <th data-name="'d' + allele.hvrVariantMap['d'].variantId" data-container="allele.hvrVariantMap['d']" class="hvrId">d</th>
+                <th data-name="'e' + allele.hvrVariantMap['e'].variantId" data-container="allele.hvrVariantMap['e']" class="hvrId">e</th>
+                <th data-name="'f' + allele.hvrVariantMap['f'].variantId" data-container="allele.hvrVariantMap['f']" class="hvrId">f</th>
                 <th>&nbsp;</th>
                 <c:forEach var="codonNumber" begin="1" end="100">
-                    <th data-name="allele.codonMap['${codonNumber}'] == undefined ? '' : allele.codonMap['${codonNumber}'].aminoAcid" class="codon ${codonNumber % 10 == 0 ? "index" : ""}">${codonNumber % 10 == 0 ? codonNumber : "&nbsp;"}</th>                
+                    <th data-name="allele.codonMap['${codonNumber}'] == undefined ? '' : allele.codonMap['${codonNumber}'].aminoAcid" data-container="allele.codonMap['${codonNumber}'] == undefined ? '' : allele.codonMap['${codonNumber}']" class="codon ${codonNumber % 10 == 0 ? "index" : ""}">${codonNumber % 10 == 0 ? codonNumber : "&nbsp;"}</th>
                 </c:forEach>
             </tr>
         </thead>
@@ -85,32 +85,80 @@ td.diff.hypervariable {
 
 <script>
 
-var alleles // The array of alleles.
+var alleles = []; // The array of alleles.
+
+// Get all alleles.
+function getAlleles() {
+    return $.ajax({
+        url: "/hladpb1-webServices/resources/alleles?synonymous=null", // filter out synonymous alleles
+        dataType: "json"
+    }).then(function(response) {
+        alleles = response;
+    });
+}
 
 // Put an allele. With this report, this is only used to set the current
 // reference allele.
 function putAllele(allele) {
-    $.ajax({
+    return $.ajax({
         url: "/hladpb1-webServices/resources/alleles/" + allele.alleleName,
         dataType: "json",
         type: "PUT",
         contentType: "application/json",
         data: JSON.stringify(allele)
-    }).done(function(response) {
-        getAlleles();
     });
 }
 
-// Get all alleles and refresh the hypervariable region matches.
-function getAlleles() {
-    $.ajax({
-        url: "/hladpb1-webServices/resources/alleles?synonymous=null", // filter out synonymous alleles
-        dataType: "json"
-    }).done(function(response) {
-        alleles = response;
-        $("#reportTable tbody tr").each(function() {
-            var alleleName = $(this).data("value");
-            $(this).children("td").eq(2).html(alleles.find(function(allele) { return alleleName == allele.alleleName; }).hvrMatchCount);
+// Populate rows in the report table from the alleles array.
+function populateTableRows() {
+    var rowHtml = [];
+    alleles.forEach(function(allele) {
+        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "'>");
+        $("#columnNames th").each(function(index) {
+            var name = $(this).data("name");
+            if(name == undefined) {
+                rowHtml.push("<td></td>");
+            }
+            else {
+                var val = eval(name);
+                var tagAttributes = $(this)[0].outerHTML;
+                tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));
+                rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "" : val) + "</td>");
+            }
+        });
+        rowHtml.push("</tr>");
+    });
+    $("#reportTable tbody").append(rowHtml.join(""));
+}
+
+// Set the UI state based on the hypervariable region matches.
+function setUiState() {
+    $("#reportTable tbody tr").each(function() {
+        var alleleName = $(this).data("value");
+        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+        $(this).removeClass("referenceAllele");
+        if(allele.referenceAllele) {
+            $(this).addClass("referenceAllele");
+        }
+        $(this).children("td").each(function() {
+            if($(this).data("name") == "allele.hvrMatchCount") {
+                $(this).html(allele.hvrMatchCount);
+            }
+            if($(this).hasClass("hvrId")) {
+                $(this).removeClass("mismatch");
+                if(!eval($(this).data("container") + ".matchesReference")) {
+                    $(this).addClass("mismatch");
+                }
+            }
+            if($(this).hasClass("codon") && $(this).html() != "") {
+                $(this).removeClass("mismatch");
+                if(!eval($(this).data("container") + ".matchesReference")) {
+                    $(this).addClass("mismatch");
+                }
+                if(eval($(this).data("container") + ".hypervariableRegionName") != null) {
+                    $(this).addClass("hypervariableRegion");
+                }
+            }
         });
     });
 }
@@ -118,31 +166,14 @@ function getAlleles() {
 // Document ready! Let's go...
 $(document).ready(function() {
 
-    // Initially populate the report table.
-    $.ajax({
-        url: "/hladpb1-webServices/resources/alleles?synonymous=null", // filter out synonymous alleles
-        dataType: "json"
-    }).done(function(response) {
-        alleles = response;
-        var rowHtml = [];
-        alleles.forEach(function(allele) {
-            rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "'>");
-            $("#columnNames th").each(function(index) {
-                var val = eval($(this).data("name"));
-                var classs = $(this).attr("class");
-                rowHtml.push("<td data-name=\"" + $(this).data("name") + "\" " + (classs == undefined ? "" : "class='" + classs + "'") + ">" + (val == undefined ? "" : val) + "</td>");
-            });
-            rowHtml.push("</tr>");
-        });
-        $("#reportTable tbody").append(rowHtml.join(""));
-    });
+    getAlleles().then(populateTableRows).then(setUiState);
 
     // Click on a row to set it as the reference allele.
     $("#reportTable tbody").on("click", "tr", function() {
         var alleleName = $(this).data("value");
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
         allele.referenceAllele = true;
-        putAllele(allele);
+        putAllele(allele).then(getAlleles).then(setUiState);
     });
 
     // Click on sort.
