@@ -5,7 +5,7 @@
 
 <head>
 
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 
@@ -59,16 +59,18 @@ a.filterEnabled {
     <p>
         The reference allele for hypervariable region matching is highlighted in
         yellow. This report only shows the lowest allele number for synonymous
-        alleles. Click on a row to set that allele as the reference allele. By
-        default, this report only shows alleles where there are at least 4
-        hypervariable region matches to the reference allele, but you may toggle
-        this filter on and off.
+        alleles. Select a reference allele from the list or click on a row to
+        set that allele as the reference allele. By default, this report only
+        shows alleles where there are at least 4 hypervariable region matches to
+        the reference allele, but you may toggle this filter on and off.
     </p>   
     <p>
         The IMGT allele database version is <span id="imgtDbVersion">...</span>
         and the single antigen bead (SAB) reagent lot number is
-        <span id="reagentLotNumber">...</span>. This report is for research use
-        only.
+        <span id="reagentLotNumber">...</span>.
+    </p>
+    <p>
+        This report is for research use only.
     </p>
     <p>
         <table>
@@ -76,6 +78,9 @@ a.filterEnabled {
             <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">alleles match filter criteria</td></tr>
             <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">alleles are not visible</td></tr>
         </table>
+    </p>
+    <p>
+        reference allele: <select id="referenceAlleleSelect"></select>
     </p>
     
     <table id="reportTable" cellspacing="0">
@@ -134,7 +139,7 @@ var hvrMatchCountGe4Only = true; // only show alleles where the match count is g
 function getReagentLotNumber() {
     $("#working").show();
     return $.ajax({
-        url: "/hladpb1-webServices/resources/hypervariableRegions/reagentLotNumber",
+        url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
         dataType: "json"
     }).then(function(response) {
         reagentLotNumber = response;
@@ -145,7 +150,7 @@ function getReagentLotNumber() {
 function getAlleles() {
     $("#working").show();
     return $.ajax({
-        url: "/hladpb1-webServices/resources/alleles?synonymous=false", // always filter out synonymous alleles
+        url: "/hladpb1/resources/alleles?synonymous=false", // always filter out synonymous alleles
         dataType: "json"
     }).then(function(response) {
         alleles = response;
@@ -157,7 +162,7 @@ function getAlleles() {
 function putAllele(allele) {
     $("#working").show();
     return $.ajax({
-        url: "/hladpb1-webServices/resources/alleles/" + allele.alleleName,
+        url: "/hladpb1/resources/alleles/" + allele.alleleName,
         dataType: "json",
         type: "PUT",
         contentType: "application/json",
@@ -165,28 +170,34 @@ function putAllele(allele) {
     });
 }
 
-// Populate rows in the report table from the alleles array.
+// Populate rows in the report table from the alleles array. Note that this is
+// only done once. All sorting and filtering is done locally. Changing the
+// reference allele does involve a getAlleles() call, but the HTML table rows
+// are updated in-situ.
 function populateTableRows() {
     $("#working").show();
     $("#reportTable tbody tr").remove();
     var rowHtml = [];
+    var selectHtml = [];
     alleles.forEach(function(allele) {
-        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + (!isRowVisible(allele) ? " style='visibility: hidden;'" : "") + "'>");
+        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + (!isRowVisible(allele) ? "' display: none;'" : "") + "'>");
         $("#columnNames th").each(function(index) {
             var name = $(this).data("name");
             if(name == undefined) {
-                rowHtml.push("<td></td>");
+                rowHtml.push("<td>&nbsp;</td>");
             }
             else {
                 var val = eval(name);
                 var tagAttributes = $(this)[0].outerHTML;
                 tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));
-                rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "" : val) + "</td>");
+                rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "&nbsp;" : val) + "</td>");
             }
         });
         rowHtml.push("</tr>");
+        selectHtml.push("<option value='" + allele.alleleName + "'>" + allele.alleleName + "</option>");
     });
     $("#reportTable tbody").append(rowHtml.join(""));
+    $("#referenceAlleleSelect").append(selectHtml.join(""));
 }
 
 // Set the UI state based on the hypervariable region matches.
@@ -214,6 +225,7 @@ function setUiState() {
             $(this).removeClass("referenceAllele");
             if(allele.referenceAllele) {
                 $(this).addClass("referenceAllele");
+                $("#referenceAlleleSelect").val(allele.alleleName);
             }
             $(this).children("td").each(function() {
                 if($(this).data("name") == "allele.hvrMatchCount") {
@@ -275,6 +287,14 @@ $(document).ready(function() {
 
     // Initial population of report table.
     getReagentLotNumber().then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+
+    // Select a reference allele from the list. Handled by web service.
+    $("#referenceAlleleSelect").change(function() {
+        var alleleName = $(this).val();
+        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+        allele.referenceAllele = true;
+        putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
+    });
 
     // Click on a row to set it as the reference allele. Handled by web service.
     $("#reportTable tbody").on("click", "tr", function() {
