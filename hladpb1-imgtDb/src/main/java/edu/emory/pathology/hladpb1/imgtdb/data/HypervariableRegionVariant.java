@@ -40,5 +40,37 @@ public class HypervariableRegionVariant {
     public void setBeadAlleleNameList(List<String> beadAlleleNameList) {
         this.beadAlleleNameList = beadAlleleNameList;
     }
+
+    public Boolean getKnownReactiveEpitopeForCompat() {
+        return knownReactiveEpitopeForCompat;
+    }
+
+    public void setKnownReactiveEpitopeForCompat(Boolean knownReactiveEpitopeForCompat) {
+        this.knownReactiveEpitopeForCompat = knownReactiveEpitopeForCompat;
+    }
+
+    public Boolean getCompatIsRecipientEpitope() {
+        return compatIsRecipientEpitope;
+    }
+
+    public void setCompatIsRecipientEpitope(Boolean compatIsRecipientEpitope) {
+        this.compatIsRecipientEpitope = compatIsRecipientEpitope;
+    }
+
+    public Boolean getCompatPositiveSabCount() {
+        return compatPositiveSabCount;
+    }
+
+    public void setCompatPositiveSabCount(Boolean compatPositiveSabCount) {
+        this.compatPositiveSabCount = compatPositiveSabCount;
+    }
+
+    public Boolean getCompatAntibodyConsideredPresent() {
+        return compatAntibodyConsideredPresent;
+    }
+
+    public void setCompatAntibodyConsideredPresent(Boolean compatAntibodyConsideredPresent) {
+        this.compatAntibodyConsideredPresent = compatAntibodyConsideredPresent;
+    }
     
 }

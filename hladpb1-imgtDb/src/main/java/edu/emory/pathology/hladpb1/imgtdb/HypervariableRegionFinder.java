@@ -31,6 +31,10 @@ public class HypervariableRegionFinder {
         this.xmlFileName = xmlFileName;
         this.reagentLotNumber = reagentLotNumber;
     }
+
+    public HypervariableRegion getHypervariableRegion(String hypervariableRegionName) throws JAXBException {
+        return getHypervariableRegionList().stream().filter((hypervariableRegion) -> (hypervariableRegionName.equals(hypervariableRegion.getHypervariableRegionName()))).findFirst().get();
+    }
     
     public List<HypervariableRegion> getHypervariableRegionList() throws JAXBException {
         if(hypervariableRegionList == null) {

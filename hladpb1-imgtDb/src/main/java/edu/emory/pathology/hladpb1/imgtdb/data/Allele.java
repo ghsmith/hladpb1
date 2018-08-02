@@ -19,13 +19,13 @@ public class Allele {
     private String version;
     private String alleleName;
     private SortedMap<String, HypervariableRegionVariantRef> hvrVariantMap;
-    private Integer matchesHvrCount;
     private SortedMap<Integer, Codon> codonMap;
     private Boolean nullAllele;
     private String synonymousAlleleName;
     private Boolean synonymousAlleleProteinShorter;
     private Boolean singleAntigenBead;
     private Boolean referenceForMatches;
+    private Integer matchesHvrCount;
     private Boolean recipientAntibodyForCompat;
     private Boolean recipientTypeForCompat;
     private Boolean donorTypeForCompat;
