@@ -162,8 +162,8 @@ public class AlleleFinder {
     public void assignHypervariableRegionVariantMatches(String referenceAlleleName) throws JAXBException {
         Allele referenceAllele = getAllele(referenceAlleleName);
         getAlleleList().stream().forEach((allele) -> {
-            allele.setReferenceAllele(referenceAllele.equals(allele));
-            allele.setHvrMatchCount((int)referenceAllele.getHvrVariantMap().keySet().stream().filter((hvrName) -> (
+            allele.setReferenceForMatches(referenceAllele.equals(allele));
+            allele.setMatchesHvrCount((int)referenceAllele.getHvrVariantMap().keySet().stream().filter((hvrName) -> (
                 referenceAllele.getHvrVariantMap().get(hvrName).variantId.equals(allele.getHvrVariantMap().get(hvrName).variantId))).count()
             );
             allele.getHvrVariantMap().keySet().stream().forEach((hvrName) -> {

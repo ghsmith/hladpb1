@@ -19,16 +19,17 @@ public class Allele {
     private String version;
     private String alleleName;
     private SortedMap<String, HypervariableRegionVariantRef> hvrVariantMap;
-    private Integer hvrMatchCount;
+    private Integer matchesHvrCount;
     private SortedMap<Integer, Codon> codonMap;
     private Boolean nullAllele;
     private String synonymousAlleleName;
     private Boolean synonymousAlleleProteinShorter;
     private Boolean singleAntigenBead;
-    private Boolean referenceAllele;
-    private Boolean recipientAntibody;
-    private Boolean recipientType;
-    private Boolean donorType;
+    private Boolean referenceForMatches;
+    private Boolean recipientAntibodyForCompat;
+    private Boolean recipientTypeForCompat;
+    private Boolean donorTypeForCompat;
+    private String compatInterpretation;
 
     public Integer getSequenceNumber() {
         return sequenceNumber;
@@ -62,12 +63,12 @@ public class Allele {
         this.hvrVariantMap = hvrVariantMap;
     }
 
-    public Integer getHvrMatchCount() {
-        return hvrMatchCount;
+    public Integer getMatchesHvrCount() {
+        return matchesHvrCount;
     }
 
-    public void setHvrMatchCount(Integer hvrMatchCount) {
-        this.hvrMatchCount = hvrMatchCount;
+    public void setMatchesHvrCount(Integer matchesHvrCount) {
+        this.matchesHvrCount = matchesHvrCount;
     }
 
     public SortedMap<Integer, Codon> getCodonMap() {
@@ -110,36 +111,44 @@ public class Allele {
         this.singleAntigenBead = singleAntigenBead;
     }
 
-    public Boolean getReferenceAllele() {
-        return referenceAllele;
+    public Boolean getReferenceForMatches() {
+        return referenceForMatches;
     }
 
-    public void setReferenceAllele(Boolean referenceAllele) {
-        this.referenceAllele = referenceAllele;
+    public void setReferenceForMatches(Boolean referenceForMatches) {
+        this.referenceForMatches = referenceForMatches;
     }
 
-    public Boolean getRecipientAntibody() {
-        return recipientAntibody;
+    public Boolean getRecipientAntibodyForCompat() {
+        return recipientAntibodyForCompat;
     }
 
-    public void setRecipientAntibody(Boolean recipientAntibody) {
-        this.recipientAntibody = recipientAntibody;
+    public void setRecipientAntibodyForCompat(Boolean recipientAntibodyForCompat) {
+        this.recipientAntibodyForCompat = recipientAntibodyForCompat;
     }
 
-    public Boolean getRecipientType() {
-        return recipientType;
+    public Boolean getRecipientTypeForCompat() {
+        return recipientTypeForCompat;
     }
 
-    public void setRecipientType(Boolean recipientType) {
-        this.recipientType = recipientType;
+    public void setRecipientTypeForCompat(Boolean recipientTypeForCompat) {
+        this.recipientTypeForCompat = recipientTypeForCompat;
     }
 
-    public Boolean getDonorType() {
-        return donorType;
+    public Boolean getDonorTypeForCompat() {
+        return donorTypeForCompat;
     }
 
-    public void setDonorType(Boolean donorType) {
-        this.donorType = donorType;
+    public void setDonorTypeForCompat(Boolean donorTypeForCompat) {
+        this.donorTypeForCompat = donorTypeForCompat;
     }
-    
+
+    public String getCompatInterpretation() {
+        return compatInterpretation;
+    }
+
+    public void setCompatInterpretation(String compatInterpretation) {
+        this.compatInterpretation = compatInterpretation;
+    }
+
 }
