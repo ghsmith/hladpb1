@@ -88,7 +88,7 @@ a.filterEnabled {
             <tr>
                 <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
                 <th>[<a id="sabFilter" href="javascript:void(0);">filter=Y</a>]</th>
-                <th>[<a id="hvrMatchCountGe4Filter" href="javascript:void(0);">filter&ge;4)</a>]<br/>[<a id="hvrMatchCountSort" href="javascript:void(0);">sort</a>]</th>
+                <th>[<a id="matchesHvrCountGe4Filter" href="javascript:void(0);">filter&ge;4)</a>]<br/>[<a id="matchesHvrCountSort" href="javascript:void(0);">sort</a>]</th>
                 <th colspan="6" style="border-bottom: 1px solid black;">hypervariable<br/>region ID</th>
                 <th>&nbsp;</th>
                 <th colspan="100" style="border-bottom: 1px solid black;">protein sequence (aligned to HLA-DPB1*01:01 codons 1-100)</th>
@@ -96,7 +96,7 @@ a.filterEnabled {
             <tr id="columnNames">
                 <th data-name="allele.alleleName" class="alleleName">allele name</th>
                 <th data-name="allele.singleAntigenBead ? 'Y' : '&nbsp;'">SAB</th>
-                <th data-name="allele.hvrMatchCount">matches</th>
+                <th data-name="allele.matchesHvrCount">matches</th>
                 <th data-name="'a' + allele.hvrVariantMap['a'].variantId" data-container="allele.hvrVariantMap['a']" class="hvrId">a</th>
                 <th data-name="'b' + allele.hvrVariantMap['b'].variantId" data-container="allele.hvrVariantMap['b']" class="hvrId">b</th>
                 <th data-name="'c' + allele.hvrVariantMap['c'].variantId" data-container="allele.hvrVariantMap['c']" class="hvrId">c</th>
@@ -133,7 +133,7 @@ a.filterEnabled {
 var reagentLotNumber; // the single antigen bead reagent lot number
 var alleles = []; // the array of alleles
 var sabOnly = false; // only show single antigen bead alleles
-var hvrMatchCountGe4Only = true; // only show alleles where the match count is ge 4
+var matchesHvrCountGe4Only = true; // only show alleles where the match count is ge 4
 
 // Get reagent lot number.
 function getReagentLotNumber() {
@@ -209,8 +209,8 @@ function setUiState() {
         $("#reagentLotNumber").html(reagentLotNumber);
         $("#sabFilter").removeClass("filterEnabled");
         if(sabOnly) { $("#sabFilter").addClass("filterEnabled"); }
-        $("#hvrMatchCountGe4Filter").removeClass("filterEnabled");
-        if(hvrMatchCountGe4Only) { $("#hvrMatchCountGe4Filter").addClass("filterEnabled"); }
+        $("#matchesHvrCountGe4Filter").removeClass("filterEnabled");
+        if(matchesHvrCountGe4Only) { $("#matchesHvrCountGe4Filter").addClass("filterEnabled"); }
         $("#hypervariableRegionNames").children("th").each(function() {
             // This assumes that the first allele has all hypervariable regions
             // represented.
@@ -223,13 +223,13 @@ function setUiState() {
             if(isRowVisible(allele)) { $(this).show(); }
             else                     { $(this).hide(); }
             $(this).removeClass("referenceAllele");
-            if(allele.referenceAllele) {
+            if(allele.referenceForMatches) {
                 $(this).addClass("referenceAllele");
                 $("#referenceAlleleSelect").val(allele.alleleName);
             }
             $(this).children("td").each(function() {
-                if($(this).data("name") == "allele.hvrMatchCount") {
-                    $(this).html(allele.hvrMatchCount);
+                if($(this).data("name") == "allele.matchesHvrCount") {
+                    $(this).html(allele.matchesHvrCount);
                 }
                 if($(this).hasClass("hvrId")) {
                     $(this).removeClass("mismatch");
@@ -259,8 +259,8 @@ function setUiState() {
 // Row filtering function.
 function isRowVisible(allele) {
     rowVisible = true;
-    if(sabOnly && !allele.singleAntigenBead)             { rowVisible = false; }
-    if(hvrMatchCountGe4Only && allele.hvrMatchCount < 4) { rowVisible = false; }
+    if(sabOnly && !allele.singleAntigenBead)                 { rowVisible = false; }
+    if(matchesHvrCountGe4Only && allele.matchesHvrCount < 4) { rowVisible = false; }
     return rowVisible;
 }
 
@@ -274,7 +274,7 @@ function alleleNameSort(a, b) {
 };
 
 // Sort function.
-function hvrMatchCountSort(a, b) {
+function matchesHvrCountSort(a, b) {
     var A = $(a).children("td").eq(2).html();
     var B = $(b).children("td").eq(2).html();
     if(A < B)      { return  1; }
@@ -292,7 +292,7 @@ $(document).ready(function() {
     $("#referenceAlleleSelect").change(function() {
         var alleleName = $(this).val();
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
-        allele.referenceAllele = true;
+        allele.referenceForMatches = true;
         putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     });
 
@@ -300,7 +300,7 @@ $(document).ready(function() {
     $("#reportTable tbody").on("click", "tr", function() {
         var alleleName = $(this).data("value");
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
-        allele.referenceAllele = true;
+        allele.referenceForMatches = true;
         putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     });
 
@@ -311,8 +311,8 @@ $(document).ready(function() {
     });
 
     // Match count filter toggle on/off. This is handled locally.
-    $("#hvrMatchCountGe4Filter").click(function() {
-        hvrMatchCountGe4Only = !hvrMatchCountGe4Only;
+    $("#matchesHvrCountGe4Filter").click(function() {
+        matchesHvrCountGe4Only = !matchesHvrCountGe4Only;
         setUiState().done(function() { $("#working").hide(); });
     });
 
@@ -330,11 +330,11 @@ $(document).ready(function() {
     });
     
     // Click on sort. This is handled locally.
-    $("#hvrMatchCountSort").click(function() {
+    $("#matchesHvrCountSort").click(function() {
         $("#working").show();
         setTimeout(function() {
             var rows = $('#reportTable tbody tr').get();
-            rows.sort(hvrMatchCountSort);
+            rows.sort(matchesHvrCountSort);
             $.each(rows, function(index, row) {
               $('#reportTable').children('tbody').append(row);
             });

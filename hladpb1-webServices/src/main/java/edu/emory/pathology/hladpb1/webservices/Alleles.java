@@ -28,7 +28,7 @@ public class Alleles {
 
     @GET
     @Produces("application/json")
-    public List<Allele> getJson(@QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int hvrMatchCount) throws JAXBException {
+    public List<Allele> getJson(@QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int matchesHvrCount) throws JAXBException {
         List<Allele> alleles = alleleFinder.get().getAlleleList();
         // Implementing some rudimentary filtering.
         if("false".equals(synonymous)) {
@@ -37,8 +37,8 @@ public class Alleles {
         if("true".equals(sab)) {
             alleles = alleles.stream().filter((allele) -> (allele.getSingleAntigenBead())).collect(Collectors.toList());
         }
-        if(hvrMatchCount > 0) {
-            alleles = alleles.stream().filter((allele) -> (allele.getHvrMatchCount() >= hvrMatchCount)).collect(Collectors.toList());
+        if(matchesHvrCount > 0) {
+            alleles = alleles.stream().filter((allele) -> (allele.getMatchesHvrCount() >= matchesHvrCount)).collect(Collectors.toList());
         }
         return alleles;
     }
@@ -55,7 +55,7 @@ public class Alleles {
     @Consumes("application/json")
     public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele allele) throws JAXBException {
         // Currently only allowing changes to the reference allele.
-        if(allele.getReferenceAllele()) {
+        if(allele.getReferenceForMatches()) {
             alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
         }
     }
