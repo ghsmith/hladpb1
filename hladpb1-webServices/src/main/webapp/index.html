@@ -1,10 +1,411 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Start Page</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="json/jquery.jsonview.min.css" />
+        <script type="text/javascript" src="json/jquery.jsonview.min.js"></script>
+        <style>
+            body {
+                font-family: monospace;
+            }
+            h2 {
+                margin-top: 40px;
+                border-bottom: 1px solid black;
+            }
+            h3 {
+                margin-top: 30px;
+            }
+            table.parameters th, table.parameters td {
+                border: 1px solid black;
+            }
+            div.jsonOutput {
+                width: 100%;
+                height: 300px;
+                overflow: scroll;
+                border: 1px solid black;
+                background-color: ivory;
+            }
+        </style>
+        <title>HLA-DPB1 REST API Endpoints</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        
+        <div style="text-align: center;">
+            <h1>HLA-DPB1 REST API Endpoints</h1>
+            <p>
+                Geoffrey H. Smith, MD<br/>
+                August 1, 2018<br/>
+                geoffrey.smith@emory.edu<br/>
+            </p>
+        </div>
+        
+        <h2>Background</h2>
+
+        <p>
+            This page describes an application programming interface (API)
+            for an HLA-DPB1 allele compatibility prediction system.
+            Compatibility predictions are based on considering recipient
+            antibody reactivity to epitopes at six (6) hypervariable regions in
+            the DPB1 protein [REFERENCE].
+        </p>
+        
+        <h2>Methods</h2>
+
+        <p>
+            The API is implemented as a set of REpresentational State Transfer
+            (REST) web service endpoints. Reference implementations of
+            HTML5 web applications that use the REST API are also provided. The
+            source code for the API and the HTML5 applications is available in
+            GitHub (<a href="https://github.com/ghsmith/hladpb1">https://github.com/ghsmith/hladpb1</a>)
+            [CONFIRM WITH BOB/HOWIE THAT I CAN MAKE THIS GITHUB REPO PUBLIC].
+            The API is implemented using Java Enterprise Edition components and
+            is deployed on a Java Application Server. To simplify application
+            development, the REST API maintains some state at the level of the
+            HTTP session, but no state is durably persisted across HTTP
+            sessions.
+        </p>
+        
+        <h2>Resources</h2>
+
+        <h3>GET /hladpb1/resources/alleles</h3>
+        <p>
+            Returns a JavaScript object notation (JSON) array of HLA-DPB1
+            alleles. Some filtering is supported using query parameters.
+        </p>
+        <h4>Query Parameters</h4>
+        <table cellspacing="0" class="parameters">
+            <tr><th>name</th><th>required</th><th>type</th><th>description</th><th>default</th><th>example</th></tr>
+            <tr>
+                <td>synonymous</td>
+                <td>no</td>
+                <td>boolean</td>
+                <td>
+                    If set to false, only the first allele of sets of synonymous
+                    alleles is returned. Allele order is based on the IMGT
+                    database.
+                </td>
+                <td>no default</td>
+                <td>synonymous=false</td>
+            </tr>
+            <tr>
+                <td>sab</td>
+                <td>no</td>
+                <td>boolean</td>
+                <td>
+                    If set to true, only alleles associated with single antigen
+                    beans (SAB) are returned.
+                </td>
+                <td>no default</td>
+                <td>sab=true</td>
+            </tr>
+            <tr>
+                <td>hvrMatchCount</td>
+                <td>no</td>
+                <td>int</td>
+                <td>
+                    If specified, only alleles with at least this many
+                    hypervariable regions matching the refeference allele are
+                    returned.
+                </td>
+                <td>no default</td>
+                <td>hvrMatchCount=4</td>
+            </tr>
+        </table>
+        <h4>Example Usage</h4>
+        <p>
+            <a id="exampleGetAllelesLink" href="javascript:void(0);">GET /hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3</a>
+            <br/><br/>returns JSON allele array:
+            <div  id="exampleGetAllelesOutput" class="jsonOutput">
+                Click link above to see JSON output.
+            </div>
+            <script>
+                $("#exampleGetAllelesLink").click(function() {
+                    $.ajax({
+                        url: "/hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3",
+                        dataType: "text"
+                    }).done(function(response) {
+                        $("#exampleGetAllelesOutput").JSONView(response, { collapsed: true });
+                        $("#exampleGetAllelesOutput").JSONView("expand", 0);
+                        $("#exampleGetAllelesOutput").JSONView("expand", 1);
+                    });
+                });
+            </script>
+        </p>
+        
+        <h3>GET /hladpb1/resources/alleles/{alleleName}</h3>
+        <p>
+            Returns a JSON representation of the allele identified by URL
+            parameter {alleleName}. This method takes no parameters.
+        </p>
+        <h4>Example Usage</h4>
+        <p>
+            <a id="exampleGetAlleleLink" href="javascript:void(0);">GET /hladpb1/resources/alleles/HLA-DPB1*01:01:01:01</a>
+            <br/><br/>returns JSON allele:
+            <div  id="exampleGetAlleleOutput" class="jsonOutput">
+                Click link above to see JSON output.
+            </div>
+            <script>
+                $("#exampleGetAlleleLink").click(function() {
+                    $.ajax({
+                        url: "/hladpb1/resources/alleles/HLA-DPB1*01:01:01:01",
+                        dataType: "text"
+                    }).done(function(response) {
+                        $("#exampleGetAlleleOutput").JSONView(response, { collapsed: false });
+                    });
+                });
+            </script>
+        </p>
+
+        <h3>PUT /hladpb1/resources/alleles/{alleleName}</h3>
+        <p>
+            Updates the allele identified by the URL parameter {alleleName} on
+            the server based on the JSON representation of the allele
+            in the body of the request. The update only affects the allele
+            in the HTTP session that is calling the method. This is intended to
+            allow clients to update a limited number of clinically determined
+            allele and hypervariable region properties related to an HLA-DPB1
+            compatibility evaluation. A JSON representation of an allele is
+            presented in the previous example usage. A JSON representation of a
+            hypervariable region is presented in the subsequent example usage.
+            This method takes no parameters and has no output.
+        </p>
+        <h4>Modifiable Properties</h4>
+        <table cellspacing="0" class="parameters">
+            <tr><th>name</th><th>type</th><th>description</th><th>example</th></tr>
+            <tr>
+                <td>allele<br/>&nbsp;.referenceForMatches</td>
+                <td>boolean</td>
+                <td>
+                    If set to true, this is the reference allele for all
+                    hypervariable region match properties (properties with
+                    names starting with <i>matches</i>). When this property is
+                    set for an allele, the property is unset for any other
+                    allele (i.e., there can only be one reference allele) and
+                    the following properties are automatically recomputed for
+                    all alleles:
+                    <ul>
+                        <li>allele.matchesHvrCount</li>
+                        <li>allele.hvrVariantMap[].matchesReference</li>
+                        <li>allele.codonMap[].matchesReference</li>
+                    </ul>
+                </td>
+                <td>{...<br/>referenceForMatches: true,<br/>...}</td>
+            </tr>
+            <tr>
+                <td>allele<br/>&nbsp;.recipientAntibodyForCompat</td>
+                <td>boolean</td>
+                <td rowspan="3">
+                    If set to true, designates the allele as reactive with a
+                    recipient antibody, as a recipient type, or as a donor type
+                    and used as the basis for all of the compatibility
+                    properties (properties with names starting with
+                    <i>compat</i>). When any of these properties are set for an
+                    allele, the following properties are automatically
+                    recomputed for all alleles and hypervariable region
+                    variants:
+                    <ul>
+                        <li>allele.compatInterpretation</li>
+                        <li>hypervariableRegion.variantMap[].compatIsRecipientEptiope</li>
+                        <li>hypervariableRegion.variantMap[].compatPositiveSabCount</li>
+                        <li>hypervariableRegion.variantMap[].compatAntibodyConsideredPresent</li>
+                    </ul>
+                </td>
+                <td>{...<br/>recipientAntibodyForCompat: true,<br/>...}</td>
+            </tr>
+            <tr>
+                <td>allele<br/>&nbsp;.recipientTypeForCompat</td>
+                <td>boolean</td>
+                <td>{...<br/>recipientTypeForCompat: true,<br/>...}</td>
+            </tr>
+            <tr>
+                <td>allele<br/>&nbsp;.donorTypeForCompat</td>
+                <td>boolean</td>
+                <td>{...<br/>donorTypeForCompat: true,<br/>...}</td>
+            </tr>
+        </table>
+
+        <h3>GET /hladpb1/resources/hypervariableRegions</h3>
+        <p>
+            Returns a JavaScript object notation (JSON) array of HLA-DPB1
+            hypervariable regions. This method takes no parameters
+        </p>
+        <h4>Example Usage</h4>
+        <p>
+            <a id="exampleGetHvrsLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions</a>
+            <br/><br/>returns JSON hypervariableRegion array:
+            <div  id="exampleGetHvrsOutput" class="jsonOutput">
+                Click link above to see JSON output.
+            </div>
+            <script>
+                $("#exampleGetHvrsLink").click(function() {
+                    $.ajax({
+                        url: "/hladpb1/resources/hypervariableRegions",
+                        dataType: "text"
+                    }).done(function(response) {
+                        $("#exampleGetHvrsOutput").JSONView(response, { collapsed: true });
+                        $("#exampleGetHvrsOutput").JSONView("expand", 0);
+                        $("#exampleGetHvrsOutput").JSONView("expand", 1);
+                    });
+                });
+            </script>
+        </p>
+
+        <h3>GET /hladpb1/resources/hypervariableRegions/{hypervariableRegionName}</h3>
+        <p>
+            Returns a JSON representation of the hypervariable region identified
+            by URL parameter {hypervariableRegionName}. This method takes no
+            parameters.
+        </p>
+        <h4>Example Usage</h4>
+        <p>
+            <a id="exampleGetHvrLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions/f</a>
+            <br/><br/>returns JSON hypervariableRegion array:
+            <div  id="exampleGetHvrOutput" class="jsonOutput">
+                Click link above to see JSON output.
+            </div>
+            <script>
+                $("#exampleGetHvrLink").click(function() {
+                    $.ajax({
+                        url: "/hladpb1/resources/hypervariableRegions/f",
+                        dataType: "text"
+                    }).done(function(response) {
+                        $("#exampleGetHvrOutput").JSONView(response, { collapsed: false });
+                    });
+                });
+            </script>
+        </p>
+        
+        <h3>PUT /hladpb1/resources/hypervariableRegion/{hypervariableRegionName}</h3>
+        <p>
+            Updates the hypervariable region identified by the URL parameter
+            {hypervariableRegionName} on the server based on the JSON
+            representation of the hypervariableRegion in the body of the
+            request. The update only affects the hypervariable region in the
+            HTTP session that is calling the method. This is intended to
+            allow clients to update a limited number of clinically determined
+            allele and hypervariable region properties related to an HLA-DPB1
+            compatibility evaluation. A JSON representation of a hypervariable
+            region is presented in the previous example usage. A JSON
+            representation of an allele is presented in the <i>GET
+            /hladpb1/resources/alleles/{alleleName}</i> section. This method
+            takes no parameters and has no output.
+        </p>
+        <h4>Modifiable Properties</h4>
+        <table cellspacing="0" class="parameters">
+            <tr><th>name</th><th>type</th><th>description</th><th>example</th></tr>
+            <tr>
+                <td>hypervariableRegion<br/>&nbsp;.variantMap[]<br/>&nbsp;&nbsp;.knownReactiveEpitopeForCompat</td>
+                <td>boolean</td>
+                <td>
+                    If set to true, the recipient is assumed to have an antibody
+                    reactive with the epitope regardless of all other
+                    considerations and used as a basis for all of the
+                    compatibility properties (properties with names starting
+                    with <i>compat</i>). When this property is set for a
+                    hypervariable region variant, the following properties are
+                    automatically recomputed for all alleles and hypervariable
+                    region variants:
+                    <ul>
+                        <li>allele.compatInterpretation</li>
+                        <li>hypervariableRegion.variantMap[].compatIsRecipientEptiope</li>
+                        <li>hypervariableRegion.variantMap[].compatPositiveSabCount</li>
+                        <li>hypervariableRegion.variantMap[].compatAntibodyConsideredPresent</li>
+                    </ul>
+                </td>
+                <td>{...<br/>knownReactiveEpitopeForCompat: true,<br/>...}</td>
+            </tr>
+        </table>
+
+        <h3>GET /hladpb1/resources/hypervariableRegions/reagentLotNumber</h3>
+        <p>
+            Returns a JSON representation of the current single antigen bead
+            reagent lot number (each hypervariable region variant is associated
+            with a set of single antigen beads). The reagent lot number is
+            currently administratively specified. This method takes no
+            parameters.
+        </p>
+        <h4>Example Usage</h4>
+        <p>
+            <a id="exampleGetReagentLotNumberLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions/reagentLotNumber</a>
+            <br/><br/>returns JSON reagentLotNumber:
+            <div  id="exampleGetReagentLotNumberOutput" class="jsonOutput">
+                Click link above to see JSON output.
+            </div>
+            <script>
+                $("#exampleGetReagentLotNumberLink").click(function() {
+                    $.ajax({
+                        url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
+                        dataType: "text"
+                    }).done(function(response) {
+                        $("#exampleGetReagentLotNumberOutput").JSONView(response, { collapsed: false });
+                    });
+                });
+            </script>
+        </p>
+        
+        <h2>Reference Implementations</h2>
+
+        <h3><a>HLA-DPB1 Allele Difference Report (JSP - does not use REST API)</a></h3>
+        <p>
+            [UNDER CONSTRUCTION]
+            For a given HLA-DPB1 reference allele, this report sorts all
+            other HLA-DPB1 alleles from most similar to least similar based on
+            hypervariable region epitopes. This report is implemented as a
+            Java Server Page (JSP) where all of the HTML is generated on the
+            server and is downloaded to the client. Every operation requires
+            the entire page to be re-downloaded to the client.
+            <span style="background-color: yellow;">This report does not use the
+            HLA-DPB1 REST API and is provided as an example of an undesirable
+            implementation style.</span>
+        </p>
+            
+        <h3><a href="/hladpb1/ajaxDifferenceReport.html">HLA-DPB1 Allele Difference Report (AJAX - uses REST API)</a></h3>
+        <p>
+            For a given HLA-DPB1 reference allele, this highly interactive
+            report sorts all other HLA-DPB1 alleles from most similar to least
+            similar based on hypervariable region epitopes. This is the most
+            basic usage of the HLA-DPB1 REST API. The report is implemented as a
+            static HTML5 web page that uses the jQuery asynchronous
+            JavaScript and XML (AJAX) API to access the HLA-DPB1 REST endpoints
+            described above.
+        </p>
+            
+        <h3><a>HLA-DPB1 Compatibility Report</a></h3>
+        <p>
+            [UNDER CONSTRUCTION]
+            This highly interactive report makes donor/recipient compatibility
+            predictions based on the donor/recipient HLA-DPB1 types and the
+            recipient antibody profile (SAB positivity and/or known reactivity
+            to particular hypervarible epitopes). The report is implemented as a
+            single HTML5 web application that uses the jQuery AJAX API to access
+            the HLA-DPB1 REST endpoints.
+        </p>
+            
+        <h3><a>HLA-DPB1 Compatibility Wizard</a></h3>
+        <p>
+            [UNDER CONSTRUCTION]
+            This wizard makes donor/recipient compatibility predictions based on
+            the donor/recipient HLA-DPB1 types and the recipient antibody
+            profile (SAB positivity and/or known reactivity to particular
+            hypervarible epitopes). The wizard is implemented as a
+            static HTML5 web page that uses the jQuery AJAX API to access the
+            HLA-DPB1 REST endpoints and jQuery Mobile user interface components.
+        </p>
+            
     </body>
 </html>
+
+<script>
+    
+// Document ready! Let's go...
+$(document).ready(function() {
+   $("#exampleGetAllelesLink").click();
+   $("#exampleGetAlleleLink").click();
+   $("#exampleGetHvrsLink").click();
+   $("#exampleGetHvrLink").click();
+   $("#exampleGetReagentLotNumberLink").click();
+});
+
+</script>

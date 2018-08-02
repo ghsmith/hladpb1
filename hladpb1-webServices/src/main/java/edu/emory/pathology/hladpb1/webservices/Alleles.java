@@ -54,7 +54,8 @@ public class Alleles {
     @Path("{alleleName}")
     @Consumes("application/json")
     public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele allele) throws JAXBException {
-        // Currently only allowing changes to the reference allele.
+        // Currently only allowing changes to the forMatch and forCompatibility
+        // properties.
         if(allele.getReferenceForMatches()) {
             alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
         }

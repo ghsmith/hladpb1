@@ -41,7 +41,7 @@ td.mismatch {
     background-color: lightgray;
 }
 a.filterEnabled {
-    background-color: lightgreen;
+    background-color: yellow;
 }
 
 </style>
@@ -52,7 +52,7 @@ a.filterEnabled {
 
 <body>
 
-    <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white;">working...</div>
+    <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div>
 
     <h1>HLA-DPB1 Allele Difference Report</h1>
     
@@ -74,9 +74,9 @@ a.filterEnabled {
     </p>
     <p>
         <table>
-            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">alleles are loaded</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">alleles are loaded into memory</td></tr>
             <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">alleles match filter criteria</td></tr>
-            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">alleles are not visible</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">alleles do not match filter criteria</td></tr>
         </table>
     </p>
     <p>
