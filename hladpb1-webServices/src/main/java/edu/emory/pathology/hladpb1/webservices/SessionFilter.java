@@ -41,25 +41,27 @@ public class SessionFilter implements Filter {
         if (debug) {
             log("SessionFilter:DoBeforeProcessing");
         }
-                
-        AlleleFinder alleleFinder = (AlleleFinder)((HttpServletRequest)request).getSession().getAttribute("alleleFinder");
-        HypervariableRegionFinder hypervariableRegionFinder = (HypervariableRegionFinder)((HttpServletRequest)request).getSession().getAttribute("hypervariableRegionFinder");
-        if(alleleFinder == null || hypervariableRegionFinder == null) {
-            alleleFinder = new AlleleFinder(request.getServletContext().getInitParameter("imgtXmlFileName"));
-            hypervariableRegionFinder = new HypervariableRegionFinder(request.getServletContext().getInitParameter("emoryXmlFileName"), request.getServletContext().getInitParameter("reagentLotNumber"));
-            ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
-            ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
-            try {
-                alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionFinder.getHypervariableRegionList());
-                alleleFinder.assignHypervariableRegionVariantMatches(alleleFinder.getAlleleList().get(0).getAlleleName());
+
+        synchronized(((HttpServletRequest)request).getSession()) {
+            AlleleFinder alleleFinder = (AlleleFinder)((HttpServletRequest)request).getSession().getAttribute("alleleFinder");
+            HypervariableRegionFinder hypervariableRegionFinder = (HypervariableRegionFinder)((HttpServletRequest)request).getSession().getAttribute("hypervariableRegionFinder");
+            if(alleleFinder == null || hypervariableRegionFinder == null) {
+                alleleFinder = new AlleleFinder(request.getServletContext().getInitParameter("imgtXmlFileName"));
+                hypervariableRegionFinder = new HypervariableRegionFinder(request.getServletContext().getInitParameter("emoryXmlFileName"), request.getServletContext().getInitParameter("reagentLotNumber"));
+                ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
+                ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
+                try {
+                    alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionFinder.getHypervariableRegionList());
+                    alleleFinder.assignHypervariableRegionVariantMatches(alleleFinder.getAlleleList().get(0).getAlleleName());
+                }
+                catch(JAXBException e) {
+                    throw new RuntimeException(e);            }
             }
-            catch(JAXBException e) {
-                throw new RuntimeException(e);            }
+            Alleles.alleleFinder.set(alleleFinder);
+            Alleles.hypervariableRegionFinder.set(hypervariableRegionFinder);
+            HypervariableRegions.alleleFinder.set(alleleFinder);
+            HypervariableRegions.hypervariableRegionFinder.set(hypervariableRegionFinder);
         }
-        Alleles.alleleFinder.set(alleleFinder);
-        Alleles.hypervariableRegionFinder.set(hypervariableRegionFinder);
-        HypervariableRegions.alleleFinder.set(alleleFinder);
-        HypervariableRegions.hypervariableRegionFinder.set(hypervariableRegionFinder);
         
     }    
     
