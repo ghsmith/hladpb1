@@ -120,13 +120,13 @@ public class AlleleFinder {
                     }
                 }
             });
+            // Add sequence number for sorting.
+            int sequenceNumber = 1;
+            for(Allele allele : alleleList) {
+                allele.setSequenceNumber(sequenceNumber++);
+            }
             LOG.info(String.format("%d HLA-DPB1 alleles loaded", alleleList.size()));
             LOG.info(String.format("version is %s", alleleList.get(0).getVersion()));
-        }
-        // Add sequence number for sorting.
-        int sequenceNumber = 1;
-        for(Allele allele : alleleList) {
-            allele.setSequenceNumber(sequenceNumber++);
         }
         return alleleList;
     }

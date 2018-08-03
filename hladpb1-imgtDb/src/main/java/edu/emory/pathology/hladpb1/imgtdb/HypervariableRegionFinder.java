@@ -59,9 +59,9 @@ public class HypervariableRegionFinder {
                     emoryHvrVariant.getBeads().getBead().stream().forEach((emoryBead) -> { hvrVariant.getBeadAlleleNameList().add(emoryBead.getAlleleName()); });
                 });
             });
+            LOG.info(String.format("%d hypervariable regions loaded", hypervariableRegionList.size()));
+            LOG.info(String.format("lot number %s", reagentLotNumber));
         }
-        LOG.info(String.format("%d hypervariable regions loaded", hypervariableRegionList.size()));
-        LOG.info(String.format("lot number %s", reagentLotNumber));
         return hypervariableRegionList;
     }
 
