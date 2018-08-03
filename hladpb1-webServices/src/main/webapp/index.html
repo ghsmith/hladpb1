@@ -129,6 +129,8 @@
             </div>
             <script>
                 $("#exampleGetAllelesLink").click(function() {
+                    $("#exampleGetAllelesOutput").html("working...");
+                    setTimeout(function() {
                     $.ajax({
                         url: "/hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3",
                         dataType: "text"
@@ -137,7 +139,7 @@
                         $("#exampleGetAllelesOutput").JSONView("expand", 0);
                         $("#exampleGetAllelesOutput").JSONView("expand", 1);
                     });
-                });
+                }, 1000)});
             </script>
         </p>
         
@@ -154,13 +156,15 @@
             </div>
             <script>
                 $("#exampleGetAlleleLink").click(function() {
+                    $("#exampleGetAlleleOutput").html("working...");
+                    setTimeout(function() {
                     $.ajax({
                         url: "/hladpb1/resources/alleles/HLA-DPB1*01:01:01:01",
                         dataType: "text"
                     }).done(function(response) {
                         $("#exampleGetAlleleOutput").JSONView(response, { collapsed: false });
                     });
-                });
+                }, 1000)});
             </script>
         </p>
 
@@ -245,6 +249,8 @@
             </div>
             <script>
                 $("#exampleGetHvrsLink").click(function() {
+                    $("#exampleGetHvrsOutput").html("working...");
+                    setTimeout(function() {
                     $.ajax({
                         url: "/hladpb1/resources/hypervariableRegions",
                         dataType: "text"
@@ -253,7 +259,7 @@
                         $("#exampleGetHvrsOutput").JSONView("expand", 0);
                         $("#exampleGetHvrsOutput").JSONView("expand", 1);
                     });
-                });
+                }, 1000)});
             </script>
         </p>
 
@@ -271,13 +277,15 @@
             </div>
             <script>
                 $("#exampleGetHvrLink").click(function() {
+                    $("#exampleGetHvrOutput").html("working...");
+                    setTimeout(function() {
                     $.ajax({
                         url: "/hladpb1/resources/hypervariableRegions/f",
                         dataType: "text"
                     }).done(function(response) {
                         $("#exampleGetHvrOutput").JSONView(response, { collapsed: false });
                     });
-                });
+                }, 1000)});
             </script>
         </p>
         
@@ -338,13 +346,15 @@
             </div>
             <script>
                 $("#exampleGetReagentLotNumberLink").click(function() {
+                    $("#exampleGetReagentLotNumberOutput").html("working...");
+                    setTimeout(function() {
                     $.ajax({
                         url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
                         dataType: "text"
                     }).done(function(response) {
                         $("#exampleGetReagentLotNumberOutput").JSONView(response, { collapsed: false });
                     });
-                });
+                }, 1000)});
             </script>
         </p>
         
