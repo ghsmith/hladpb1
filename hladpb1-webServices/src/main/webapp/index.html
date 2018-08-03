@@ -9,6 +9,11 @@
         <style>
             body {
                 font-family: monospace;
+                font-size: medium;
+            }
+            table {
+                font-family: monospace;
+                font-size: medium;
             }
             h2 {
                 margin-top: 40px;
@@ -16,6 +21,10 @@
             }
             h3 {
                 margin-top: 30px;
+            }
+            table.parameters {
+                border-spacing: 0px;
+                border-collapse: collapse;
             }
             table.parameters th, table.parameters td {
                 border: 1px solid black;
@@ -58,8 +67,7 @@
             (REST) web service endpoints. Reference implementations of
             HTML5 web applications that use the REST API are also provided. The
             source code for the API and the HTML5 applications is available in
-            GitHub (<a href="https://github.com/ghsmith/hladpb1">https://github.com/ghsmith/hladpb1</a>)
-            [CONFIRM WITH BOB/HOWIE THAT I CAN MAKE THIS GITHUB REPO PUBLIC].
+            GitHub (<a href="https://github.com/ghsmith/hladpb1">https://github.com/ghsmith/hladpb1</a>).
             The API is implemented using Java Enterprise Edition components and
             is deployed on a Java Application Server. To simplify application
             development, the REST API maintains some state at the level of the
@@ -75,7 +83,7 @@
             alleles. Some filtering is supported using query parameters.
         </p>
         <h4>Query Parameters</h4>
-        <table cellspacing="0" class="parameters">
+        <table class="parameters">
             <tr><th>name</th><th>required</th><th>type</th><th>description</th><th>default</th><th>example</th></tr>
             <tr>
                 <td>synonymous</td>
@@ -118,7 +126,6 @@
             <a id="exampleGetAllelesLink" href="javascript:void(0);">GET /hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3</a>
             <br/><br/>returns JSON allele array:
             <div  id="exampleGetAllelesOutput" class="jsonOutput">
-                Click link above to see JSON output.
             </div>
             <script>
                 $("#exampleGetAllelesLink").click(function() {
@@ -144,7 +151,6 @@
             <a id="exampleGetAlleleLink" href="javascript:void(0);">GET /hladpb1/resources/alleles/HLA-DPB1*01:01:01:01</a>
             <br/><br/>returns JSON allele:
             <div  id="exampleGetAlleleOutput" class="jsonOutput">
-                Click link above to see JSON output.
             </div>
             <script>
                 $("#exampleGetAlleleLink").click(function() {
@@ -172,7 +178,7 @@
             This method takes no parameters and has no output.
         </p>
         <h4>Modifiable Properties</h4>
-        <table cellspacing="0" class="parameters">
+        <table class="parameters">
             <tr><th>name</th><th>type</th><th>description</th><th>example</th></tr>
             <tr>
                 <td>allele<br/>&nbsp;.referenceForMatches</td>
@@ -236,7 +242,6 @@
             <a id="exampleGetHvrsLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions</a>
             <br/><br/>returns JSON hypervariableRegion array:
             <div  id="exampleGetHvrsOutput" class="jsonOutput">
-                Click link above to see JSON output.
             </div>
             <script>
                 $("#exampleGetHvrsLink").click(function() {
@@ -263,7 +268,6 @@
             <a id="exampleGetHvrLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions/f</a>
             <br/><br/>returns JSON hypervariableRegion array:
             <div  id="exampleGetHvrOutput" class="jsonOutput">
-                Click link above to see JSON output.
             </div>
             <script>
                 $("#exampleGetHvrLink").click(function() {
@@ -293,7 +297,7 @@
             takes no parameters and has no output.
         </p>
         <h4>Modifiable Properties</h4>
-        <table cellspacing="0" class="parameters">
+        <table class="parameters">
             <tr><th>name</th><th>type</th><th>description</th><th>example</th></tr>
             <tr>
                 <td>hypervariableRegion<br/>&nbsp;.variantMap[]<br/>&nbsp;&nbsp;.knownReactiveEpitopeForCompat</td>
@@ -331,7 +335,6 @@
             <a id="exampleGetReagentLotNumberLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions/reagentLotNumber</a>
             <br/><br/>returns JSON reagentLotNumber:
             <div  id="exampleGetReagentLotNumberOutput" class="jsonOutput">
-                Click link above to see JSON output.
             </div>
             <script>
                 $("#exampleGetReagentLotNumberLink").click(function() {
@@ -406,11 +409,40 @@
     
 // Document ready! Let's go...
 $(document).ready(function() {
-   $("#exampleGetAllelesLink").click();
-   $("#exampleGetAlleleLink").click();
-   $("#exampleGetHvrsLink").click();
-   $("#exampleGetHvrLink").click();
-   $("#exampleGetReagentLotNumberLink").click();
+    $.ajax({
+        url: "/hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3",
+        dataType: "text"
+    }).then(function(response) {
+        $("#exampleGetAllelesOutput").JSONView(response, { collapsed: true });
+        $("#exampleGetAllelesOutput").JSONView("expand", 0);
+        $("#exampleGetAllelesOutput").JSONView("expand", 1);
+    }).then(function() {
+    $.ajax({
+        url: "/hladpb1/resources/alleles/HLA-DPB1*01:01:01:01",
+        dataType: "text"
+    }).then(function(response) {
+        $("#exampleGetAlleleOutput").JSONView(response, { collapsed: false });
+    }).then(function() {
+    $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions",
+        dataType: "text"
+    }).then(function(response) {
+        $("#exampleGetHvrsOutput").JSONView(response, { collapsed: true });
+        $("#exampleGetHvrsOutput").JSONView("expand", 0);
+        $("#exampleGetHvrsOutput").JSONView("expand", 1);
+    }).then(function() {
+    $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions/f",
+        dataType: "text"
+    }).then(function(response) {
+        $("#exampleGetHvrOutput").JSONView(response, { collapsed: false });
+    }).then(function() {
+    $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
+        dataType: "text"
+    }).done(function(response) {
+        $("#exampleGetReagentLotNumberOutput").JSONView(response, { collapsed: false });
+    })})})})});
 });
 
 </script>

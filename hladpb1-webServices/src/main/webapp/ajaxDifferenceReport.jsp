@@ -5,6 +5,7 @@
 
 <head>
 
+<meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
@@ -13,6 +14,13 @@
            
 body {
     font-family: monospace;
+    font-size: medium;
+}
+table {
+    font-family: monospace;
+    font-size: medium;
+    border-spacing: 0px;
+    border-collapse: collapse;
 }
 tr.referenceAllele {
     background-color: yellow;
@@ -74,16 +82,16 @@ a.filterEnabled {
     </p>
     <p>
         <table>
-            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">alleles are loaded into memory</td></tr>
-            <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">alleles match filter criteria</td></tr>
-            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">alleles do not match filter criteria</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">&nbsp;alleles are loaded into memory</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">&nbsp;alleles match filter criteria</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">&nbsp;alleles do not match filter criteria</td></tr>
         </table>
     </p>
     <p>
         reference allele: <select id="referenceAlleleSelect"></select>
     </p>
     
-    <table id="reportTable" cellspacing="0">
+    <table id="reportTable">
         <thead>
             <tr>
                 <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
@@ -180,7 +188,7 @@ function populateTableRows() {
     var rowHtml = [];
     var selectHtml = [];
     alleles.forEach(function(allele) {
-        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + (!isRowVisible(allele) ? "' display: none;'" : "") + "'>");
+        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "' " + (!isRowVisible(allele) ? "style='display: none;'" : "") + ">");
         $("#columnNames th").each(function(index) {
             var name = $(this).data("name");
             if(name == undefined) {
