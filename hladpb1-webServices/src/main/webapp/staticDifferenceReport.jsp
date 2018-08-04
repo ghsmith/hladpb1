@@ -129,7 +129,7 @@ a.filterEnabled {
         <input name="matchesHvrCountGe4Only" type="hidden" value="${matchesHvrCountGe4Only}"/>
     </form>
 
-    <h1>HLA-DPB1 Allele Difference Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/staticDifferenceReport.html">static version</a>)</h1>
+    <h1>HLA-DPB1 Allele Difference Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/staticDifferenceReport.jsp">static version</a>)</h1>
     
     <p>
         The reference allele for hypervariable region matching is highlighted in
