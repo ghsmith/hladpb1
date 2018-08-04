@@ -361,9 +361,8 @@
         
         <h2>Reference Implementations</h2>
 
-        <h3><a>HLA-DPB1 Allele Difference Report (JSP - does not use REST API)</a></h3>
+        <h3><a href="/hladpb1/staticDifferenceReport.jsp">HLA-DPB1 Allele Difference Report (static - does not use REST API)</a></h3>
         <p>
-            [UNDER CONSTRUCTION]
             For a given HLA-DPB1 reference allele, this report sorts all
             other HLA-DPB1 alleles from most similar to least similar based on
             hypervariable region epitopes. This report is implemented as a
@@ -374,16 +373,19 @@
             HLA-DPB1 REST API and is provided as an example of an undesirable
             implementation style.</span>
         </p>
+        <p>
+            Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/staticDifferenceReport.jsp">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/staticDifferenceReport.jsp</a>
+        </p>
             
         <h3><a href="/hladpb1/ajaxDifferenceReport.html">HLA-DPB1 Allele Difference Report (AJAX - uses REST API)</a></h3>
         <p>
             For a given HLA-DPB1 reference allele, this highly interactive
             report sorts all other HLA-DPB1 alleles from most similar to least
             similar based on hypervariable region epitopes. This is the most
-            basic usage of the HLA-DPB1 REST API. The report is implemented as a
-            static HTML5 web page that uses the jQuery asynchronous
-            JavaScript and XML (AJAX) API to access the HLA-DPB1 REST endpoints
-            described above.
+            basic usage of the HLA-DPB1 REST API. The report is implemented as
+            an HTML5 web page that uses the jQuery asynchronous JavaScript and
+            XML (AJAX) API to access the HLA-DPB1 REST endpoints described
+            above.
         </p>
         <p>
             Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html</a>

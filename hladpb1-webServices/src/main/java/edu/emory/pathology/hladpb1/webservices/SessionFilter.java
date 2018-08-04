@@ -48,14 +48,15 @@ public class SessionFilter implements Filter {
             if(alleleFinder == null || hypervariableRegionFinder == null) {
                 alleleFinder = new AlleleFinder(request.getServletContext().getInitParameter("imgtXmlFileName"));
                 hypervariableRegionFinder = new HypervariableRegionFinder(request.getServletContext().getInitParameter("emoryXmlFileName"), request.getServletContext().getInitParameter("reagentLotNumber"));
-                ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
-                ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
                 try {
                     alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionFinder.getHypervariableRegionList());
                     alleleFinder.assignHypervariableRegionVariantMatches(alleleFinder.getAlleleList().get(0).getAlleleName());
                 }
                 catch(JAXBException e) {
-                    throw new RuntimeException(e);            }
+                    throw new RuntimeException(e);
+                }
+                ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
+                ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
             }
             Alleles.alleleFinder.set(alleleFinder);
             Alleles.hypervariableRegionFinder.set(hypervariableRegionFinder);

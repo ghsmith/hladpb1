@@ -62,7 +62,7 @@ a.filterEnabled {
 
     <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div>
 
-    <h1>HLA-DPB1 Allele Difference Report</h1>
+    <h1>HLA-DPB1 Allele Difference Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html">AJAX version</a>)</h1>
     
     <p>
         The reference allele for hypervariable region matching is highlighted in

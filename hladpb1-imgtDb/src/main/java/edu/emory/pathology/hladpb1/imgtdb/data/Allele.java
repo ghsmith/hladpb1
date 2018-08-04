@@ -11,8 +11,26 @@ public class Allele {
     // Inner class to make it convenient to reference hypervariable region with
     // the matchesReference attribute.
     public static class HypervariableRegionVariantRef {
-        public String variantId;
-        public Boolean matchesReference;
+        
+        private String variantId;
+        private Boolean matchesReference;
+
+        public String getVariantId() {
+            return variantId;
+        }
+
+        public void setVariantId(String variantId) {
+            this.variantId = variantId;
+        }
+
+        public Boolean getMatchesReference() {
+            return matchesReference;
+        }
+
+        public void setMatchesReference(Boolean matchesReference) {
+            this.matchesReference = matchesReference;
+        }
+        
     }
     
     private Integer sequenceNumber;
