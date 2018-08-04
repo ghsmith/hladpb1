@@ -429,6 +429,21 @@
     
 // Document ready! Let's go...
 $(document).ready(function() {
+    var allele;
+    $.ajax({
+        url: "/hladpb1/resources/alleles/HLA-DPB1*01:01:01:01",
+        dataType: "json"
+    }).then(function(response) {
+        allele = response;
+        allele.referenceForMatches = true;
+    }).then(function() {
+    $.ajax({
+        url: "/hladpb1/resources/alleles/HLA-DPB1*01:01:01:01",
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(allele)
+    }).then(function() {
     $.ajax({
         url: "/hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3",
         dataType: "text"
@@ -462,7 +477,7 @@ $(document).ready(function() {
         dataType: "text"
     }).done(function(response) {
         $("#exampleGetReagentLotNumberOutput").JSONView(response, { collapsed: false });
-    })})})})});
+    })})})})})})});
 });
 
 </script>
