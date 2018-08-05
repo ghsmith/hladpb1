@@ -14,7 +14,8 @@ public class HypervariableRegionVariant {
     private List<String> beadAlleleNameList;
     private Boolean knownReactiveEpitopeForCompat;
     private Boolean compatIsRecipientEpitope;
-    private Boolean compatPositiveSabCount;
+    private Integer compatPositiveSabCount;
+    private Integer compatPositiveSabPct;
     private Boolean compatAntibodyConsideredPresent;
 
     public String getVariantId() {
@@ -57,12 +58,20 @@ public class HypervariableRegionVariant {
         this.compatIsRecipientEpitope = compatIsRecipientEpitope;
     }
 
-    public Boolean getCompatPositiveSabCount() {
+    public Integer getCompatPositiveSabCount() {
         return compatPositiveSabCount;
     }
 
-    public void setCompatPositiveSabCount(Boolean compatPositiveSabCount) {
+    public void setCompatPositiveSabCount(Integer compatPositiveSabCount) {
         this.compatPositiveSabCount = compatPositiveSabCount;
+    }
+
+    public Integer getCompatPositiveSabPct() {
+        return compatPositiveSabPct;
+    }
+
+    public void setCompatPositiveSabPct(Integer compatPositiveSabPct) {
+        this.compatPositiveSabPct = compatPositiveSabPct;
     }
 
     public Boolean getCompatAntibodyConsideredPresent() {
@@ -72,5 +81,5 @@ public class HypervariableRegionVariant {
     public void setCompatAntibodyConsideredPresent(Boolean compatAntibodyConsideredPresent) {
         this.compatAntibodyConsideredPresent = compatAntibodyConsideredPresent;
     }
-    
+   
 }
