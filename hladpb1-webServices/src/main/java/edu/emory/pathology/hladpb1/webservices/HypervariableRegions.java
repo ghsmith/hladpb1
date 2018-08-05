@@ -47,12 +47,17 @@ public class HypervariableRegions {
     @PUT
     @Path("{hypervariableRegionName}")
     @Consumes("application/json")
-    public void putJsonAllele(@PathParam("hypervariableRegionName") String hypervariableRegionName, HypervariableRegion hypervariableRegion) throws JAXBException {
-        // Currently only allowing changes to the forCompatibility properties.
-        HypervariableRegion currentHypervariableRegion = hypervariableRegionFinder.get().getHypervariableRegion(hypervariableRegionName);
-        hypervariableRegion.getVariantMap().keySet().forEach((hyperVariableRegionName) -> {
-            currentHypervariableRegion.getVariantMap().get(hyperVariableRegionName).setKnownReactiveEpitopeForCompat(hypervariableRegion.getVariantMap().get(hyperVariableRegionName).getKnownReactiveEpitopeForCompat());
+    public void putJsonAllele(@PathParam("hypervariableRegionName") String hypervariableRegionName, HypervariableRegion updatedHypervariableRegion) throws JAXBException {
+        HypervariableRegion hypervariableRegion = hypervariableRegionFinder.get().getHypervariableRegion(hypervariableRegionName);
+        boolean[] assignCompatibilityStatus = new boolean[] {false}; // wrapping for use in lambda
+        hypervariableRegion.getVariantMap().keySet().forEach((variantId) -> {
+            if(!updatedHypervariableRegion.getVariantMap().get(variantId).getKnownReactiveEpitopeForCompat().equals(hypervariableRegion.getVariantMap().get(variantId).getKnownReactiveEpitopeForCompat())) {
+                hypervariableRegion.getVariantMap().get(variantId).setKnownReactiveEpitopeForCompat(updatedHypervariableRegion.getVariantMap().get(variantId).getKnownReactiveEpitopeForCompat());
+                assignCompatibilityStatus[0] = true;
+            }
         });
+        if(assignCompatibilityStatus[0]) {
+        }
     }
     
 }

@@ -44,9 +44,9 @@ public class Allele {
     private Boolean singleAntigenBead;
     private Boolean referenceForMatches;
     private Integer matchesHvrCount;
-    private Boolean recipientAntibodyForCompat;
-    private Boolean recipientTypeForCompat;
-    private Boolean donorTypeForCompat;
+    private Boolean recipientAntibodyForCompat = false;
+    private Boolean recipientTypeForCompat = false;
+    private Boolean donorTypeForCompat = false;
     private String compatInterpretation;
 
     public Integer getSequenceNumber() {

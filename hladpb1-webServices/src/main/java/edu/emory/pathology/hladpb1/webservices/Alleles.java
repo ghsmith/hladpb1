@@ -53,10 +53,25 @@ public class Alleles {
     @PUT
     @Path("{alleleName}")
     @Consumes("application/json")
-    public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele allele) throws JAXBException {
-        // Currently only allowing changes to the forMatch and forCompatibility
-        // properties.
+    public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele updatedAllele) throws JAXBException {
+        Allele allele = alleleFinder.get().getAllele(alleleName);
+        boolean[] assignCompatibilityStatus = new boolean[] {false}; // wrapping for use in lambda
+        if(!updatedAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
+            allele.setDonorTypeForCompat(updatedAllele.getDonorTypeForCompat());
+            assignCompatibilityStatus[0] = true;
+        }
+        if(!updatedAllele.getRecipientTypeForCompat().equals(allele.getRecipientTypeForCompat())) {
+            allele.setRecipientTypeForCompat(updatedAllele.getRecipientTypeForCompat());
+            assignCompatibilityStatus[0] = true;
+        }
+        if(!updatedAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
+            allele.setRecipientAntibodyForCompat(updatedAllele.getRecipientAntibodyForCompat());
+            assignCompatibilityStatus[0] = true;
+        }
+        if(assignCompatibilityStatus[0]) {
+        }
         if(allele.getReferenceForMatches()) {
+            // This will concurrently un-assign the current reference allele.
             alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
         }
     }

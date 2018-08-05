@@ -12,7 +12,7 @@ public class HypervariableRegionVariant {
     private String variantId;
     private List<String> proteinSequenceList;
     private List<String> beadAlleleNameList;
-    private Boolean knownReactiveEpitopeForCompat;
+    private Boolean knownReactiveEpitopeForCompat = false;
     private Boolean compatIsRecipientEpitope;
     private Integer compatPositiveSabCount;
     private Integer compatPositiveSabPct;

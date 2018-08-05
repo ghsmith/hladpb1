@@ -47,7 +47,7 @@ th.indexRight, td.indexRight {
 a.filterEnabled {
     background-color: yellow;
 }
-#reportTable tr:hover {
+#reportTable tbody tr:hover {
     background-color: yellow;
 }
 table.statusDescriptionTable td {
@@ -65,7 +65,7 @@ table.statusDescriptionTable td {
 
     <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div>
 
-    <h1>HLA-DPB1 Compatability Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReport.html">source code</a>)</h1>
+    <h1>HLA-DPB1 Compatibility Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReport.html">source code</a>)</h1>
     
     <p>
         Select recipient antibodies and donor & recipient alleles below. An
@@ -107,9 +107,9 @@ table.statusDescriptionTable td {
             <tr id="columnNames">
                 <th data-name="allele.alleleName" class="alleleName">allele name</th>
                 <th data-name="allele.singleAntigenBead ? 'Y' : '&nbsp;'">SAB</th>
-                <th data-name="allele.donorTypeForCompat" data-label="D">donor<br/>type (D)</th>
-                <th data-name="allele.recipientTypeForCompat" data-label="R">recipient<br/>type (R)</th>
-                <th data-name="allele.recipientAntibodyForCompat" data-label="Ab">recipient<br/>antibody (Ab)</th>
+                <th data-name="allele.donorTypeForCompat" data-label="D">donor<br/>type<br/>(D)</th>
+                <th data-name="allele.recipientTypeForCompat" data-label="R">recip<br/>type<br/>(R)</th>
+                <th data-name="allele.recipientAntibodyForCompat" data-label="Ab">recip<br/>antib<br/>(Ab)</th>
                 <th data-name="allele.compatInterpretation">status</th>
                 <th colspan="7" data-hvr-id="a" class="hvrId index">a</th>
                 <th colspan="7" data-hvr-id="b" class="hvrId index">b</th>
@@ -137,48 +137,48 @@ table.statusDescriptionTable td {
             </tr>
             <tr id="hvrVariantSeqs" style="border: 1px solid black;">
                 <th colspan="6" style="text-align: right;">protein sequence(s) &Longrightarrow;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['a'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="a" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="variantSeq indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['b'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="b" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="variantSeq indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['c'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="c" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="variantSeq indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['d'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="d" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="variantSeq indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="variantSeq indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="variantSeq indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['a'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="a" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="a" class="variantSeq indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['b'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="b" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="b" class="variantSeq indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['c'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="c" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="c" class="variantSeq indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['d'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="d" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="d" class="variantSeq indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="e" class="variantSeq indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['${variantId}'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="f" class="variantSeq indexRight">&nbsp;</th>
             </tr>
             <tr id="hvrRecipientEpitopes" style="border: 1px solid black;">
                 <th colspan="6" style="text-align: right;">is a recipient epitope? &Longrightarrow;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] != undefined && hvrMap['a'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="a" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="recipientEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] != undefined && hvrMap['b'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="b" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="recipientEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] != undefined && hvrMap['c'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="c" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="recipientEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] != undefined && hvrMap['d'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="d" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="recipientEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] != undefined && hvrMap['e'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="e" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="recipientEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] != undefined && hvrMap['f'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="f" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="recipientEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] != undefined && hvrMap['a'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="a" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="a" class="recipientEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] != undefined && hvrMap['b'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="b" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="b" class="recipientEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] != undefined && hvrMap['c'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="c" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="c" class="recipientEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] != undefined && hvrMap['d'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="d" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="d" class="recipientEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] != undefined && hvrMap['e'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="e" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="e" class="recipientEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] != undefined && hvrMap['f'].variantMap['${variantId}'].compatIsRecipientEpitope ? 'Y' : '&nbsp;'" data-hvr-id="f" class="recipientEpitope ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="f" class="recipientEpitope indexRight">&nbsp;</th>
             </tr>
             <tr id="hvrPctBeadsPositives" style="border: 1px solid black;">
                 <th colspan="6" style="text-align: right;">percentage of beads positive &Longrightarrow;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] != undefined ? hvrMap['a'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="a" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="pctBeadsPositive indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] != undefined ? hvrMap['b'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="b" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="pctBeadsPositive indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] != undefined ? hvrMap['c'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="c" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="pctBeadsPositive indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] != undefined ? hvrMap['d'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="d" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="pctBeadsPositive indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] != undefined ? hvrMap['e'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="e" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="pctBeadsPositive indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] != undefined ? hvrMap['f'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="f" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="pctBeadsPositive indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] != undefined ? hvrMap['a'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="a" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="a" class="pctBeadsPositive indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] != undefined ? hvrMap['b'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="b" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="b" class="pctBeadsPositive indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] != undefined ? hvrMap['c'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="c" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="c" class="pctBeadsPositive indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] != undefined ? hvrMap['d'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="d" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="d" class="pctBeadsPositive indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] != undefined ? hvrMap['e'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="e" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="e" class="pctBeadsPositive indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] != undefined ? hvrMap['f'].variantMap['${variantId}'].compatPositiveSabPct : '&nbsp;'" data-hvr-id="f" class="pctBeadsPositive ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="f" class="pctBeadsPositive indexRight">&nbsp;</th>
             </tr>
             <tr id="hvrAntibodyPresents" style="border: 1px solid black;">
                 <th colspan="6" style="text-align: right;">is an antibody likely? &Longrightarrow;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] != undefined && hvrMap['a'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="a" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="antibodyPresent indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] != undefined && hvrMap['b'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="b" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="antibodyPresent indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] != undefined && hvrMap['c'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="c" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="antibodyPresent indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] != undefined && hvrMap['d'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="d" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="antibodyPresent indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] != undefined && hvrMap['e'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="e" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="antibodyPresent indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] != undefined && hvrMap['f'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="f" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th class="antibodyPresent indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'] != undefined && hvrMap['a'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="a" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="a" class="antibodyPresent indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'] != undefined && hvrMap['b'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="b" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="b" class="antibodyPresent indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'] != undefined && hvrMap['c'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="c" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="c" class="antibodyPresent indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'] != undefined && hvrMap['d'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="d" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="d" class="antibodyPresent indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'] != undefined && hvrMap['e'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="e" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="e" class="antibodyPresent indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'] != undefined && hvrMap['f'].variantMap['${variantId}'].compatAntibodyConsideredPresent ? 'Y' : '&nbsp;'" data-hvr-id="f" class="antibodyPresent ${variantId == 1 ? "index" : ""}"></th></c:forEach><th data-hvr-id="f" class="antibodyPresent indexRight">&nbsp;</th>
             </tr>
             <tr id="hvrKnownReactiveEpitopes" style="border: 1px solid black;">
                 <th colspan="6" style="text-align: right;">epitope known to be reactive? &Longrightarrow;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-hvr-id="a" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th class="knownReactiveEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-hvr-id="a" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th class="knownReactiveEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-hvr-id="a" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th class="knownReactiveEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-hvr-id="a" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th class="knownReactiveEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-hvr-id="a" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th class="knownReactiveEpitope indexRight">&nbsp;</th>
-                <c:forEach var="variantId" begin="1" end="6"><th data-hvr-id="a" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th class="knownReactiveEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['a'].variantMap['${variantId}'].knownReactiveEpitopeForCompat" data-container="hvrMap['a'].variantMap['${variantId}']" data-hvr-id="a" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th data-hvr-id="a" class="knownReactiveEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['b'].variantMap['${variantId}'].knownReactiveEpitopeForCompat" data-container="hvrMap['b'].variantMap['${variantId}']" data-hvr-id="b" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th data-hvr-id="b" class="knownReactiveEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['c'].variantMap['${variantId}'].knownReactiveEpitopeForCompat" data-container="hvrMap['c'].variantMap['${variantId}']" data-hvr-id="c" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th data-hvr-id="c" class="knownReactiveEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['d'].variantMap['${variantId}'].knownReactiveEpitopeForCompat" data-container="hvrMap['d'].variantMap['${variantId}']" data-hvr-id="d" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th data-hvr-id="d" class="knownReactiveEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['e'].variantMap['${variantId}'].knownReactiveEpitopeForCompat" data-container="hvrMap['e'].variantMap['${variantId}']" data-hvr-id="e" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th data-hvr-id="e" class="knownReactiveEpitope indexRight">&nbsp;</th>
+                <c:forEach var="variantId" begin="1" end="6"><th data-name="hvrMap['f'].variantMap['${variantId}'].knownReactiveEpitopeForCompat" data-container="hvrMap['f'].variantMap['${variantId}']" data-hvr-id="f" class="knownReactiveEpitope ${variantId == 1 ? "index" : ""}"><input type="checkbox"></th></c:forEach><th data-hvr-id="f" class="knownReactiveEpitope indexRight">&nbsp;</th>
             </tr>
         </thead>
         <tbody>
@@ -222,6 +222,18 @@ function getHypervariableRegions() {
     });
 }
 
+// Put a hypervariable region (updates known reactive epitope attribute).
+function putHypervariableRegion(hypervariableRegion) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions/" + hypervariableRegion.hypervariableRegionName,
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(hypervariableRegion)
+    });
+}
+
 // Get all alleles.
 function getAlleles() {
     $("#working").show();
@@ -233,8 +245,7 @@ function getAlleles() {
     });
 }
 
-// Put an allele. With this report, this is only used to set the current
-// reference allele.
+// Put an allele (updates donor type, recipient type, and recipient antibodies).
 function putAllele(allele) {
     $("#working").show();
     return $.ajax({
@@ -297,15 +308,21 @@ function setUiState() {
         $("#hvrVariantSeqs th.variantSeq, #hvrRecipientEpitopes th.recipientEpitope, #hvrPctBeadsPositives th.pctBeadsPositive, #hvrAntibodyPresents th.antibodyPresent").each(function() {
             $(this).html(eval($(this).data("name")));
         });
+        $("#hvrKnownReactiveEpitopes th.knownReactiveEpitope").each(function() {
+            $(this).children("input").prop("checked", eval($(this).data("container")) != undefined && eval($(this).data("name")));
+        });
         $("#reportTable tbody tr").each(function() {
             var alleleName = $(this).data("value");
             var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
             if(isRowVisible(allele)) { $(this).show(); }
             else                     { $(this).hide(); }
             $(this).children("td").each(function() {
-                //if($(this).data("name") == "allele.matchesHvrCount") {
-                //    $(this).html(allele.matchesHvrCount);
-                //}
+                if($(this).data("name").match(/.*ForCompat/)) {
+                    $(this).children("input").prop("checked", eval($(this).data("name")));
+                }
+                if($(this).data("name") == "allele.compatInterpretation") {
+                    $(this).html(eval($(this).data("name")));
+                }
             });
         });
         dfr.resolve();
@@ -335,13 +352,22 @@ $(document).ready(function() {
     // Initial population of report table.
     getReagentLotNumber().then(getHypervariableRegions).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
 
-    // Click on a row to set it as the reference allele. Handled by web service.
-    //$("#reportTable tbody").on("click", "tr", function() {
-    //    var alleleName = $(this).data("value");
-    //    var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
-    //    allele.referenceForMatches = true;
-    //    putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
-    //});
+    // Change a hypervariable region input (i.e., click a checkbox).
+    $("#reportTable thead").on("change", "input", function() {
+        var hvrId = $(this).parent().data("hvr-id");
+        if(eval($(this).parent().data("container")) != undefined) {
+            eval($(this).parent().data("name") + " = " + $(this).prop("checked"));
+        }
+        putHypervariableRegion(hvrMap[hvrId]).then(getHypervariableRegions).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
+    });
+
+    // Change an allele input (i.e., click a checkbox).
+    $("#reportTable tbody").on("change", "input", function() {
+        var alleleName = $(this).parents("tr").data("value");
+        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+        eval($(this).parent().data("name") + " = " + $(this).prop("checked"));
+        putAllele(allele).then(getHypervariableRegions).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
+    });
 
     // Single antigen bead filter toggle on/off. This is handled locally.
     $("#sabFilter").click(function() {
