@@ -189,7 +189,7 @@ function populateTableRows() {
     var selectHtml = [];
     alleles.forEach(function(allele) {
         rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "' " + (!isRowVisible(allele) ? "style='display: none;'" : "") + ">");
-        $("#columnNames th").each(function(index) {
+        $("#columnNames th").each(function() {
             var name = $(this).data("name");
             if(name == undefined) {
                 rowHtml.push("<td>&nbsp;</td>");
