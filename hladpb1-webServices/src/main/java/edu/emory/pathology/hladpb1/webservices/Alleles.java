@@ -65,8 +65,12 @@ public class Alleles {
             assignCompatibilityStatus[0] = true;
         }
         if(!updatedAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
-            allele.setRecipientAntibodyForCompat(updatedAllele.getRecipientAntibodyForCompat());
-            assignCompatibilityStatus[0] = true;
+            // Not allowing antibodies to specified for alleles that are not the
+            // subject of a single antigen bead.
+            if(allele.getSingleAntigenBead()) {
+                allele.setRecipientAntibodyForCompat(updatedAllele.getRecipientAntibodyForCompat());
+                assignCompatibilityStatus[0] = true;
+            }
         }
         if(assignCompatibilityStatus[0]) {
         }

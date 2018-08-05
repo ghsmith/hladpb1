@@ -30,13 +30,18 @@ th, td {
 th.alleleName, td.alleleName {
     text-align: left;
 }
-th.hvrId, td.hvrId {
+th.hvrId {
     text-align: center;
+    border-left: 1px solid black;
 }
 th.variantId, th.variantSeq, th.recipientEpitope,
 th.pctBeadsPositive, th.antibodyPresent, th.knownReactiveEpitope {
     text-align: center;
     border: 1px solid black;
+}
+td.variantId {
+    text-align: center;
+    border-left: 1px solid black;
 }
 th.index, td.index {
     border-left: 3px solid black;
@@ -77,13 +82,16 @@ table.statusDescriptionTable td {
     </p>
     <p>
         <table class="statusDescriptionTable">
-            <tr><td>LC</td><td>likely&nbsp;compatible</td><td>the single antigen bead corresponding to the donor allele is NOT positive and antibody specificity for an epitope of the donor allele is NOT inferred</td></tr>
-            <tr><td>I</td><td>incompatible</i></td><td>the single antigen bead corresponding to the donor allele is positive</td></tr>
+            <tr><td>LC</td><td>likely&nbsp;compatible</td><td>the single antigen bead (SAB) corresponding to the donor allele is NOT positive and antibody specificity for an epitope of the donor allele is NOT inferred</td></tr>
             <tr><td>LI</td><td>likely&nbsp;incompatible</i></td><td>antibody specificity for an epitope of the donor allele is inferred</td></tr>
+            <tr><td>I</td><td>incompatible</i></td><td>the single antigen bead corresponding to the donor allele is positive</td></tr>
             <tr><td>AA</td><td>auto-antibody</td><td>the single antigen bead corresponding to the donor allele is positive, but is also a recipient allele</td></tr>
         </table>
     </p>
-
+    <p>
+        Selection of antibodies to alleles that are not the subject of a single
+        antigen bead is currently not allowed.
+    </p>
     <p>
         The IMGT allele database version is <span id="imgtDbVersion">...</span>
         and the single antigen bead (SAB) reagent lot number is
@@ -93,14 +101,20 @@ table.statusDescriptionTable td {
         This report is for research use only.
     </p>
     
+    <p>
+        <table>
+            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">&nbsp;alleles are loaded into memory</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">&nbsp;alleles match filter criteria</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">&nbsp;alleles do not match filter criteria</td></tr>
+        </table>
+    </p>
+
     <table id="reportTable">
         <thead>
             <tr>
                 <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
                 <th>[<a id="sabFilter" href="javascript:void(0);">filter=Y</a>]</th>
-                <th>[<a id="donorTypeFilter" href="javascript:void(0);">filter=Y</a>]</th>
-                <th>[<a id="recipientTypeFilter" href="javascript:void(0);">filter=Y</a>]</th>
-                <th>[<a id="sabPositiveFilter" href="javascript:void(0);">filter=Y</a>]</th>
+                <th colspan="3" style="border-bottom: 1px solid black;">[<a id="selectedFilter" href="javascript:void(0);">filter=Y</a>]</th>
                 <th>[<a id="statusSort" href="javascript:void(0);">sort</a>]</th>
                 <th colspan="42" style="border-bottom: 1px solid black;">hypervariable region name</th>
             </tr>
@@ -196,6 +210,13 @@ var alleles = []; // the array of alleles
 var hypervariableRegions = []; // the array of hypervariableRegions
 var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region ID
 var sabOnly = false; // only show single antigen bead alleles
+var selectedOnly = false; // only show donor type alleles or recipient type alleles or recipient antibody alleles
+var statusSortMap = {
+    'LC': { sortSeq: 1 },
+    'LI': { sortSeq: 2 },
+    'I':  { sortSeq: 3 },
+    'AA': { sortSeq: 0 }
+}
 
 // Get reagent lot number.
 function getReagentLotNumber() {
@@ -303,8 +324,8 @@ function setUiState() {
     setTimeout(function() {
         $("#imgtDbVersion").html(alleles[0].version);
         $("#reagentLotNumber").html(reagentLotNumber);
-        $("#sabFilter").removeClass("filterEnabled");
-        if(sabOnly) { $("#sabFilter").addClass("filterEnabled"); }
+        $("#sabFilter").removeClass("filterEnabled");      if(sabOnly )     { $("#sabFilter").addClass("filterEnabled"); }
+        $("#selectedFilter").removeClass("filterEnabled"); if(selectedOnly) { $("#selectedFilter").addClass("filterEnabled"); }
         $("#hvrVariantSeqs th.variantSeq, #hvrRecipientEpitopes th.recipientEpitope, #hvrPctBeadsPositives th.pctBeadsPositive, #hvrAntibodyPresents th.antibodyPresent").each(function() {
             $(this).html(eval($(this).data("name")));
         });
@@ -325,6 +346,9 @@ function setUiState() {
                 }
             });
         });
+        $("#allelesLoaded").html($("#reportTable tbody tr").length);
+        $("#allelesShown").html($("#reportTable tbody tr:visible").length);
+        $("#allelesFiltered").html($("#reportTable tbody tr:hidden").length);
         dfr.resolve();
     }, 1);
     return dfr.promise();
@@ -333,7 +357,8 @@ function setUiState() {
 // Row filtering function.
 function isRowVisible(allele) {
     rowVisible = true;
-    if(sabOnly && !allele.singleAntigenBead) { rowVisible = false; }
+    if(sabOnly && !allele.singleAntigenBead)                                                                               { rowVisible = false; }
+    if(selectedOnly && !(allele.donorTypeForCompat || allele.recipientTypeForCompat || allele.recipientAntibodyForCompat)) { rowVisible = false; }
     return rowVisible;
 }
 
@@ -345,6 +370,15 @@ function alleleNameSort(a, b) {
     else if(A > B) { return  1; }
     else           { return  0; }
 };
+
+// Sort function.
+function statusSort(a, b) {
+    var A = statusSortMap[$(a).children("td").eq(6).html()];
+    var B = statusSortMap[$(b).children("td").eq(6).html()];
+    if(A < B)      { return -1; }
+    else if(A > B) { return  1; }
+    else           { return alleleNameSort(a, b); }
+}
 
 // Document ready! Let's go...
 $(document).ready(function() {
@@ -372,6 +406,13 @@ $(document).ready(function() {
     // Single antigen bead filter toggle on/off. This is handled locally.
     $("#sabFilter").click(function() {
         sabOnly = !sabOnly;
+        setUiState().done(function() { $("#working").hide(); });
+    });
+
+    // Donor type or recipient type or recipient antibody filter toggle on/off.
+    // This is handled locally.
+    $("#selectedFilter").click(function() {
+        selectedOnly = !selectedOnly;
         setUiState().done(function() { $("#working").hide(); });
     });
 
