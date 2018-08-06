@@ -1,5 +1,6 @@
 package edu.emory.pathology.hladpb1.imgtdb.data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  * 
  * @author ghsmith
  */
-public class HypervariableRegionVariant {
+public class HypervariableRegionVariant implements Serializable {
 
     // Inner class to make it convenient to reference single antigen beads and
     // their positivitiy.

@@ -1,5 +1,6 @@
 package edu.emory.pathology.hladpb1.imgtdb.data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -8,7 +9,7 @@ import java.util.SortedMap;
  * 
  * @author ghsmith
  */
-public class HypervariableRegion {
+public class HypervariableRegion implements Serializable {
    
     private String hypervariableRegionName;
     private List<Integer> codonNumberList;

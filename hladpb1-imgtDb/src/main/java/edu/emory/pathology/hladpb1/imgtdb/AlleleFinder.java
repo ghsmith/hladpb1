@@ -6,9 +6,7 @@ import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +37,7 @@ public class AlleleFinder {
     }
     
     public List<Allele> getAlleleList() {
+        
         if(alleleList == null) {
             alleleList = new ArrayList();
             JaxbImgtFinder imgtFinder = new JaxbImgtFinder(xmlFileName);
@@ -135,10 +134,15 @@ public class AlleleFinder {
             for(Allele allele : alleleList) {
                 allele.setSequenceNumber(sequenceNumber++);
             }
+            // Strip out all but codons 1-100. We can always add them back
+            // later.
+            getAlleleList().stream().forEach((allele) -> { allele.setCodonMap(allele.getCodonMap().subMap(1, 100)); });
             LOG.info(String.format("%d HLA-DPB1 alleles loaded", alleleList.size()));
             LOG.info(String.format("version is %s", alleleList.get(0).getVersion()));
         }
+        
         return alleleList;
+        
     }
 
     public void assignHypervariableRegionVariantIds(HypervariableRegionFinder hypervariableRegionFinder) {
@@ -146,11 +150,11 @@ public class AlleleFinder {
         List<HypervariableRegion> hypervariableRegionList = hypervariableRegionFinder.getHypervariableRegionList();
 
         // 1. Ensure the source data is consistent with IMGT.
-        hypervariableRegionList.stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> { hvrVariant.getBeadAlleleRefList().forEach((beadAlleleRef) -> {
+        hypervariableRegionList.stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> { variant.getBeadAlleleRefList().forEach((beadAlleleRef) -> {
             if(!(
                 getAlleleList().stream().filter((allele) -> (allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().isPresent()
             )) {
-                throw new RuntimeException("Hypervariable region " + hypervariableRegion.getHypervariableRegionName() + " variant " + hvrVariant.getVariantId() + " bead allele " + beadAlleleRef.getAlleleName() + " does not exist in IMGT database");
+                throw new RuntimeException("Hypervariable region " + hypervariableRegion.getHypervariableRegionName() + " variant " + variant.getVariantId() + " bead allele " + beadAlleleRef.getAlleleName() + " does not exist in IMGT database");
             }
             getAlleleList().stream().filter((allele) -> (allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().ifPresent((allele) -> {
                 StringBuilder hvrProteinSequence = new StringBuilder();
@@ -159,11 +163,11 @@ public class AlleleFinder {
                     hvrProteinSequence.append(codon == null ? "*" : codon.getAminoAcid());
                 });
                 if(!(
-                    hvrVariant.getProteinSequenceList().stream().filter((proteinSequence) -> (hvrProteinSequence.toString().equals(proteinSequence))).count() == 1
+                    variant.getProteinSequenceList().stream().filter((proteinSequence) -> (hvrProteinSequence.toString().equals(proteinSequence))).count() == 1
                 )) {
                     throw new RuntimeException(
-                        "Hypervariable region " + hypervariableRegion.getHypervariableRegionName() + " variant " + hvrVariant.getVariantId() + " bead allele " + beadAlleleRef.getAlleleName()
-                        + " protein sequence is not consistent with IMGT database (hypervariable region: " + hvrVariant.getProteinSequenceList() + " / IMGT: " + hvrProteinSequence
+                        "Hypervariable region " + hypervariableRegion.getHypervariableRegionName() + " variant " + variant.getVariantId() + " bead allele " + beadAlleleRef.getAlleleName()
+                        + " protein sequence is not consistent with IMGT database (hypervariable region: " + variant.getProteinSequenceList() + " / IMGT: " + hvrProteinSequence
                     );
                 }
             });
@@ -186,10 +190,10 @@ public class AlleleFinder {
                 hvrvRef.setHypervariableRegionName(hypervariableRegion.getHypervariableRegionName());
                 hvrvRef.setVariantId(hvrProteinSequence.toString()); // default if the protein sequence does not match an established hypervariable region variant
                 allele.setSingleAntigenBead(false);
-                hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
-                    hvrVariant.getProteinSequenceList().stream().filter((proteinSequence) -> (hvrProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
-                        hvrvRef.setVariantId(hvrVariant.getVariantId());
-                        hvrVariant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().ifPresent((beadAlleleRef) -> {
+                hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
+                    variant.getProteinSequenceList().stream().filter((proteinSequence) -> (hvrProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
+                        hvrvRef.setVariantId(variant.getVariantId());
+                        variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().ifPresent((beadAlleleRef) -> {
                             allele.setSingleAntigenBead(true);
                         });
                     });
@@ -204,24 +208,18 @@ public class AlleleFinder {
         Allele referenceAllele = getAllele(referenceAlleleName);
         getAlleleList().stream().forEach((allele) -> {
             allele.setReferenceForMatches(referenceAllele.equals(allele));
-            allele.setMatchesHvrCount((int)referenceAllele.getHvrVariantMap().keySet().stream().filter((hvrName) -> (
-                referenceAllele.getHvrVariantMap().get(hvrName).getVariantId().equals(allele.getHvrVariantMap().get(hvrName).getVariantId()))).count()
+            allele.setMatchesHvrCount((int)referenceAllele.getHvrVariantMap().values().stream().filter((hvrVariant) -> (
+                referenceAllele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId().equals(hvrVariant.getVariantId()))).count()
             );
-            allele.getHvrVariantMap().keySet().stream().forEach((hvrName) -> {
-                allele.getHvrVariantMap().get(hvrName).setMatchesReference(
-                    referenceAllele.getHvrVariantMap().get(hvrName).getVariantId()
-                    .equals(allele.getHvrVariantMap().get(hvrName).getVariantId())
+            allele.getHvrVariantMap().values().stream().forEach((hvrVariant) -> {
+                hvrVariant.setMatchesReference(
+                    referenceAllele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId().equals(hvrVariant.getVariantId())
                 );
             });
-            allele.getCodonMap().keySet().stream().forEach((codonNumber) -> {
-                allele.getCodonMap().get(codonNumber).setMatchesReference(null);
-                if(allele.getCodonMap().get(codonNumber) != null) {
-                    if(referenceAllele.getCodonMap().get(codonNumber) != null) {
-                        allele.getCodonMap().get(codonNumber).setMatchesReference(
-                            referenceAllele.getCodonMap().get(codonNumber).getAminoAcid()
-                            .equals(allele.getCodonMap().get(codonNumber).getAminoAcid())
-                        );
-                    }
+            allele.getCodonMap().values().stream().forEach((codon) -> {
+                codon.setMatchesReference(false);
+                if(referenceAllele.getCodonMap().get(codon.getCodonNumber()) != null) {
+                    codon.setMatchesReference(referenceAllele.getCodonMap().get(codon.getCodonNumber()).getAminoAcid().equals(codon.getAminoAcid()));
                 }
             });
         });
@@ -230,55 +228,51 @@ public class AlleleFinder {
 
     public void computeCompatInterpretation(HypervariableRegionFinder hypervariableRegionFinder) {
 
-        // Creating a hypervariable region map for convenience (and to avoid
-        // JAXB exception throwing problems inside of lambda functions).
-        Map<String, HypervariableRegion> hvrMap = hypervariableRegionFinder.getHypervariableRegionList().stream().collect(Collectors.toMap(HypervariableRegion::getHypervariableRegionName, Function.identity()));
-
         // 1. Reset all compatibility attributes.
         getAlleleList().stream().forEach((allele) -> {
             allele.setCompatInterpretation(null);
         });
-        hvrMap.values().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
-            hvrVariant.setCompatIsRecipientEpitope(false);
-            hvrVariant.setCompatPositiveSabCount(0);
-            hvrVariant.setCompatPositiveSabPct(0);
-            hvrVariant.setCompatAntibodyConsideredPresent(false);
-            hvrVariant.getBeadAlleleRefList().stream().forEach((beadAlleleRef) -> { beadAlleleRef.setCompatBeadPositive(false); });
+        hypervariableRegionFinder.getHypervariableRegionList().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
+            variant.setCompatIsRecipientEpitope(false);
+            variant.setCompatPositiveSabCount(0);
+            variant.setCompatPositiveSabPct(0);
+            variant.setCompatAntibodyConsideredPresent(false);
+            variant.getBeadAlleleRefList().stream().forEach((beadAlleleRef) -> { beadAlleleRef.setCompatBeadPositive(false); });
         }); });
         
         // 2. Determine which hypervariable region variants correspond to
         //    recipient epitopes.
         getAlleleList().stream().filter((allele) -> (allele.getRecipientTypeForCompat())).forEach((allele) -> {
-            allele.getHvrVariantMap().values().stream().forEach((hvrvRef) -> {
-                hvrMap.get(hvrvRef.getHypervariableRegionName()).getVariantMap().get(hvrvRef.getVariantId()).setCompatIsRecipientEpitope(true);
+            allele.getHvrVariantMap().values().stream().forEach((hvrVariant) -> {
+                hypervariableRegionFinder.getHypervariableRegion(hvrVariant.getHypervariableRegionName()).getVariantMap().get(hvrVariant.getVariantId()).setCompatIsRecipientEpitope(true);
             });
         });
 
         // 3. Determine the percentage of beads that are positive for each
         //    hypervariable region variant.
         getAlleleList().stream().filter((allele) -> (allele.getSingleAntigenBead() && allele.getRecipientAntibodyForCompat())).forEach((allele) -> {
-            allele.getHvrVariantMap().values().stream().forEach((hvrvRef) -> {
-                hvrMap.get(hvrvRef.getHypervariableRegionName()).getVariantMap().get(hvrvRef.getVariantId()).getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (
+            allele.getHvrVariantMap().values().stream().forEach((hvrVariant) -> {
+                hypervariableRegionFinder.getHypervariableRegion(hvrVariant.getHypervariableRegionName()).getVariantMap().get(hvrVariant.getVariantId()).getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (
                     allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName())
                 )).forEach((beadAlleleRef) -> {
                     beadAlleleRef.setCompatBeadPositive(true);
                 });
             });
         });
-        hvrMap.values().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
-            hvrVariant.setCompatPositiveSabCount(new Long(hvrVariant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue());
-            hvrVariant.setCompatPositiveSabPct(
-                (100 * new Long(hvrVariant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue())
-                / new Long(hvrVariant.getBeadAlleleRefList().stream().count()).intValue()
+        hypervariableRegionFinder.getHypervariableRegionList().values().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
+            variant.setCompatPositiveSabCount(new Long(variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue());
+            variant.setCompatPositiveSabPct(
+                (100 * new Long(variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue())
+                / new Long(variant.getBeadAlleleRefList().stream().count()).intValue()
             );
         }); });
 
         // 4. Determine is an antibody for each hypervariable region variant
         //    epitope is considered to be present.
-        hvrMap.values().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((hvrVariant) -> {
-            hvrVariant.setCompatAntibodyConsideredPresent(
-                (hvrVariant.getCompatPositiveSabPct().equals(100) || hvrVariant.getKnownReactiveEpitopeForCompat())
-                && !hvrVariant.getCompatIsRecipientEpitope()
+        hypervariableRegionFinder.getHypervariableRegionList().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
+            variant.setCompatAntibodyConsideredPresent(
+                (variant.getCompatPositiveSabPct().equals(100) || variant.getKnownReactiveEpitopeForCompat())
+                && !variant.getCompatIsRecipientEpitope()
             );
         }); });
         
@@ -294,10 +288,10 @@ public class AlleleFinder {
             }
             else {
                 int[] epitopeAntibodyCount = new int[] { 0 }; // wrapping for use in lambda
-                allele.getHvrVariantMap().values().stream().forEach((hvrVariantFromAllele) -> {
+                allele.getHvrVariantMap().values().stream().forEach((hvrVariant) -> {
                     if(
-                        hvrMap.get(hvrVariantFromAllele.getHypervariableRegionName()).getVariantMap().values().stream().filter((hvrVariant) -> (
-                            hvrVariant.getCompatAntibodyConsideredPresent() && hvrVariantFromAllele.getVariantId().equals(hvrVariant.getVariantId())
+                        hypervariableRegionFinder.getHypervariableRegion(hvrVariant.getHypervariableRegionName()).getVariantMap().values().stream().filter((variant) -> (
+                            variant.getCompatAntibodyConsideredPresent() && hvrVariant.getVariantId().equals(variant.getVariantId())
                         )).count() == 1
                     ) {
                         epitopeAntibodyCount[0]++;

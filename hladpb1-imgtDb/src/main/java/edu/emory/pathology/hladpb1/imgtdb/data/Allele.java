@@ -1,16 +1,17 @@
 package edu.emory.pathology.hladpb1.imgtdb.data;
 
+import java.io.Serializable;
 import java.util.SortedMap;
 
 /**
  * Data class for an allele.
  * @author ghsmith
  */
-public class Allele {
+public class Allele implements Serializable {
 
     // Inner class to make it convenient to reference hypervariable region with
     // the matchesReference attribute.
-    public static class HypervariableRegionVariantRef {
+    public static class HypervariableRegionVariantRef implements Serializable {
         
         private String hypervariableRegionName;
         private String variantId;

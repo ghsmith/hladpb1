@@ -1,10 +1,12 @@
 package edu.emory.pathology.hladpb1.imgtdb.data;
 
+import java.io.Serializable;
+
 /**
  * Data class for a codon.
  * @author ghsmith
  */
-public class Codon {
+public class Codon implements Serializable {
 
     private Integer codonNumber;
     private String aminoAcid;
