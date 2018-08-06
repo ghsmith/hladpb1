@@ -3,6 +3,8 @@ package edu.emory.pathology.hladpb1.webservices;
 import edu.emory.pathology.hladpb1.imgtdb.AlleleFinder;
 import edu.emory.pathology.hladpb1.imgtdb.HypervariableRegionFinder;
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
@@ -12,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * This class implements the Alleles RESTful web services.
@@ -27,8 +30,13 @@ public class Alleles {
 
     @GET
     @Produces("application/json")
-    public List<Allele> getJson(@QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int matchesHvrCount) {
+    public List<Allele> getJson(@QueryParam("noCodons") String noCodons, @QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int matchesHvrCount) {
         List<Allele> alleles = alleleFinder.get().getAlleleList();
+        // noCodons saves bandwidth
+        if("true".equals(noCodons)) {
+            alleles = (List)SerializationUtils.clone((Serializable)alleles);
+            alleles.stream().forEach((allele) -> { allele.setCodonMap(null); });
+        }
         // Implementing some rudimentary filtering.
         if("false".equals(synonymous)) {
             alleles = alleles.stream().filter((allele) -> (allele.getSynonymousAlleleName() == null)).collect(Collectors.toList());
@@ -45,8 +53,14 @@ public class Alleles {
     @GET
     @Path("{alleleName}")
     @Produces("application/json")
-    public Allele getJsonAllele(@PathParam("alleleName") String alleleName) {
-        return alleleFinder.get().getAllele(alleleName);
+    public Allele getJsonAllele(@PathParam("alleleName") String alleleName, @QueryParam("noCodons") String noCodons) {
+        Allele allele = alleleFinder.get().getAllele(alleleName);
+        // noCodons saves bandwidth
+        if("true".equals(noCodons)) {
+            allele = (Allele)SerializationUtils.clone((Serializable)allele);
+            allele.setCodonMap(null);
+        }
+        return allele;
     }
 
     @PUT

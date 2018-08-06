@@ -31,10 +31,13 @@
                 border: 1px solid black;
             }
             div.jsonOutput {
-                width: 100%;
+                display: inline-block;
+                min-width: 50%;
                 height: 300px;
                 overflow: scroll;
-                border: 1px solid black;
+                overflow-x: hidden;
+                border: 1px solid gray;
+                margin-left: 30px;
                 background-color: ivory;
             }
         </style>
@@ -72,8 +75,8 @@
 
         <p>
             The API is implemented as a set of REpresentational State Transfer
-            (REST) web service endpoints. Reference implementations of
-            HTML5 web applications that use the REST API are also provided. The
+            (REST) web service endpoints. <a href="#ri">Reference implementations</a>
+            of HTML5 web applications that use the REST API are also provided. The
             source code for the API and the HTML5 applications is available in
             GitHub (<a href="https://github.com/ghsmith/hladpb1">https://github.com/ghsmith/hladpb1</a>).
             The API is implemented using Java Enterprise Edition components and
@@ -89,6 +92,7 @@
         <p>
             Returns a JavaScript object notation (JSON) array of HLA-DPB1
             alleles. Some filtering is supported using query parameters.
+            Only codons 1-100 are returned.
         </p>
         <h4>Query Parameters</h4>
         <table class="parameters">
@@ -102,7 +106,7 @@
                     alleles is returned. Allele order is based on the IMGT
                     database.
                 </td>
-                <td>no default</td>
+                <td>true (i.e., no filtering)</td>
                 <td>synonymous=false</td>
             </tr>
             <tr>
@@ -113,7 +117,7 @@
                     If set to true, only alleles associated with single antigen
                     beans (SAB) are returned.
                 </td>
-                <td>no default</td>
+                <td>false (i.e., no filtering)</td>
                 <td>sab=true</td>
             </tr>
             <tr>
@@ -125,8 +129,19 @@
                     hypervariable regions matching the refeference allele are
                     returned.
                 </td>
-                <td>no default</td>
+                <td>0 (i.e., no filtering)</td>
                 <td>hvrMatchCount=4</td>
+            </tr>
+            <tr>
+                <td>noCodons</td>
+                <td>no</td>
+                <td>boolean</td>
+                <td>
+                    If set to true, codons are not returned, which substantially
+                    reduces the JSON payload size.
+                </td>
+                <td>false</td>
+                <td>noCodons=true</td>
             </tr>
         </table>
         <h4>Example Usage</h4>
@@ -154,8 +169,23 @@
         <h3>GET /hladpb1/resources/alleles/{alleleName}</h3>
         <p>
             Returns a JSON representation of the allele identified by URL
-            parameter {alleleName}. This method takes no parameters.
+            parameter {alleleName}. Only codons 1-100 are returned.
         </p>
+        <h4>Query Parameters</h4>
+        <table class="parameters">
+            <tr><th>name</th><th>required</th><th>type</th><th>description</th><th>default</th><th>example</th></tr>
+            <tr>
+                <td>noCodons</td>
+                <td>no</td>
+                <td>boolean</td>
+                <td>
+                    If set to true, codons are not returned, which substantially
+                    reduces the JSON payload size.
+                </td>
+                <td>false</td>
+                <td>noCodons=true</td>
+            </tr>
+        </table>
         <h4>Example Usage</h4>
         <p>
             <a id="exampleGetAlleleLink" href="javascript:void(0);">GET /hladpb1/resources/alleles/HLA-DPB1*01:01:01:01</a>
@@ -368,7 +398,7 @@
             </script>
         </p>
         
-        <h2>Reference Implementations</h2>
+        <h2 id="ri">Reference Implementations</h2>
 
         <h3><a href="/hladpb1/staticDifferenceReport.jsp">HLA-DPB1 Allele Difference Report (static - does not use REST API)</a></h3>
         <p>
@@ -400,6 +430,16 @@
             Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html</a>
         </p>
             
+        <h3><a href="/hladpb1/ajaxDifferenceReportNoCodons.html">HLA-DPB1 Allele Difference Report <i style="color: green;">&Longrightarrow;&nbsp;Express&nbsp;&Longrightarrow;</i></a></h3>
+        <p>
+            Same as above, but without codons. This version works better on
+            devices that have smaller displays, limited bandwidth, or slower
+            graphics rendering.
+        </p>
+        <p>
+            Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReportNoCodons.html</a>
+        </p>
+            
         <h3><a href="/hladpb1/ajaxCompatibilityReport.html">HLA-DPB1 Compatibility Report</a></h3>
         <p>
             This highly interactive report makes donor/recipient compatibility
@@ -413,6 +453,16 @@
             Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReport.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReport.html</a>
         </p>
             
+        <h3><a href="/hladpb1/ajaxCompatibilityReportNoHvrs.html">HLA-DPB1 Compatibility Report <i style="color: green;">&Longrightarrow;&nbsp;Express&nbsp;&Longrightarrow;</i></a></h3>
+        <p>
+            Same as above, but without hypervariable regions. This version works
+            better on devices that have smaller displays, limited bandwidth, or
+            slower graphics rendering.
+        </p>
+        <p>
+            Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportNoHvrs.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportNoHvrs.html</a>
+        </p>
+
         <h3><a>HLA-DPB1 Compatibility Wizard</a></h3>
         <p>
             [UNDER CONSTRUCTION]
@@ -424,7 +474,7 @@
             HLA-DPB1 REST endpoints and jQuery Mobile user interface components.
         </p>
 
-        <p>Copyright &copy; 2018, Geoffrey H. Smith, MD
+        <p><br/>Copyright &copy; 2018, Geoffrey H. Smith, MD
         
     </body>
 </html>

@@ -266,7 +266,7 @@ function putHypervariableRegion(hypervariableRegion) {
 function getAlleles() {
     $("#working").show();
     return $.ajax({
-        url: "/hladpb1/resources/alleles?synonymous=false", // always filter out synonymous alleles
+        url: "/hladpb1/resources/alleles?noCodons=true&synonymous=false", // always filter out synonymous alleles
         dataType: "json"
     }).then(function(response) {
         alleles = response;
@@ -277,7 +277,7 @@ function getAlleles() {
 function putAllele(allele) {
     $("#working").show();
     return $.ajax({
-        url: "/hladpb1/resources/alleles/" + allele.alleleName,
+        url: "/hladpb1/resources/alleles/" + allele.alleleName + "?noCodons=true",
         dataType: "json",
         type: "PUT",
         contentType: "application/json",

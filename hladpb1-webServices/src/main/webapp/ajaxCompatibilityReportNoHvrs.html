@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+
+<html>
+
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+
+<style>
+           
+body {
+    font-family: monospace;
+    font-size: medium;
+}
+table {
+    font-family: monospace;
+    font-size: medium;
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+th, td {
+    text-align: center;
+    white-space: nowrap;
+    padding: 3px;
+}
+th.alleleName, td.alleleName {
+    text-align: left;
+}
+a.filterEnabled {
+    background-color: yellow;
+}
+#reportTable tbody tr:hover {
+    background-color: yellow;
+    border: 1px solid black;
+}
+table.statusDescriptionTable td {
+    text-align: left;
+    border: 1px solid black;
+}
+
+</style>
+
+<title>HLA-DPB1 Compatibility Report</title>
+        
+</head>
+
+<body>
+
+    <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div>
+
+    <h1>HLA-DPB1 Compatibility Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportNoHvrs.html">source code</a>)</h1>
+
+    <p>This is the abridged version of the report. A <a href="/hladpb1/ajaxCompatibilityReport.html">full version<a> is also available.</p>
+    <p>
+        Select recipient antibodies and donor & recipient alleles below. An
+        antibody for a hypervariable region epitope is inferred when (a) all
+        single antigen beads with that epitope are positive and (b) the epitope
+        is not present on any of the recipient's alleles. Each donor allele will
+        be evaluated for compatibility with the recipient and assigned a
+        compatibility status:
+    </p>
+    <p>
+        <table class="statusDescriptionTable">
+            <tr><td>LC</td><td>likely&nbsp;compatible</td><td>the single antigen bead (SAB) corresponding to the donor allele is NOT positive and antibody specificity for an epitope of the donor allele is NOT inferred</td></tr>
+            <tr><td>LI</td><td>likely&nbsp;incompatible</i></td><td>antibody specificity for an epitope of the donor allele is inferred</td></tr>
+            <tr><td>I</td><td>incompatible</i></td><td>the single antigen bead corresponding to the donor allele is positive</td></tr>
+            <tr><td>AA</td><td>auto-antibody</td><td>the single antigen bead is positive, but is also a recipient allele</td></tr>
+        </table>
+    </p>
+    <p>
+        Selection of antibodies to alleles that are not the subject of a single
+        antigen bead is currently not allowed. Hypervariable region variants
+        that are not associated with a variant ID (i.e., appear in the <i>n/a</i>
+        column below), are currently not considered when assigning a
+        compatibility status.
+    </p>
+    <p>
+        The IMGT allele database version is <span id="imgtDbVersion">...</span>
+        and the single antigen bead (SAB) reagent lot number is
+        <span id="reagentLotNumber">...</span>.
+    </p>
+    <p>
+        This report is for research use only.
+    </p>
+    
+    <p>
+        <table>
+            <tr><td style="text-align: right;"><span id="allelesLoaded">...</span></td><td style="text-align: left;">&nbsp;alleles are loaded into memory</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesShown">...</span></td><td style="text-align: left;">&nbsp;alleles match filter criteria</td></tr>
+            <tr><td style="text-align: right;"><span id="allelesFiltered">...</span></td><td style="text-align: left;">&nbsp;alleles do not match filter criteria</td></tr>
+        </table>
+    </p>
+
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
+                <th>[<a id="sabFilter" href="javascript:void(0);">filter=Y</a>]</th>
+                <th colspan="3" style="border-bottom: 1px solid black;">[<a id="selectedFilter" href="javascript:void(0);">filter=Y</a>]</th>
+                <th>[<a id="statusSort" href="javascript:void(0);">sort</a>]</th>
+            </tr>
+            <tr id="columnNames">
+                <th data-name="allele.alleleName" class="alleleName">allele name</th>
+                <th data-name="allele.singleAntigenBead ? 'Y' : '&nbsp;'">SAB</th>
+                <th data-name="allele.donorTypeForCompat" data-label="D">donor<br/>type<br/>(D)</th>
+                <th data-name="allele.recipientTypeForCompat" data-label="R">recip<br/>type<br/>(R)</th>
+                <th data-name="allele.recipientAntibodyForCompat" data-label="Ab">recip<br/>antib<br/>(Ab)</th>
+                <th data-name="allele.compatInterpretation">status</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+        
+</body>
+
+</html>
+
+<script>
+
+var reagentLotNumber; // the single antigen bead reagent lot number
+var alleles = []; // the array of alleles
+var hypervariableRegions = []; // the array of hypervariableRegions
+var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region ID
+var sabOnly = false; // only show single antigen bead alleles
+var selectedOnly = false; // only show donor type alleles or recipient type alleles or recipient antibody alleles
+var statusSortMap = {
+    'LC': { sequence: 3 },
+    'LI': { sequence: 2 },
+    'I':  { sequence: 1 },
+    'AA': { sequence: 0 }
+}
+
+// Get reagent lot number.
+function getReagentLotNumber() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
+        dataType: "json"
+    }).then(function(response) {
+        reagentLotNumber = response;
+    });
+}
+
+// Get all hypervariable regions.
+function getHypervariableRegions() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions",
+        dataType: "json"
+    }).then(function(response) {
+        hypervariableRegions = response;
+        hypervariableRegions.forEach(function(hypervariableRegion) {
+            hvrMap[hypervariableRegion.hypervariableRegionName] = hypervariableRegion;
+        });
+    });
+}
+
+// Put a hypervariable region (updates known reactive epitope attribute).
+function putHypervariableRegion(hypervariableRegion) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions/" + hypervariableRegion.hypervariableRegionName,
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(hypervariableRegion)
+    });
+}
+
+// Get all alleles.
+function getAlleles() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/alleles?noCodons=true&synonymous=false", // always filter out synonymous alleles
+        dataType: "json"
+    }).then(function(response) {
+        alleles = response;
+    });
+}
+
+// Put an allele (updates donor type, recipient type, and recipient antibodies).
+function putAllele(allele) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/alleles/" + allele.alleleName + "?noCodons=true",
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(allele)
+    });
+}
+
+// Populate rows in the report table from the alleles array. Note that this is
+// only done once. All sorting and filtering is done locally. Changing the
+// reference allele does involve a getAlleles() call, but the HTML table rows
+// are updated in-situ.
+function populateTableRows() {
+    $("#working").show();
+    $("#reportTable tbody tr").remove();
+    var rowHtml = [];
+    alleles.forEach(function(allele) {
+        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "' " + (!isRowVisible(allele) ? "style='display: none;'" : "") + ">");
+        $("#columnNames th").each(function() {
+            var name = $(this).data("name");
+            if(name.match(/.*ForCompat/)) {
+                var val = eval($(this).data("name"));
+                var tagAttributes = $(this)[0].outerHTML;
+                tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));
+                rowHtml.push("<td " + tagAttributes + "><input type='checkbox'>" + $(this).data("label") + "</td>");
+                
+            }
+            else {
+                var val = eval(name);
+                var tagAttributes = $(this)[0].outerHTML;
+                tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));
+                rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "&nbsp;" : val) + "</td>");
+            }
+        });
+        rowHtml.push("</tr>");
+    });
+    $("#reportTable tbody").append(rowHtml.join(""));
+}
+
+// Set the UI state based on the hypervariable region matches.
+function setUiState() {
+    var dfr = $.Deferred();
+    $("#working").show();
+    setTimeout(function() {
+        $("#imgtDbVersion").html(alleles[0].version);
+        $("#reagentLotNumber").html(reagentLotNumber);
+        $("#sabFilter").removeClass("filterEnabled");      if(sabOnly )     { $("#sabFilter").addClass("filterEnabled"); }
+        $("#selectedFilter").removeClass("filterEnabled"); if(selectedOnly) { $("#selectedFilter").addClass("filterEnabled"); }
+        $("#reportTable tbody tr").each(function() {
+            var alleleName = $(this).data("value");
+            var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+            if(isRowVisible(allele)) { $(this).show(); }
+            else                     { $(this).hide(); }
+            $(this).children("td").each(function() {
+                if($(this).data("name").match(/.*ForCompat/)) {
+                    $(this).children("input").prop("checked", eval($(this).data("name")));
+                }
+                if($(this).data("name") == "allele.compatInterpretation") {
+                    $(this).html(eval($(this).data("name")));
+                }
+            });
+        });
+        
+        $("#allelesLoaded").html($("#reportTable tbody tr").length);
+        $("#allelesShown").html($("#reportTable tbody tr:visible").length);
+        $("#allelesFiltered").html($("#reportTable tbody tr:hidden").length);
+        dfr.resolve();
+    }, 1);
+    return dfr.promise();
+}
+
+// Row filtering function.
+function isRowVisible(allele) {
+    rowVisible = true;
+    if(sabOnly && !allele.singleAntigenBead)                                                                               { rowVisible = false; }
+    if(selectedOnly && !(allele.donorTypeForCompat || allele.recipientTypeForCompat || allele.recipientAntibodyForCompat)) { rowVisible = false; }
+    return rowVisible;
+}
+
+// Sort function.
+function alleleNameSort(a, b) {
+    var A = $(a).data("sequence");
+    var B = $(b).data("sequence");
+    if(A < B)      { return -1; }
+    else if(A > B) { return  1; }
+    else           { return  0; }
+};
+
+// Sort function.
+function statusSort(a, b) {
+    var A = statusSortMap[$(a).children("td").eq(5).html()].sequence;
+    var B = statusSortMap[$(b).children("td").eq(5).html()].sequence;
+    if(A < B)      { return -1; }
+    else if(A > B) { return  1; }
+    else           { return alleleNameSort(a, b); }
+}
+
+// Document ready! Let's go...
+$(document).ready(function() {
+
+    // Initial population of report table.
+    getReagentLotNumber().then(getHypervariableRegions).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+
+    // Change a hypervariable region input (i.e., click a checkbox).
+    $("#reportTable thead").on("change", "input", function() {
+        var hvrId = $(this).parent().data("hvr-id");
+        if(eval($(this).parent().data("container")) != undefined) {
+            eval($(this).parent().data("name") + " = " + $(this).prop("checked"));
+        }
+        putHypervariableRegion(hvrMap[hvrId]).then(getHypervariableRegions).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
+    });
+
+    // Change an allele input (i.e., click a checkbox).
+    $("#reportTable tbody").on("change", "input", function() {
+        var alleleName = $(this).parents("tr").data("value");
+        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+        eval($(this).parent().data("name") + " = " + $(this).prop("checked"));
+        putAllele(allele).then(getHypervariableRegions).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
+    });
+
+    // Single antigen bead filter toggle on/off. This is handled locally.
+    $("#sabFilter").click(function() {
+        sabOnly = !sabOnly;
+        setUiState().done(function() { $("#working").hide(); });
+    });
+
+    // Donor type or recipient type or recipient antibody filter toggle on/off.
+    // This is handled locally.
+    $("#selectedFilter").click(function() {
+        selectedOnly = !selectedOnly;
+        setUiState().done(function() { $("#working").hide(); });
+    });
+
+    // Click on sort. This is handled locally.
+    $("#alleleNameSort").click(function() {
+        $("#working").show();
+        setTimeout(function() {
+            var rows = $('#reportTable tbody tr').get();
+            rows.sort(alleleNameSort);
+            $.each(rows, function(index, row) {
+                $('#reportTable').children('tbody').append(row);
+            });
+            $("#working").hide();
+        }, 1);
+    });
+    
+    // Click on sort. This is handled locally.
+    $("#statusSort").click(function() {
+        $("#working").show();
+        setTimeout(function() {
+            var rows = $('#reportTable tbody tr').get();
+            rows.sort(statusSort);
+            $.each(rows, function(index, row) {
+                $('#reportTable').children('tbody').append(row);
+            });
+            $("#working").hide();
+        }, 1);
+    });
+    
+});
+
+</script>
