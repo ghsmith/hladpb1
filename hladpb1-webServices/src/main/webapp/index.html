@@ -228,6 +228,7 @@
                         <li>hypervariableRegion.variantMap[].compatIsRecipientEptiope</li>
                         <li>hypervariableRegion.variantMap[].compatPositiveSabCount</li>
                         <li>hypervariableRegion.variantMap[].compatAntibodyConsideredPresent</li>
+                        <li>hypervariableRegion.variantMap[].beadAlleleRefList[].compatBeadPositive</li>
                     </ul>
                 </td>
                 <td>{...<br/>recipientAntibodyForCompat: true,<br/>...}</td>
@@ -332,6 +333,7 @@
                         <li>hypervariableRegion.variantMap[].compatIsRecipientEptiope</li>
                         <li>hypervariableRegion.variantMap[].compatPositiveSabCount</li>
                         <li>hypervariableRegion.variantMap[].compatAntibodyConsideredPresent</li>
+                        <li>hypervariableRegion.variantMap[].beadAlleleRefList[].compatBeadPositive</li>
                     </ul>
                 </td>
                 <td>{...<br/>knownReactiveEpitopeForCompat: true,<br/>...}</td>
@@ -398,15 +400,17 @@
             Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxDifferenceReport.html</a>
         </p>
             
-        <h3><a>HLA-DPB1 Compatibility Report</a></h3>
+        <h3><a href="/hladpb1/ajaxCompatibilityReport.html">HLA-DPB1 Compatibility Report</a></h3>
         <p>
-            [UNDER CONSTRUCTION]
             This highly interactive report makes donor/recipient compatibility
             predictions based on the donor/recipient HLA-DPB1 types and the
             recipient antibody profile (SAB positivity and/or known reactivity
             to particular hypervarible epitopes). The report is implemented as a
             single HTML5 web application that uses the jQuery AJAX API to access
             the HLA-DPB1 REST endpoints.
+        </p>
+        <p>
+            Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReport.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReport.html</a>
         </p>
             
         <h3><a>HLA-DPB1 Compatibility Wizard</a></h3>

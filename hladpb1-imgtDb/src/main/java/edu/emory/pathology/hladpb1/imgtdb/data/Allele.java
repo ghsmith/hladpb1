@@ -12,8 +12,17 @@ public class Allele {
     // the matchesReference attribute.
     public static class HypervariableRegionVariantRef {
         
+        private String hypervariableRegionName;
         private String variantId;
         private Boolean matchesReference;
+
+        public String getHypervariableRegionName() {
+            return hypervariableRegionName;
+        }
+
+        public void setHypervariableRegionName(String hypervariableRegionName) {
+            this.hypervariableRegionName = hypervariableRegionName;
+        }
 
         public String getVariantId() {
             return variantId;

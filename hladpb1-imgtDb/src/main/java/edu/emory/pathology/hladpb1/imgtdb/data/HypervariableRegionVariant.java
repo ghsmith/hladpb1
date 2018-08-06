@@ -8,10 +8,35 @@ import java.util.List;
  * @author ghsmith
  */
 public class HypervariableRegionVariant {
+
+    // Inner class to make it convenient to reference single antigen beads and
+    // their positivitiy.
+    public static class BeadAlleleRef {
+        
+        private String alleleName;
+        private Boolean compatBeadPositive;
+
+        public String getAlleleName() {
+            return alleleName;
+        }
+
+        public void setAlleleName(String alleleName) {
+            this.alleleName = alleleName;
+        }
+
+        public Boolean getCompatBeadPositive() {
+            return compatBeadPositive;
+        }
+
+        public void setCompatBeadPositive(Boolean compatBeadPositive) {
+            this.compatBeadPositive = compatBeadPositive;
+        }
+
+    }
     
     private String variantId;
     private List<String> proteinSequenceList;
-    private List<String> beadAlleleNameList;
+    private List<BeadAlleleRef> beadAlleleRefList;
     private Boolean knownReactiveEpitopeForCompat = false;
     private Boolean compatIsRecipientEpitope;
     private Integer compatPositiveSabCount;
@@ -34,12 +59,12 @@ public class HypervariableRegionVariant {
         this.proteinSequenceList = proteinSequenceList;
     }
 
-    public List<String> getBeadAlleleNameList() {
-        return beadAlleleNameList;
+    public List<BeadAlleleRef> getBeadAlleleRefList() {
+        return beadAlleleRefList;
     }
 
-    public void setBeadAlleleNameList(List<String> beadAlleleNameList) {
-        this.beadAlleleNameList = beadAlleleNameList;
+    public void setBeadAlleleRefList(List<BeadAlleleRef> beadAlleleRefList) {
+        this.beadAlleleRefList = beadAlleleRefList;
     }
 
     public Boolean getKnownReactiveEpitopeForCompat() {

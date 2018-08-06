@@ -14,7 +14,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBException;
 
 /**
  * This is the default NetBeans filter template. This filter ensures that the
@@ -48,13 +47,9 @@ public class SessionFilter implements Filter {
             if(alleleFinder == null || hypervariableRegionFinder == null) {
                 alleleFinder = new AlleleFinder(request.getServletContext().getInitParameter("imgtXmlFileName"));
                 hypervariableRegionFinder = new HypervariableRegionFinder(request.getServletContext().getInitParameter("emoryXmlFileName"), request.getServletContext().getInitParameter("reagentLotNumber"));
-                try {
-                    alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionFinder.getHypervariableRegionList());
-                    alleleFinder.assignHypervariableRegionVariantMatches(alleleFinder.getAlleleList().get(0).getAlleleName());
-                }
-                catch(JAXBException e) {
-                    throw new RuntimeException(e);
-                }
+                alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionFinder);
+                alleleFinder.assignHypervariableRegionVariantMatches(alleleFinder.getAlleleList().get(0).getAlleleName());
+                alleleFinder.computeCompatInterpretation(hypervariableRegionFinder);
                 ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
                 ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
             }

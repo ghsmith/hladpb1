@@ -12,7 +12,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.xml.bind.JAXBException;
 
 /**
  * This class implements the Alleles RESTful web services.
@@ -28,7 +27,7 @@ public class Alleles {
 
     @GET
     @Produces("application/json")
-    public List<Allele> getJson(@QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int matchesHvrCount) throws JAXBException {
+    public List<Allele> getJson(@QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int matchesHvrCount) {
         List<Allele> alleles = alleleFinder.get().getAlleleList();
         // Implementing some rudimentary filtering.
         if("false".equals(synonymous)) {
@@ -46,35 +45,36 @@ public class Alleles {
     @GET
     @Path("{alleleName}")
     @Produces("application/json")
-    public Allele getJsonAllele(@PathParam("alleleName") String alleleName) throws JAXBException {
+    public Allele getJsonAllele(@PathParam("alleleName") String alleleName) {
         return alleleFinder.get().getAllele(alleleName);
     }
 
     @PUT
     @Path("{alleleName}")
     @Consumes("application/json")
-    public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele updatedAllele) throws JAXBException {
+    public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele updateAllele) {
         Allele allele = alleleFinder.get().getAllele(alleleName);
-        boolean[] assignCompatibilityStatus = new boolean[] {false}; // wrapping for use in lambda
-        if(!updatedAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
-            allele.setDonorTypeForCompat(updatedAllele.getDonorTypeForCompat());
+        boolean[] assignCompatibilityStatus = new boolean[] { false }; // wrapping for use in lambda
+        if(!updateAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
+            allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());
             assignCompatibilityStatus[0] = true;
         }
-        if(!updatedAllele.getRecipientTypeForCompat().equals(allele.getRecipientTypeForCompat())) {
-            allele.setRecipientTypeForCompat(updatedAllele.getRecipientTypeForCompat());
+        if(!updateAllele.getRecipientTypeForCompat().equals(allele.getRecipientTypeForCompat())) {
+            allele.setRecipientTypeForCompat(updateAllele.getRecipientTypeForCompat());
             assignCompatibilityStatus[0] = true;
         }
-        if(!updatedAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
+        if(!updateAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
             // Not allowing antibodies to specified for alleles that are not the
             // subject of a single antigen bead.
             if(allele.getSingleAntigenBead()) {
-                allele.setRecipientAntibodyForCompat(updatedAllele.getRecipientAntibodyForCompat());
+                allele.setRecipientAntibodyForCompat(updateAllele.getRecipientAntibodyForCompat());
                 assignCompatibilityStatus[0] = true;
             }
         }
         if(assignCompatibilityStatus[0]) {
+            alleleFinder.get().computeCompatInterpretation(hypervariableRegionFinder.get());
         }
-        if(allele.getReferenceForMatches()) {
+        if(updateAllele.getReferenceForMatches()) {
             // This will concurrently un-assign the current reference allele.
             alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
         }

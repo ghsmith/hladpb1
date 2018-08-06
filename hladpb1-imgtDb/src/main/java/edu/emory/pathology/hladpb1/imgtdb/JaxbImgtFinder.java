@@ -30,10 +30,15 @@ public class JaxbImgtFinder {
         }
     }
     
-    public Alleles getAlleles() throws JAXBException {
+    public Alleles getAlleles() {
         if(alleles == null) {
-            JAXBContext jc0 = JAXBContext.newInstance("edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt");
-            alleles = (Alleles)jc0.createUnmarshaller().unmarshal(new File(xmlFileName));            
+            try {
+                JAXBContext jc0 = JAXBContext.newInstance("edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt");
+                alleles = (Alleles)jc0.createUnmarshaller().unmarshal(new File(xmlFileName));            
+            }
+            catch(JAXBException e) {
+                throw new RuntimeException(e);
+            }
             LOG.info(String.format("%d alleles loaded from IMGT XML database", alleles.getAllele().size()));
             LOG.info(String.format("IMGT XML database version is %s", alleles.getAllele().get(0).getReleaseversions().getCurrentrelease()));
         }

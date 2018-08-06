@@ -29,10 +29,15 @@ public class JaxbEmoryFinder {
         }
     }
     
-    public ReagentLots getReagentLots() throws JAXBException {
+    public ReagentLots getReagentLots() {
         if(reagentLots == null) {
-            JAXBContext jc0 = JAXBContext.newInstance("edu.emory.pathology.hladpb1.imgtdb.jaxb.emory");
-            reagentLots = (ReagentLots)jc0.createUnmarshaller().unmarshal(new File(xmlFileName));            
+            try {
+                JAXBContext jc0 = JAXBContext.newInstance("edu.emory.pathology.hladpb1.imgtdb.jaxb.emory");
+                reagentLots = (ReagentLots)jc0.createUnmarshaller().unmarshal(new File(xmlFileName));
+            }
+            catch(JAXBException e) {
+                throw new RuntimeException(e);
+            }
             LOG.info(String.format("%d reagent lots loaded from Emory XML database", reagentLots.getReagentLot().size()));
         }
         return reagentLots;

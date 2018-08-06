@@ -59,6 +59,7 @@
               <bead alleleName="HLA-DPB1*17:01"/>
               <bead alleleName="HLA-DPB1*18:01"/>
               <bead alleleName="HLA-DPB1*19:01"/>
+              <bead alleleName="HLA-DPB1*23:01"/>
               <bead alleleName="HLA-DPB1*20:01"/>
             </beads>
           </hvrVariant>
@@ -79,7 +80,6 @@
           <hvrVariant variantId="4" proteinSequences="LV">
             <beads>
               <bead alleleName="HLA-DPB1*05:01"/>
-              <bead alleleName="HLA-DPB1*23:01"/>
             </beads>
           </hvrVariant>
         </hvrVariants>
@@ -133,7 +133,6 @@
               <bead alleleName="HLA-DPB1*04:01"/>
               <bead alleleName="HLA-DPB1*04:02"/>
               <bead alleleName="HLA-DPB1*05:01"/>
-              <bead alleleName="HLA-DPB1*09:01"/>
               <bead alleleName="HLA-DPB1*18:01"/>
               <bead alleleName="HLA-DPB1*23:01"/>
             </beads>
@@ -141,6 +140,7 @@
           <hvrVariant variantId="2" proteinSequences="IE">
             <beads>
               <bead alleleName="HLA-DPB1*02:01"/>
+              <bead alleleName="HLA-DPB1*09:01"/>
               <bead alleleName="HLA-DPB1*10:01"/>
               <bead alleleName="HLA-DPB1*13:01"/>
               <bead alleleName="HLA-DPB1*17:01"/>

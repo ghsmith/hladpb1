@@ -331,7 +331,7 @@ $(document).ready(function() {
             var rows = $('#reportTable tbody tr').get();
             rows.sort(alleleNameSort);
             $.each(rows, function(index, row) {
-              $('#reportTable').children('tbody').append(row);
+                $('#reportTable').children('tbody').append(row);
             });
             $("#working").hide();
         }, 1);
@@ -344,7 +344,7 @@ $(document).ready(function() {
             var rows = $('#reportTable tbody tr').get();
             rows.sort(matchesHvrCountSort);
             $.each(rows, function(index, row) {
-              $('#reportTable').children('tbody').append(row);
+                $('#reportTable').children('tbody').append(row);
             });
             $("#working").hide();
         }, 1);

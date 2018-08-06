@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
 
 /**
  * This finder class loads our local data classes from the Emory data classes.
@@ -32,11 +31,11 @@ public class HypervariableRegionFinder {
         this.reagentLotNumber = reagentLotNumber;
     }
 
-    public HypervariableRegion getHypervariableRegion(String hypervariableRegionName) throws JAXBException {
+    public HypervariableRegion getHypervariableRegion(String hypervariableRegionName) {
         return getHypervariableRegionList().stream().filter((hypervariableRegion) -> (hypervariableRegionName.equals(hypervariableRegion.getHypervariableRegionName()))).findFirst().get();
     }
     
-    public List<HypervariableRegion> getHypervariableRegionList() throws JAXBException {
+    public List<HypervariableRegion> getHypervariableRegionList() {
         if(hypervariableRegionList == null) {
             hypervariableRegionList = new ArrayList();
             JaxbEmoryFinder emoryFinder = new JaxbEmoryFinder(xmlFileName);
@@ -55,8 +54,12 @@ public class HypervariableRegionFinder {
                     hypervariableRegion.getVariantMap().put(hvrVariant.getVariantId(), hvrVariant);
                     hvrVariant.setProteinSequenceList(new ArrayList<>());
                     Arrays.stream(emoryHvrVariant.getProteinSequences().split(",")).forEach((proteinSequence) -> { hvrVariant.getProteinSequenceList().add(proteinSequence); });
-                    hvrVariant.setBeadAlleleNameList(new ArrayList<>());
-                    emoryHvrVariant.getBeads().getBead().stream().forEach((emoryBead) -> { hvrVariant.getBeadAlleleNameList().add(emoryBead.getAlleleName()); });
+                    hvrVariant.setBeadAlleleRefList(new ArrayList<>());
+                    emoryHvrVariant.getBeads().getBead().stream().forEach((emoryBead) -> {
+                        HypervariableRegionVariant.BeadAlleleRef beadAlleleRef = new HypervariableRegionVariant.BeadAlleleRef();
+                        beadAlleleRef.setAlleleName(emoryBead.getAlleleName());
+                        hvrVariant.getBeadAlleleRefList().add(beadAlleleRef);
+                    });
                 });
             });
             LOG.info(String.format("%d hypervariable regions loaded", hypervariableRegionList.size()));
