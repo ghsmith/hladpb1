@@ -208,8 +208,10 @@ public class AlleleFinder {
         Allele referenceAllele = getAllele(referenceAlleleName);
         getAlleleList().stream().forEach((allele) -> {
             allele.setReferenceForMatches(referenceAllele.equals(allele));
-            allele.setMatchesHvrCount((int)referenceAllele.getHvrVariantMap().values().stream().filter((hvrVariant) -> (
-                referenceAllele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId().equals(hvrVariant.getVariantId()))).count()
+            allele.setMatchesHvrCount(
+                (int)referenceAllele.getHvrVariantMap().values().stream().filter((hvrVariant) -> (
+                    hvrVariant.getVariantId().equals(allele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId()))
+                ).count()
             );
             allele.getHvrVariantMap().values().stream().forEach((hvrVariant) -> {
                 hvrVariant.setMatchesReference(
@@ -259,7 +261,7 @@ public class AlleleFinder {
                 });
             });
         });
-        hypervariableRegionFinder.getHypervariableRegionList().values().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
+        hypervariableRegionFinder.getHypervariableRegionList().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
             variant.setCompatPositiveSabCount(new Long(variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue());
             variant.setCompatPositiveSabPct(
                 (100 * new Long(variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue())
