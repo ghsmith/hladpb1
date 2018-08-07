@@ -54,7 +54,6 @@ a.filterEnabled {
 }
 #reportTable tbody tr:hover {
     background-color: yellow;
-    border: 1px solid black;
 }
 #reportTable td.mismatch, #reportTable th.mismatch {
     background-color: yellow;
