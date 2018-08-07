@@ -52,10 +52,13 @@ th.indexRight, td.indexRight {
 a.filterEnabled {
     background-color: yellow;
 }
+#reportTable tbody tr {
+    border-bottom: 1px solid transparent;
+}
 #reportTable tbody tr:hover {
     background-color: yellow;
-    border: 1px solid black;
-}
+    border-bottom: 1px solid black;
+}   
 #reportTable td.mismatch, #reportTable th.mismatch {
     background-color: yellow;
 }
@@ -102,7 +105,9 @@ table.statusDescriptionTable td {
     <p>
         The IMGT allele database version is <span id="imgtDbVersion">...</span>
         and the single antigen bead (SAB) reagent lot number is
-        <span id="reagentLotNumber">...</span>.
+        <span id="reagentLotNumber">...</span>. The session ID is
+        <span id="sessionId">...</span>
+        (<a id="resetSessionLink" href="javascript:void(0);">reset session</a>).
     </p>
     <p>
         This report is for research use only.
@@ -212,6 +217,7 @@ table.statusDescriptionTable td {
 
 <script>
 
+var sessionId;
 var reagentLotNumber; // the single antigen bead reagent lot number
 var alleles = []; // the array of alleles
 var hypervariableRegions = []; // the array of hypervariableRegions
@@ -223,6 +229,26 @@ var statusSortMap = {
     'LI': { sequence: 2 },
     'I':  { sequence: 1 },
     'AA': { sequence: 0 }
+}
+
+function getSessionId() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/session",
+        dataType: "text"
+    }).then(function(response) {
+        sessionId = response;
+    });
+}
+
+function resetSession() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/session/reset",
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json"
+    });
 }
 
 // Get reagent lot number.
@@ -329,6 +355,7 @@ function setUiState() {
     var dfr = $.Deferred();
     $("#working").show();
     setTimeout(function() {
+        $("#sessionId").html(sessionId);
         $("#imgtDbVersion").html(alleles[0].version);
         $("#reagentLotNumber").html(reagentLotNumber);
         $("#sabFilter").removeClass("filterEnabled");      if(sabOnly )     { $("#sabFilter").addClass("filterEnabled"); }
@@ -402,7 +429,11 @@ function statusSort(a, b) {
 $(document).ready(function() {
 
     // Initial population of report table.
-    getReagentLotNumber().then(getHypervariableRegions).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+    getSessionId().then(getReagentLotNumber).then(getHypervariableRegions).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+
+    $("#resetSessionLink").click(function() {
+        resetSession().then(getSessionId).then(getReagentLotNumber).then(getHypervariableRegions).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+    });
 
     // Change a hypervariable region input (i.e., click a checkbox).
     $("#reportTable thead").on("change", "input", function() {

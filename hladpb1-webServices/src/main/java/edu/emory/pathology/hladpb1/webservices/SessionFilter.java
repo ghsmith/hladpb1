@@ -14,6 +14,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * This is the default NetBeans filter template. This filter ensures that the
@@ -24,6 +25,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 @WebFilter(filterName = "SessionFilter", urlPatterns = {"/*"})
 public class SessionFilter implements Filter {
+
+    protected static ThreadLocal<String> sessionMutex = new ThreadLocal<>();
+    protected static ThreadLocal<AlleleFinder> alleleFinder = new ThreadLocal<>();
+    protected static ThreadLocal<HypervariableRegionFinder> hypervariableRegionFinder = new ThreadLocal<>();
     
     private static final boolean debug = false;
 
@@ -41,7 +46,20 @@ public class SessionFilter implements Filter {
             log("SessionFilter:DoBeforeProcessing");
         }
 
-        synchronized(((HttpServletRequest)request).getSession()) {
+        // The session mutex is used to synchronize acess to methods that update
+        // attributes. Since it stores the session ID, it can also provide some
+        // traceability (e.g., web service that returns the session ID to the
+        // client).
+        String sessionMutex;
+        synchronized(this) {
+            sessionMutex = (String)((HttpServletRequest)request).getAttribute("sessionMutex");
+            if(sessionMutex == null) {
+                sessionMutex = ((HttpServletRequest)request).getSession().getId();
+                ((HttpServletRequest)request).setAttribute("sessionMutex", sessionMutex);
+            }
+        }
+        
+        synchronized(sessionMutex) {
             AlleleFinder alleleFinder = (AlleleFinder)((HttpServletRequest)request).getSession().getAttribute("alleleFinder");
             HypervariableRegionFinder hypervariableRegionFinder = (HypervariableRegionFinder)((HttpServletRequest)request).getSession().getAttribute("hypervariableRegionFinder");
             if(alleleFinder == null || hypervariableRegionFinder == null) {
@@ -53,10 +71,9 @@ public class SessionFilter implements Filter {
                 ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
                 ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
             }
-            Alleles.alleleFinder.set(alleleFinder);
-            Alleles.hypervariableRegionFinder.set(hypervariableRegionFinder);
-            HypervariableRegions.alleleFinder.set(alleleFinder);
-            HypervariableRegions.hypervariableRegionFinder.set(hypervariableRegionFinder);
+            SessionFilter.sessionMutex.set(sessionMutex);
+            SessionFilter.alleleFinder.set(alleleFinder);
+            SessionFilter.hypervariableRegionFinder.set(hypervariableRegionFinder);
         }
         
     }    

@@ -392,10 +392,44 @@
                         url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
                         dataType: "text"
                     }).done(function(response) {
-                        $("#exampleGetReagentLotNumberOutput").JSONView(response, { collapsed: false });
+                        $("#exampleGetReagentLotNumberOutput").html(response);
                     });
                 }, 1000)});
             </script>
+        </p>
+        
+        <h3>GET /hladpb1/session</h3>
+        <p>
+            Returns a JSON representation of the current session ID. All changes
+            (e.g., clinical information such as antibody profile) are persisted
+            in the session and are disposed of when the session ends. Sessions
+            automatically time out after 30 minutes. This method takes no
+            parameters.
+        </p>
+        <h4>Example Usage</h4>
+        <p>
+            <a id="exampleGetSessionLink" href="javascript:void(0);">GET /hladpb1/resources/session</a>
+            <br/><br/>returns JSON session:
+            <div  id="exampleGetSessionOutput" class="jsonOutput">
+            </div>
+            <script>
+                $("#exampleGetSessionLink").click(function() {
+                    $("#exampleGetSessionOutput").html("working...");
+                    setTimeout(function() {
+                    $.ajax({
+                        url: "/hladpb1/resources/session",
+                        dataType: "text"
+                    }).done(function(response) {
+                        $("#exampleGetSessionOutput").html(response);
+                    });
+                }, 1000)});
+            </script>
+        </p>
+
+        <h3>PUT /hladpb1/session/reset</h3>
+        <p>
+            End the current session. All changes are immediately disposed. This
+            request has no payload.
         </p>
         
         <h2 id="ri">Reference Implementations</h2>
@@ -529,9 +563,15 @@ $(document).ready(function() {
     $.ajax({
         url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
         dataType: "text"
-    }).done(function(response) {
+    }).then(function(response) {
         $("#exampleGetReagentLotNumberOutput").JSONView(response, { collapsed: false });
-    })})})})})})});
+    }).then(function() {
+    $.ajax({
+        url: "/hladpb1/resources/session",
+        dataType: "text"
+    }).done(function(response) {
+        $("#exampleGetSessionOutput").html(response);
+    }); }); }); }); }); }); }); });
 });
 
 </script>
