@@ -52,9 +52,13 @@ th.indexRight, td.indexRight {
 a.filterEnabled {
     background-color: yellow;
 }
+#reportTable tbody tr {
+    border-bottom: 1px solid transparent;
+}
 #reportTable tbody tr:hover {
     background-color: yellow;
-}
+    border-bottom: 1px solid black;
+}   
 #reportTable td.mismatch, #reportTable th.mismatch {
     background-color: yellow;
 }
