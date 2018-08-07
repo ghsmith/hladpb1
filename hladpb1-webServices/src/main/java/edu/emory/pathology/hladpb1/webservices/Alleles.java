@@ -1,10 +1,7 @@
 package edu.emory.pathology.hladpb1.webservices;
 
-import edu.emory.pathology.hladpb1.imgtdb.AlleleFinder;
-import edu.emory.pathology.hladpb1.imgtdb.HypervariableRegionFinder;
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
@@ -24,14 +21,10 @@ import org.apache.commons.lang.SerializationUtils;
 @Path("alleles")
 public class Alleles {
 
-    // These are set by SessionFilter.
-    protected static ThreadLocal<AlleleFinder> alleleFinder = new ThreadLocal<>();
-    protected static ThreadLocal<HypervariableRegionFinder> hypervariableRegionFinder = new ThreadLocal<>();
-
     @GET
     @Produces("application/json")
     public List<Allele> getJson(@QueryParam("noCodons") String noCodons, @QueryParam("synonymous") String synonymous, @QueryParam("sab") String sab, @QueryParam("hvrMatchCount") int matchesHvrCount) {
-        List<Allele> alleles = alleleFinder.get().getAlleleList();
+        List<Allele> alleles = SessionFilter.alleleFinder.get().getAlleleList();
         // noCodons saves bandwidth
         if("true".equals(noCodons)) {
             alleles = (List)SerializationUtils.clone((Serializable)alleles);
@@ -54,7 +47,7 @@ public class Alleles {
     @Path("{alleleName}")
     @Produces("application/json")
     public Allele getJsonAllele(@PathParam("alleleName") String alleleName, @QueryParam("noCodons") String noCodons) {
-        Allele allele = alleleFinder.get().getAllele(alleleName);
+        Allele allele = SessionFilter.alleleFinder.get().getAllele(alleleName);
         // noCodons saves bandwidth
         if("true".equals(noCodons)) {
             allele = (Allele)SerializationUtils.clone((Serializable)allele);
@@ -67,30 +60,32 @@ public class Alleles {
     @Path("{alleleName}")
     @Consumes("application/json")
     public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele updateAllele) {
-        Allele allele = alleleFinder.get().getAllele(alleleName);
-        boolean[] assignCompatibilityStatus = new boolean[] { false }; // wrapping for use in lambda
-        if(!updateAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
-            allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());
-            assignCompatibilityStatus[0] = true;
-        }
-        if(!updateAllele.getRecipientTypeForCompat().equals(allele.getRecipientTypeForCompat())) {
-            allele.setRecipientTypeForCompat(updateAllele.getRecipientTypeForCompat());
-            assignCompatibilityStatus[0] = true;
-        }
-        if(!updateAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
-            // Not allowing antibodies to specified for alleles that are not the
-            // subject of a single antigen bead.
-            if(allele.getSingleAntigenBead()) {
-                allele.setRecipientAntibodyForCompat(updateAllele.getRecipientAntibodyForCompat());
+        synchronized(SessionFilter.sessionMutex.get()) {
+            Allele allele = SessionFilter.alleleFinder.get().getAllele(alleleName);
+            boolean[] assignCompatibilityStatus = new boolean[] { false }; // wrapping for use in lambda
+            if(!updateAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
+                allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());
                 assignCompatibilityStatus[0] = true;
             }
-        }
-        if(assignCompatibilityStatus[0]) {
-            alleleFinder.get().computeCompatInterpretation(hypervariableRegionFinder.get());
-        }
-        if(updateAllele.getReferenceForMatches()) {
-            // This will concurrently un-assign the current reference allele.
-            alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
+            if(!updateAllele.getRecipientTypeForCompat().equals(allele.getRecipientTypeForCompat())) {
+                allele.setRecipientTypeForCompat(updateAllele.getRecipientTypeForCompat());
+                assignCompatibilityStatus[0] = true;
+            }
+            if(!updateAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
+                // Not allowing antibodies to specified for alleles that are not the
+                // subject of a single antigen bead.
+                if(allele.getSingleAntigenBead()) {
+                    allele.setRecipientAntibodyForCompat(updateAllele.getRecipientAntibodyForCompat());
+                    assignCompatibilityStatus[0] = true;
+                }
+            }
+            if(assignCompatibilityStatus[0]) {
+                SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
+            }
+            if(updateAllele.getReferenceForMatches()) {
+                // This will concurrently un-assign the current reference allele.
+                SessionFilter.alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
+            }
         }
     }
     

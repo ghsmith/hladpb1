@@ -69,7 +69,9 @@ a.filterEnabled {
     <p>
         The IMGT allele database version is <span id="imgtDbVersion">...</span>
         and the single antigen bead (SAB) reagent lot number is
-        <span id="reagentLotNumber">...</span>.
+        <span id="reagentLotNumber">...</span>. The session ID is
+        <span id="sessionId">...</span>
+        (<a id="resetSessionLink" href="javascript:void(0);">reset session</a>).
     </p>
     <p>
         This report is for research use only.
@@ -115,10 +117,31 @@ a.filterEnabled {
 
 <script>
 
+var sessionId;
 var reagentLotNumber; // the single antigen bead reagent lot number
 var alleles = []; // the array of alleles
 var sabOnly = false; // only show single antigen bead alleles
 var matchesHvrCountGe4Only = true; // only show alleles where the match count is ge 4
+
+function getSessionId() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/session",
+        dataType: "text"
+    }).then(function(response) {
+        sessionId = response;
+    });
+}
+
+function resetSession() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/session/reset",
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json"
+    });
+}
 
 // Get reagent lot number.
 function getReagentLotNumber() {
@@ -190,6 +213,7 @@ function setUiState() {
     var dfr = $.Deferred();
     $("#working").show();
     setTimeout(function() {
+        $("#sessionId").html(sessionId);
         $("#imgtDbVersion").html(alleles[0].version);
         $("#reagentLotNumber").html(reagentLotNumber);
         $("#sabFilter").removeClass("filterEnabled");
@@ -256,7 +280,11 @@ function matchesHvrCountSort(a, b) {
 $(document).ready(function() {
 
     // Initial population of report table.
-    getReagentLotNumber().then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+    getSessionId().then(getReagentLotNumber).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+
+    $("#resetSessionLink").click(function() {
+        resetSession().then(getSessionId).then(getReagentLotNumber).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+    });
 
     // Select a reference allele from the list. Handled by web service.
     $("#referenceAlleleSelect").change(function() {
