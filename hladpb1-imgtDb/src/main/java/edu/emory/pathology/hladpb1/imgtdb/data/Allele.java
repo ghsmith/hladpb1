@@ -59,6 +59,14 @@ public class Allele implements Serializable {
     private Boolean donorTypeForCompat = false;
     private String compatInterpretation;
 
+    // These fields are not used by any algorithms and are only provided as
+    // a convenience for clients that keep track of which allele is allele #1
+    // and which allele is allele #2.
+    private Boolean recipientAllele1;
+    private Boolean recipientAllele2;
+    private Boolean donorAllele1;
+    private Boolean donorAllele2;
+    
     public Integer getSequenceNumber() {
         return sequenceNumber;
     }
@@ -179,4 +187,36 @@ public class Allele implements Serializable {
         this.compatInterpretation = compatInterpretation;
     }
 
+    public Boolean getRecipientAllele1() {
+        return recipientAllele1;
+    }
+
+    public void setRecipientAllele1(Boolean recipientAllele1) {
+        this.recipientAllele1 = recipientAllele1;
+    }
+
+    public Boolean getRecipientAllele2() {
+        return recipientAllele2;
+    }
+
+    public void setRecipientAllele2(Boolean recipientAllele2) {
+        this.recipientAllele2 = recipientAllele2;
+    }
+
+    public Boolean getDonorAllele1() {
+        return donorAllele1;
+    }
+
+    public void setDonorAllele1(Boolean donorAllele1) {
+        this.donorAllele1 = donorAllele1;
+    }
+
+    public Boolean getDonorAllele2() {
+        return donorAllele2;
+    }
+
+    public void setDonorAllele2(Boolean donorAllele2) {
+        this.donorAllele2 = donorAllele2;
+    }
+    
 }

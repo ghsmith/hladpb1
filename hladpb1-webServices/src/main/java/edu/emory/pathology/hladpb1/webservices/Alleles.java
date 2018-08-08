@@ -62,6 +62,38 @@ public class Alleles {
     public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele updateAllele) {
         synchronized(SessionFilter.sessionMutex.get()) {
             Allele allele = SessionFilter.alleleFinder.get().getAllele(alleleName);
+            if(updateAllele.getDonorAllele1() != null && updateAllele.getDonorAllele1()) {
+                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
+                    if(loopAllele.getDonorAllele1() != null && loopAllele.getDonorAllele1()) {
+                        loopAllele.setDonorAllele1(false);
+                    }
+                });
+                allele.setDonorAllele1(true);
+            }
+            if(updateAllele.getDonorAllele2() != null && updateAllele.getDonorAllele2()) {
+                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
+                    if(loopAllele.getDonorAllele2() != null && loopAllele.getDonorAllele2()) {
+                        loopAllele.setDonorAllele2(false);
+                    }
+                });
+                allele.setDonorAllele2(true);
+            }
+            if(updateAllele.getRecipientAllele1() != null && updateAllele.getRecipientAllele1()) {
+                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
+                    if(loopAllele.getRecipientAllele1() != null && loopAllele.getRecipientAllele1()) {
+                        loopAllele.setRecipientAllele1(false);
+                    }
+                });
+                allele.setRecipientAllele1(true);
+            }
+            if(updateAllele.getRecipientAllele2() != null && updateAllele.getRecipientAllele2()) {
+                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
+                    if(loopAllele.getRecipientAllele2() != null && loopAllele.getRecipientAllele2()) {
+                        loopAllele.setRecipientAllele2(false);
+                    }
+                });
+                allele.setRecipientAllele2(true);
+            }
             boolean[] assignCompatibilityStatus = new boolean[] { false }; // wrapping for use in lambda
             if(!updateAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
                 allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());

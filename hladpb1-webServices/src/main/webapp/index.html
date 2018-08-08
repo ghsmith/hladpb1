@@ -273,6 +273,35 @@
                 <td>boolean</td>
                 <td>{...<br/>donorTypeForCompat: true,<br/>...}</td>
             </tr>
+            <tr>
+                <td>allele<br/>&nbsp;.recipientAllele1</td>
+                <td>boolean</td>
+                <td rowspan="4">
+                    The enumerated recipient and donor allele properties are
+                    only provided for the convenience of clients that need to
+                    keep track of which allele represents allele #1 and which
+                    allele represents allele #2. When one of these properties
+                    is set for an allele, it is concurrently unset for all other
+                    alleles (i.e., there can only be one allele #1 and one
+                    allele #2).
+                </td>
+                <td>{...<br/>recipientAllele1: true,<br/>...}</td>
+            </tr>
+            <tr>
+                <td>allele<br/>&nbsp;.recipientAllele2</td>
+                <td>boolean</td>
+                <td>{...<br/>recipientAllele2: true,<br/>...}</td>
+            </tr>
+            <tr>
+                <td>allele<br/>&nbsp;.donorAllele1</td>
+                <td>boolean</td>
+                <td>{...<br/>donorAllele1: true,<br/>...}</td>
+            </tr>
+            <tr>
+                <td>allele<br/>&nbsp;.donorAllele2</td>
+                <td>boolean</td>
+                <td>{...<br/>donorAllele2: true,<br/>...}</td>
+            </tr>
         </table>
 
         <h3>GET /hladpb1/resources/hypervariableRegions</h3>
@@ -497,15 +526,17 @@
             Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportNoHvrs.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportNoHvrs.html</a>
         </p>
 
-        <h3><a>HLA-DPB1 Compatibility Wizard</a></h3>
+        <h3><a href="/hladpb1/ajaxMobileCompatibilityWizard.html">HLA-DPB1 Compatibility Wizard</a></h3>
         <p>
-            [UNDER CONSTRUCTION]
             This wizard makes donor/recipient compatibility predictions based on
             the donor/recipient HLA-DPB1 types and the recipient antibody
             profile (SAB positivity and/or known reactivity to particular
             hypervarible epitopes). The wizard is implemented as a
             static HTML5 web page that uses the jQuery AJAX API to access the
             HLA-DPB1 REST endpoints and jQuery Mobile user interface components.
+        </p>
+        <p>
+            Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportNoHvrs.html">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxMobileCompatibilityWizard.html</a>
         </p>
 
         <p><br/>Copyright &copy; 2018, Geoffrey H. Smith, MD

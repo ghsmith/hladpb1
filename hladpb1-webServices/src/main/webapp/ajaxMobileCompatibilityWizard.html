@@ -29,8 +29,10 @@
     <div id="recipientHlaTypePage" data-role="page">
 
         <div data-role="header">
-            <h1>HLA-DPB1 Compatibility Wizard</h1>
+            <h1><br/>HLA-DPB1 Compatibility Wizard</h1>
         </div>
+
+        <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div>
 
         <div class="ui-content">
             <fieldset class="ui-grid-a">
@@ -240,209 +242,139 @@
 
 </html>
 
-<!--script type="text/javascript">
+<script type="text/javascript">
 
-var reportId;
-var imgtHlaVersion;
-var oneLambdaLotNo;
-var hlaTypeList;
-var singleAntigenBeadList;
-var hypervariableRegionList;
+var sessionId;
+var reagentLotNumber; // the single antigen bead reagent lot number
+var alleles = []; // the array of alleles
+var alleleMap = new Object(); // a map of alleles, indexed by allele name
+var hypervariableRegions = []; // the array of hypervariableRegions
+var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region ID
 
-function getSelectedHlaType(selectedPropertyName) {
-    if(hlaTypeList != null) {
-        for(var x = 0; x < hlaTypeList.length; x++) {
-            if(eval("hlaTypeList[x].selected" + selectedPropertyName)) {
-                return hlaTypeList[x];
-            }
-        }
-    }
-    return null;
-}
-
-function getReportId() {
-    if(reportId == null) {
-        return $.ajax({
-            type: "GET",
-            cache: false,
-            dataType: "json",
-            url: "resources/newReportId",
-            success: function(data) {
-                reportId = data.reportId;
-                $(".multiId-reportId").html(reportId);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert(textStatus + "/" + errorThrown);
-            }
-        });
-    }
-}
-
-function getImgtHlaVersion() {
-    if(imgtHlaVersion == null) {
-        return $.ajax({
-            type: "GET",
-            cache: false,
-            dataType: "json",
-            url: "resources/imgtHlaVersion/" + reportId,
-            success: function(data) {
-                imgtHlaVersion = data.imgtHlaVersion;
-                oneLambdaLotNo = data.oneLambdaLotNo;
-                $(".multiId-imgtHlaVersion").html(imgtHlaVersion);
-                $(".multiId-oneLambdaLotNo").html(oneLambdaLotNo);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert(textStatus + "/" + errorThrown);
-            }
-        });
-    }
-}
-
-function getHlaTypeList() {
-    if(hlaTypeList == null) {
-        return $.ajax({
-            type: "GET",
-            cache: false,
-            dataType: "json",
-            url: "resources/hlaType/all/" + reportId,
-            success: function(data) {
-                hlaTypeList = data;
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert(textStatus + "/" + errorThrown);
-            }
-        });
-    }
-}
-
-function setHlaType(hlaType) {
+function getSessionId() {
+    $("#working").show();
     return $.ajax({
-        type: "PUT",
-        cache: false,
-        dataType: "json",
-        contentType: "application/json",
-        url: "resources/hlaType/" + reportId,
-        data: JSON.stringify(hlaType),
-        //success:
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(textStatus + "/" + errorThrown);
-        }
+        url: "/hladpb1/resources/session",
+        dataType: "text"
+    }).then(function(response) {
+        sessionId = response;
     });
 }
 
-function getSingleAntigenBeadList() {
-    if(singleAntigenBeadList == null) {
-        return $.ajax({
-            type: "GET",
-            cache: false,
-            dataType: "json",
-            url: "resources/singleAntigenBead/all/" + reportId,
-            success: function(data) {
-                singleAntigenBeadList = data;
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert(textStatus + "/" + errorThrown);
-            }
-        });
-    }
-}
-
-function setSingleAntigenBead(singleAntigenBead) {
+function resetSession() {
+    $("#working").show();
     return $.ajax({
-        type: "PUT",
-        cache: false,
+        url: "/hladpb1/resources/session/reset",
         dataType: "json",
-        contentType: "application/json",
-        url: "resources/singleAntigenBead/" + reportId,
-        data: JSON.stringify(singleAntigenBead),
-        //success:
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(textStatus + "/" + errorThrown);
-        }
+        type: "PUT",
+        contentType: "application/json"
     });
 }
 
-function getHypervariableRegionList() {
-    if(hypervariableRegionList == null) {
-        return $.ajax({
-            type: "GET",
-            cache: false,
-            dataType: "json",
-            url: "resources/hypervariableRegion/all/" + reportId,
-            success: function(data) {
-                hypervariableRegionList = data;
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert(textStatus + "/" + errorThrown);
-            }
-        });
-    }
-}
-
-function setHypervariableRegion(hypervariableRegion) {
+// Get reagent lot number.
+function getReagentLotNumber() {
+    $("#working").show();
     return $.ajax({
-        type: "PUT",
-        cache: false,
-        dataType: "json",
-        contentType: "application/json",
-        url: "resources/hypervariableRegion/" + reportId,
-        data: JSON.stringify(hypervariableRegion),
-        //success:
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(textStatus + "/" + errorThrown);
-        }
+        url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
+        dataType: "json"
+    }).then(function(response) {
+        reagentLotNumber = response;
     });
 }
 
-function predictCompatibility() {
+// Get all hypervariable regions.
+function getHypervariableRegions() {
+    $("#working").show();
     return $.ajax({
-        type: "GET",
-        cache: false,
+        url: "/hladpb1/resources/hypervariableRegions",
+        dataType: "json"
+    }).then(function(response) {
+        hypervariableRegions = response;
+        hypervariableRegions.forEach(function(hypervariableRegion) {
+            hvrMap[hypervariableRegion.hypervariableRegionName] = hypervariableRegion;
+        });
+    });
+}
+
+// Put a hypervariable region (updates known reactive epitope attribute).
+function putHypervariableRegion(hypervariableRegion) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/hypervariableRegions/" + hypervariableRegion.hypervariableRegionName,
         dataType: "json",
-        url: "resources/predictCompatibility/" + reportId,
-        //success:
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(textStatus + "/" + errorThrown);
-        }
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(hypervariableRegion)
+    });
+}
+
+// Get all alleles.
+function getAlleles() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/alleles?noCodons=true&synonymous=false", // always filter out synonymous alleles
+        dataType: "json"
+    }).then(function(response) {
+        alleles = response;
+        alleles.forEach(function(allele) {
+            alleleMap[allele.alleleName] = allele;
+        });
+    });
+}
+
+// Put an allele (updates donor type, recipient type, and recipient antibodies).
+function putAllele(allele) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/alleles/" + allele.alleleName + "?noCodons=true",
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(allele)
     });
 }
 
 $("#recipientHlaTypePage").bind("pageinit", function () {
 
-    $.when(getReportId()).then(function() {
-    $.when(getHlaTypeList(), getImgtHlaVersion()).then(function() {
-        
+    getSessionId().then(getReagentLotNumber).then(getHypervariableRegions).then(getAlleles).done(function() {
+    
         $("#recipientHlaTypePage div.options div.ui-block-a").append("<fieldset data-role='controlgroup' data-filter='true' data-filter-reveal='true' data-filter-placeholder='type allele name...'></fieldset>");
-        $.each(hlaTypeList, function(index, value) {
-            $("#recipientHlaTypePage div.options div.ui-block-a fieldset").append("<label>" + value.hlaAlleleNameShort + "<input type='radio' name='recipientHlaType1' " + (value.selectedRecipientHlaType1 ? "checked='true'" : "") + "></label>");
-            if(value.selectedRecipientHlaType1) {
-                $("#recipientHlaType1").html(value.hlaAlleleNameShort);
+        $.each(alleles, function(index, allele) {
+            $("#recipientHlaTypePage div.options div.ui-block-a fieldset").append("<label>" + allele.alleleName + "<input type='radio' name='recipientHlaType1' " + (allele.recipientAllele1 ? "checked='true'" : "") + "></label>");
+            if(allele.recipientAllele1) {
+                $("#recipientHlaType1").html(allele.alleleName);
             }
         });
         $("#recipientHlaTypePage div.options div.ui-block-a").trigger("create");
         $("#recipientHlaTypePage div.options div.ui-block-a input").change(function(event) {
-            $.each(hlaTypeList, function(index, value) { value.selectedRecipientHlaType1 = false; });
-            hlaTypeList[$(this).parent().index()].selectedRecipientHlaType1 = $(this).is(":checked");
-            setHlaType(hlaTypeList[$(this).parent().index()]);
-            $("#recipientHlaType1").html(hlaTypeList[$(this).parent().index()].hlaAlleleNameShort);
+            var allele = alleles[$(this).parent().index()];
+            allele.recipientAllele1 = $(this).is(":checked");
+            if(allele.recipientAllele1) {
+                $("#recipientHlaType1").html(allele.alleleName);
+                putAllele(allele).then(function() { $("#working").hide(); });
+            }
         });
 
         $("#recipientHlaTypePage div.options div.ui-block-b").append("<fieldset data-role='controlgroup' data-filter='true' data-filter-reveal='true' data-filter-placeholder='type allele name...'></fieldset>");
-        $.each(hlaTypeList, function(index, value) {
-            $("#recipientHlaTypePage div.options div.ui-block-b fieldset").append("<label>" + value.hlaAlleleNameShort + "<input type='radio' name='recipientHlaType2' " + (value.selectedRecipientHlaType2 ? "checked='true'" : "") + "></label>");
-            if(value.selectedRecipientHlaType2) {
-                $("#recipientHlaType2").html(value.hlaAlleleNameShort);
+        $.each(alleles, function(index, allele) {
+            $("#recipientHlaTypePage div.options div.ui-block-b fieldset").append("<label>" + allele.alleleName + "<input type='radio' name='recipientHlaType2' " + (allele.recipientAllele2 ? "checked='true'" : "") + "></label>");
+            if(allele.recipientAllele2) {
+                $("#recipientHlaType2").html(allele.alleleName);
             }
         });
         $("#recipientHlaTypePage div.options div.ui-block-b").trigger("create");
         $("#recipientHlaTypePage div.options div.ui-block-b input").change(function(event) {
-            $.each(hlaTypeList, function(index, value) { value.selectedRecipientHlaType2 = false; });
-            hlaTypeList[$(this).parent().index()].selectedRecipientHlaType2 = $(this).is(":checked");
-            setHlaType(hlaTypeList[$(this).parent().index()]);
-            $("#recipientHlaType2").html(hlaTypeList[$(this).parent().index()].hlaAlleleNameShort);
+            var allele = alleles[$(this).parent().index()];
+            allele.recipientAllele2 = $(this).is(":checked");
+            if(allele.recipientAllele2) {
+                $("#recipientHlaType2").html(allele.alleleName);
+                putAllele(allele).then(function() { $("#working").hide(); });
+            }
         });
         
-    })});
+        $("#working").hide();
+        
+    });
 
 });
 
@@ -692,4 +624,4 @@ $("#compatibilityReportPage").bind("pageshow", function () {
     
 });
 
-</script-->
+</script>
