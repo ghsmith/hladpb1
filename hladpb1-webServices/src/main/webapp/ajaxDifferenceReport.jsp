@@ -133,7 +133,9 @@ a.filterEnabled {
         <tbody>
         </tbody>
     </table>
-        
+
+    <p><br/>Copyright &copy; 2018, Geoffrey H. Smith, MD
+            
 </body>
 
 </html>
