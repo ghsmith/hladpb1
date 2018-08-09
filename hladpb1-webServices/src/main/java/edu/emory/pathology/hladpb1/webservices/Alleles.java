@@ -106,26 +106,20 @@ public class Alleles {
                     loopAllele.setRecipientTypeForCompat(false);
                 }
             });
-            boolean[] assignCompatibilityStatus = new boolean[] { false }; // wrapping for use in lambda
             if(!updateAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
                 allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());
-                assignCompatibilityStatus[0] = true;
             }
             if(!updateAllele.getRecipientTypeForCompat().equals(allele.getRecipientTypeForCompat())) {
                 allele.setRecipientTypeForCompat(updateAllele.getRecipientTypeForCompat());
-                assignCompatibilityStatus[0] = true;
             }
             if(!updateAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
                 // Not allowing antibodies to specified for alleles that are not the
                 // subject of a single antigen bead.
                 if(allele.getSingleAntigenBead()) {
                     allele.setRecipientAntibodyForCompat(updateAllele.getRecipientAntibodyForCompat());
-                    assignCompatibilityStatus[0] = true;
                 }
             }
-            if(assignCompatibilityStatus[0]) {
-                SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
-            }
+            SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
             if(updateAllele.getReferenceForMatches()) {
                 // This will concurrently un-assign the current reference allele.
                 SessionFilter.alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
