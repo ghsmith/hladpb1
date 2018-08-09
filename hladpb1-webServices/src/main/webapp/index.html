@@ -30,6 +30,28 @@
             table.parameters th, table.parameters td {
                 border: 1px solid black;
             }
+            div.jsonOutputContainer {
+                height: 300px;
+            }
+            div.jsonOutputLabel {
+                display: inline-block;
+                width: 50px;
+                height: 302px;
+                overflow: hidden;
+                border-right: 5px solid darkgreen;
+                background-color: green;
+            }
+            div.jsonOutputLabelText {
+                display: inline-block;
+                transform: rotate(-90deg);
+                transform-origin: left top;
+                position: relative;
+                bottom: -290px;
+                left: 20px;
+                color: white;
+                font-size: x-large;
+                font-weight: bold;
+            }
             div.jsonOutput {
                 display: inline-block;
                 min-width: 50%;
@@ -37,7 +59,6 @@
                 overflow: scroll;
                 overflow-x: hidden;
                 border: 1px solid gray;
-                margin-left: 30px;
                 background-color: ivory;
             }
         </style>
@@ -148,8 +169,7 @@
         <p>
             <a id="exampleGetAllelesLink" href="javascript:void(0);">GET /hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3</a>
             <br/><br/>returns JSON allele array:
-            <div  id="exampleGetAllelesOutput" class="jsonOutput">
-            </div>
+            <div class="jsonOutputContainer"><div class="jsonOutputLabel"><div class="jsonOutputLabelText">allele[]</div></div><div id="exampleGetAllelesOutput" class="jsonOutput"></div></div>
             <script>
                 $("#exampleGetAllelesLink").click(function() {
                     $("#exampleGetAllelesOutput").html("working...");
@@ -190,8 +210,7 @@
         <p>
             <a id="exampleGetAlleleLink" href="javascript:void(0);">GET /hladpb1/resources/alleles/HLA-DPB1*01:01:01:01</a>
             <br/><br/>returns JSON allele:
-            <div  id="exampleGetAlleleOutput" class="jsonOutput">
-            </div>
+            <div class="jsonOutputContainer"><div class="jsonOutputLabel"><div class="jsonOutputLabelText">allele</div></div><div id="exampleGetAlleleOutput" class="jsonOutput"></div></div>
             <script>
                 $("#exampleGetAlleleLink").click(function() {
                     $("#exampleGetAlleleOutput").html("working...");
@@ -313,8 +332,7 @@
         <p>
             <a id="exampleGetHvrsLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions</a>
             <br/><br/>returns JSON hypervariableRegion array:
-            <div  id="exampleGetHvrsOutput" class="jsonOutput">
-            </div>
+            <div class="jsonOutputContainer"><div class="jsonOutputLabel"><div class="jsonOutputLabelText">hypervariableRegion[]</div></div><div id="exampleGetHvrsOutput" class="jsonOutput"></div></div>
             <script>
                 $("#exampleGetHvrsLink").click(function() {
                     $("#exampleGetHvrsOutput").html("working...");
@@ -341,8 +359,7 @@
         <p>
             <a id="exampleGetHvrLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions/f</a>
             <br/><br/>returns JSON hypervariableRegion array:
-            <div  id="exampleGetHvrOutput" class="jsonOutput">
-            </div>
+            <div class="jsonOutputContainer"><div class="jsonOutputLabel"><div class="jsonOutputLabelText">hypervariableRegion</div></div><div id="exampleGetHvrOutput" class="jsonOutput"></div></div>
             <script>
                 $("#exampleGetHvrLink").click(function() {
                     $("#exampleGetHvrOutput").html("working...");
@@ -411,8 +428,7 @@
         <p>
             <a id="exampleGetReagentLotNumberLink" href="javascript:void(0);">GET /hladpb1/resources/hypervariableRegions/reagentLotNumber</a>
             <br/><br/>returns JSON reagentLotNumber:
-            <div  id="exampleGetReagentLotNumberOutput" class="jsonOutput">
-            </div>
+            <div class="jsonOutputContainer"><div class="jsonOutputLabel"><div class="jsonOutputLabelText">reagentLotNumber</div></div><div id="exampleGetReagentLotNumberOutput" class="jsonOutput"></div></div>
             <script>
                 $("#exampleGetReagentLotNumberLink").click(function() {
                     $("#exampleGetReagentLotNumberOutput").html("working...");
@@ -438,9 +454,8 @@
         <h4>Example Usage</h4>
         <p>
             <a id="exampleGetSessionLink" href="javascript:void(0);">GET /hladpb1/resources/session</a>
-            <br/><br/>returns JSON session:
-            <div  id="exampleGetSessionOutput" class="jsonOutput">
-            </div>
+            <br/><br/>returns JSON sessionId:
+            <div class="jsonOutputContainer"><div class="jsonOutputLabel"><div class="jsonOutputLabelText">sessionId</div></div><div id="exampleGetSessionOutput" class="jsonOutput"></div></div>
             <script>
                 $("#exampleGetSessionLink").click(function() {
                     $("#exampleGetSessionOutput").html("working...");
