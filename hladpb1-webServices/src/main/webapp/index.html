@@ -32,12 +32,16 @@
             }
             div.jsonOutputContainer {
                 height: 300px;
+                position: relative;
                 white-space: nowrap;
             }
             div.jsonOutputLabel {
                 display: inline-block;
                 width: 50px;
                 height: 302px;
+                position: absolute;
+                left: 0px;
+                top: 0px;
                 overflow: hidden;
                 border-right: 5px solid darkgreen;
                 background-color: green;
@@ -47,8 +51,8 @@
                 transform: rotate(-90deg);
                 transform-origin: left top;
                 position: relative;
-                bottom: -290px;
                 left: 20px;
+                bottom: -290px;
                 color: white;
                 font-size: x-large;
                 font-weight: bold;
@@ -57,6 +61,9 @@
                 display: inline-block;
                 min-width: 50%;
                 height: 300px;
+                position: absolute;
+                left: 51px;
+                top: 0px;
                 overflow: scroll;
                 overflow-x: hidden;
                 border: 1px solid gray;
