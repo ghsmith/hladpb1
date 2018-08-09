@@ -30,7 +30,7 @@
 
         <div data-role="header">
             <h1>HLA-DPB1 Compatibility Wizard</h1>
-            <div style="height: 20px;"><div id="working" style="display: inline-block; width: 100%; height: 20px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div></div>
+            <div style="height: 20px;"><div class="multiId-working" style="display: inline-block; width: 100%; height: 20px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div></div>
         </div>
 
 
@@ -55,14 +55,18 @@
             </div>
         </div>
            
-        <div data-role="footer">
-            <center>
+        <div data-role="footer" style="text-align: center;">
+            <div style="display: inline-block; text-align: right; vertical-align: middle">
+                <img src="https://hlatools.org/htLogoTransparent.png">&nbsp;&nbsp;
+            </div>
+            <div style="display: inline-block; text-align: left; vertical-align: middle; margin-top: 5px; margin-bottom: 5px; border-left: 1px solid black; padding-left: 5px;">
                     <span style="font-size: small;">FOR RESEARCH USE ONLY
-                    <br/>report ID: <span class="multiId-reportId"></span>
+                    <br/>session ID: <span class="multiId-reportId"></span>
                     <br/>IMGT allele database version: <span class="multiId-imgtHlaVersion"></span>
                     <br/>single antigen bead (SAB) reagent lot number: <span class="multiId-oneLambdaLotNo"></span>
+                    <br/><a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxMobileCompatibilityWizard.html">source code</a>
                     <br/>Copyright &copy; 2018, Geoffrey H. Smith, MD</span>
-            </center>
+            </div>
         </div>
 
     </div>
@@ -71,12 +75,14 @@
 
         <div data-role="header">
             <h1>HLA-DPB1 Compatibility Wizard</h1>
+            <div style="height: 20px;"><div class="multiId-working" style="display: inline-block; width: 100%; height: 20px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div></div>
         </div>
 
         <div class="ui-content">
-            <fieldset class="ui-grid-a">
+            <fieldset class="ui-grid-b">
                 <div class="ui-block-a"><a href="#recipientHlaTypePage" data-role="button" class="button-prev" data-icon="arrow-l">Prev</a></div>
-                <div class="ui-block-b"><a href="#recipientEpitopePage" data-role="button" class="button-next" data-icon="arrow-r" data-iconpos="right">Next</a></div>
+                <div class="ui-block-b"><a class="multiId-resetButton" data-role="button"">Reset</a></div>
+                <div class="ui-block-c"><a href="#recipientEpitopePage" data-role="button" class="button-next" data-icon="arrow-r" data-iconpos="right">Next</a></div>
             </fieldset>        
             <div>
                 <h3>2. Select the recipient's HLA-DPB1 antibodies (positive single antigen beads).</h3>
@@ -85,14 +91,18 @@
             </div>
         </div>
 
-        <div data-role="footer">
-            <center>
+        <div data-role="footer" style="text-align: center;">
+            <div style="display: inline-block; text-align: right; vertical-align: middle">
+                <img src="https://hlatools.org/htLogoTransparent.png">&nbsp;&nbsp;
+            </div>
+            <div style="display: inline-block; text-align: left; vertical-align: middle; margin-top: 5px; margin-bottom: 5px; border-left: 1px solid black; padding-left: 5px;">
                     <span style="font-size: small;">FOR RESEARCH USE ONLY
-                    <br/>report ID: <span class="multiId-reportId"></span>
+                    <br/>session ID: <span class="multiId-reportId"></span>
                     <br/>IMGT allele database version: <span class="multiId-imgtHlaVersion"></span>
                     <br/>single antigen bead (SAB) reagent lot number: <span class="multiId-oneLambdaLotNo"></span>
+                    <br/><a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxMobileCompatibilityWizard.html">source code</a>
                     <br/>Copyright &copy; 2018, Geoffrey H. Smith, MD</span>
-            </center>
+            </div>
         </div>
 
     </div>
@@ -245,13 +255,14 @@
 
 <script type="text/javascript">
 
+var pageInitedMap = new Object();
 var alleles = []; // the array of alleles
 var alleleMap = new Object(); // a map of alleles, indexed by allele name
 var hypervariableRegions = []; // the array of hypervariableRegions
 var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region ID
 
 function getSessionId() {
-    $("#working").show();
+    $(".multiId-working").show();
     return $.ajax({
         url: "/hladpb1/resources/session",
         dataType: "text"
@@ -262,7 +273,7 @@ function getSessionId() {
 }
 
 function resetSession() {
-    $("#working").show();
+    $(".multiId-working").show();
     return $.ajax({
         url: "/hladpb1/resources/session/reset",
         dataType: "json",
@@ -273,7 +284,7 @@ function resetSession() {
 
 // Get reagent lot number.
 function getReagentLotNumber() {
-    $("#working").show();
+    $(".multiId-working").show();
     return $.ajax({
         url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
         dataType: "json"
@@ -285,7 +296,7 @@ function getReagentLotNumber() {
 
 // Get all hypervariable regions.
 function getHypervariableRegions() {
-    $("#working").show();
+    $(".multiId-working").show();
     return $.ajax({
         url: "/hladpb1/resources/hypervariableRegions",
         dataType: "json"
@@ -299,7 +310,7 @@ function getHypervariableRegions() {
 
 // Put a hypervariable region (updates known reactive epitope attribute).
 function putHypervariableRegion(hypervariableRegion) {
-    $("#working").show();
+    $(".multiId-working").show();
     return $.ajax({
         url: "/hladpb1/resources/hypervariableRegions/" + hypervariableRegion.hypervariableRegionName,
         dataType: "json",
@@ -311,7 +322,7 @@ function putHypervariableRegion(hypervariableRegion) {
 
 // Get all alleles.
 function getAlleles() {
-    $("#working").show();
+    $(".multiId-working").show();
     return $.ajax({
         url: "/hladpb1/resources/alleles?noCodons=true&synonymous=false", // always filter out synonymous alleles
         dataType: "json"
@@ -326,7 +337,7 @@ function getAlleles() {
 
 // Put an allele (updates donor type, recipient type, and recipient antibodies).
 function putAllele(allele) {
-    $("#working").show();
+    $(".multiId-working").show();
     return $.ajax({
         url: "/hladpb1/resources/alleles/" + allele.alleleName + "?noCodons=true",
         dataType: "json",
@@ -336,18 +347,24 @@ function putAllele(allele) {
     });
 }
 
-$(".multiId-resetButton").click(function() {
-    var alleles = []; // the array of alleles
-    var alleleMap = new Object(); // a map of alleles, indexed by allele name
-    var hypervariableRegions = []; // the array of hypervariableRegions
-    var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region ID
-    resetSession().done(function() { $(":mobile-pagecontainer").pagecontainer("change", "#recipientHlaTypePage"); $("#recipientHlaTypePage").trigger("pageinit"); });
-});
-        
+function initData() {
+    var dfr = $.Deferred();
+    setTimeout(function() {
+        if(alleles.length == 0) {
+            getSessionId().then(getReagentLotNumber).then(getHypervariableRegions).then(getAlleles).done(function() { dfr.resolve(); });
+        }
+        else {
+            dfr.resolve();
+        }
+    }, 1);
+    return dfr.promise();
+}
 
 $("#recipientHlaTypePage").bind("pageinit", function () {
 
-    getSessionId().then(getReagentLotNumber).then(getHypervariableRegions).then(getAlleles).done(function() {
+    pageInitedMap["#recipientHlaTypePage"] = true;
+
+    initData().done(function() {
 
         $("#recipientHlaTypePage div.options div.ui-block-a fieldset").remove();
         $("#recipientHlaType1").html("not selected");
@@ -364,7 +381,7 @@ $("#recipientHlaTypePage").bind("pageinit", function () {
             allele.recipientAllele1 = $(this).is(":checked");
             if(allele.recipientAllele1) {
                 $("#recipientHlaType1").html(allele.alleleName);
-                putAllele(allele).then(function() { $("#working").fadeOut(); });
+                putAllele(allele).done(function() { $(".multiId-working").fadeOut(); });
             }
         });
 
@@ -383,38 +400,60 @@ $("#recipientHlaTypePage").bind("pageinit", function () {
             allele.recipientAllele2 = $(this).is(":checked");
             if(allele.recipientAllele2) {
                 $("#recipientHlaType2").html(allele.alleleName);
-                putAllele(allele).then(function() { $("#working").fadeOut(); });
+                putAllele(allele).done(function() { $(".multiId-working").fadeOut(); });
             }
         });
 
-        $("#working").fadeOut();
+        $(".multiId-working").fadeOut();
+        
+    });
+    
+});
+
+$("#recipientHlaTypePage").bind("pageshow", function () {
+    
+    if(!pageInitedMap["#recipientHlaTypePage"]) {
+        $("#recipientHlaTypePage").trigger("pageinit");
+    }
+    
+});
+
+$("#singleAntigenBeadPage").bind("pageinit", function () {
+
+    pageInitedMap["#singleAntigenBeadPage"] = true;
+
+    initData().done(function() {
+
+        $("#singleAntigenBeadPage div.options fieldset").remove();
+        $("#singleAntigenBeadPage div.options").append("<fieldset data-role='controlgroup'></fieldset>");
+        $.each(alleles.filter(function(allele) { return allele.singleAntigenBead; }), function(index, sabAllele) {
+            $("#singleAntigenBeadPage div.options fieldset").append("<label>" + sabAllele.alleleName + "<input type='checkbox' name='singleAntigenBead' data-value='" + sabAllele.alleleName + "' " + (sabAllele.recipientAntibodyForCompat ? "checked='true'" : "") + "></label>");
+        });
+        $("#singleAntigenBeadPage div.options").trigger("create");
+        $("#singleAntigenBeadPage div.options input").change(function(event) {
+            var sabAllele = alleleMap[$(this).data('value')];
+            sabAllele.recipientAntibodyForCompat = $(this).is(":checked");
+            putAllele(sabAllele).done(function() { $(".multiId-working").fadeOut(); });
+        });
+        
+        $(".multiId-working").fadeOut();        
         
     });
 
 });
 
-$("#singleAntigenBeadPage").bind("pageinit", function () {
-
-    $.when(getReportId()).then(function() {
-    $.when(getSingleAntigenBeadList(), getImgtHlaVersion()).then(function() {
-        $("#singleAntigenBeadPage div.options").append("<fieldset data-role='controlgroup'></fieldset>");
-        $.each(singleAntigenBeadList, function(index, value) {
-            $("#singleAntigenBeadPage div.options fieldset").append("<label>" + value.hlaAlleleNameShort + "<input type='checkbox' name='singleAntigenBead' " + (value.selected ? "checked='true'" : "") + "></label>");
-        });
-        $("#singleAntigenBeadPage div.options").trigger("create");
-        $("#singleAntigenBeadPage div.options input").change(function(event) {
-            singleAntigenBeadList[$(this).parent().index()].selected = $(this).is(":checked");
-            setSingleAntigenBead(singleAntigenBeadList[$(this).parent().index()]);
-        });
-    })});
-
+$("#singleAntigenBeadPage").bind("pageshow", function () {
+    
+    if(!pageInitedMap["#singleAntigenBeadPage"]) {
+        $("#singleAntigenBeadPage").trigger("pageinit");
+    }
+    
 });
+
 
 $("#recipientEpitopePage").bind("pageinit", function () {
 
-    $.when(getReportId()).then(function() {
-    $.when(getHypervariableRegionList(), getImgtHlaVersion()).then(function() {
-        $("#recipientEpitopePage div.options").append("<fieldset data-role='controlgroup'></fieldset>");
+/*        $("#recipientEpitopePage div.options").append("<fieldset data-role='controlgroup'></fieldset>");
         $.each(hypervariableRegionList, function(index, value) {
             $("#recipientEpitopePage div.options fieldset").append("<label>epitope name: " + value.hypervariableRegionName + value.hypervariableRegionNumber + "<br>codon position(s): " + value.hypervariableRegionCodonPositions + "<br>protein sequence(s): " + value.hypervariableRegionProteinSequences + "<input type='checkbox' name='hypervariableRegion' " + (value.selected ? "checked='true'" : "") + "></label>");
         });
@@ -423,7 +462,7 @@ $("#recipientEpitopePage").bind("pageinit", function () {
             hypervariableRegionList[$(this).parent().index()].selected = $(this).is(":checked");
             setHypervariableRegion(hypervariableRegionList[$(this).parent().index()]);
         });
-    })});
+    })});*/
 
 });
 
@@ -637,6 +676,15 @@ $("#compatibilityReportPage").bind("pageshow", function () {
 
     })})});
     
+});
+
+$(".multiId-resetButton").click(function() {
+    pageInitedMap = new Object();
+    alleles = []; // the array of alleles
+    alleleMap = new Object(); // a map of alleles, indexed by allele name
+    hypervariableRegions = []; // the array of hypervariableRegions
+    hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region ID
+    resetSession().done(function() { $(":mobile-pagecontainer").pagecontainer("change", "#recipientHlaTypePage"); $("#recipientHlaTypePage").trigger("pageshow"); });
 });
 
 </script>

@@ -69,6 +69,7 @@ public class Alleles {
                     }
                 });
                 allele.setDonorAllele1(true);
+                allele.setDonorTypeForCompat(true);
             }
             if(updateAllele.getDonorAllele2() != null && updateAllele.getDonorAllele2()) {
                 SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
@@ -77,6 +78,7 @@ public class Alleles {
                     }
                 });
                 allele.setDonorAllele2(true);
+                allele.setDonorTypeForCompat(true);
             }
             if(updateAllele.getRecipientAllele1() != null && updateAllele.getRecipientAllele1()) {
                 SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
@@ -85,6 +87,7 @@ public class Alleles {
                     }
                 });
                 allele.setRecipientAllele1(true);
+                allele.setRecipientTypeForCompat(true);
             }
             if(updateAllele.getRecipientAllele2() != null && updateAllele.getRecipientAllele2()) {
                 SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
@@ -93,7 +96,16 @@ public class Alleles {
                     }
                 });
                 allele.setRecipientAllele2(true);
+                allele.setRecipientTypeForCompat(true);
             }
+            SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
+                if((loopAllele.getDonorAllele1() == null || !loopAllele.getDonorAllele1()) && (loopAllele.getDonorAllele2() == null || !loopAllele.getDonorAllele2())) {
+                    loopAllele.setDonorTypeForCompat(false);
+                }
+                if((loopAllele.getRecipientAllele1() == null || !loopAllele.getRecipientAllele1()) && (loopAllele.getRecipientAllele2() == null || !loopAllele.getRecipientAllele2())) {
+                    loopAllele.setRecipientTypeForCompat(false);
+                }
+            });
             boolean[] assignCompatibilityStatus = new boolean[] { false }; // wrapping for use in lambda
             if(!updateAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
                 allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());
