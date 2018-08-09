@@ -5,6 +5,7 @@
 
 <head> 
 
+    <meta name="viewport" content="width=device-width, initial-scale=0.86"> 
     <title>HLA-DPB1 Compatibility Wizard</title> 
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
@@ -383,6 +384,7 @@ $("#recipientHlaTypePage").bind("pageinit", function () {
                 $("#recipientHlaType1").html(allele.alleleName);
                 putAllele(allele).done(function() { $(".multiId-working").fadeOut(); });
             }
+            $("#recipientHlaTypePage div.options div.ui-block-a input[data-type=search]").blur();
         });
 
         $("#recipientHlaTypePage div.options div.ui-block-b fieldset").remove();
@@ -402,6 +404,7 @@ $("#recipientHlaTypePage").bind("pageinit", function () {
                 $("#recipientHlaType2").html(allele.alleleName);
                 putAllele(allele).done(function() { $(".multiId-working").fadeOut(); });
             }
+            $("#recipientHlaTypePage div.options div.ui-block-b input[data-type=search]").blur();
         });
 
         $(".multiId-working").fadeOut();
