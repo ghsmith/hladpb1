@@ -59,72 +59,65 @@ public class Alleles {
     @PUT
     @Path("{alleleName}")
     @Consumes("application/json")
-    public void putJsonAllele(@PathParam("alleleName") String alleleName, Allele updateAllele) {
+    public void putJsonAllele(@PathParam("alleleName") String alleleName, @QueryParam("enumeratedAlleleMode") String enumeratedAlleleMode, Allele updateAllele) {
+
         synchronized(SessionFilter.sessionMutex.get()) {
+
             Allele allele = SessionFilter.alleleFinder.get().getAllele(alleleName);
-            if(updateAllele.getDonorAllele1() != null && updateAllele.getDonorAllele1()) {
-                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
-                    if(loopAllele.getDonorAllele1() != null && loopAllele.getDonorAllele1()) {
-                        loopAllele.setDonorAllele1(false);
-                    }
-                });
-                allele.setDonorAllele1(true);
-                allele.setDonorTypeForCompat(true);
-            }
-            if(updateAllele.getDonorAllele2() != null && updateAllele.getDonorAllele2()) {
-                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
-                    if(loopAllele.getDonorAllele2() != null && loopAllele.getDonorAllele2()) {
-                        loopAllele.setDonorAllele2(false);
-                    }
-                });
-                allele.setDonorAllele2(true);
-                allele.setDonorTypeForCompat(true);
-            }
-            if(updateAllele.getRecipientAllele1() != null && updateAllele.getRecipientAllele1()) {
-                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
-                    if(loopAllele.getRecipientAllele1() != null && loopAllele.getRecipientAllele1()) {
-                        loopAllele.setRecipientAllele1(false);
-                    }
-                });
-                allele.setRecipientAllele1(true);
-                allele.setRecipientTypeForCompat(true);
-            }
-            if(updateAllele.getRecipientAllele2() != null && updateAllele.getRecipientAllele2()) {
-                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
-                    if(loopAllele.getRecipientAllele2() != null && loopAllele.getRecipientAllele2()) {
-                        loopAllele.setRecipientAllele2(false);
-                    }
-                });
-                allele.setRecipientAllele2(true);
-                allele.setRecipientTypeForCompat(true);
-            }
-            SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
-                if((loopAllele.getDonorAllele1() == null || !loopAllele.getDonorAllele1()) && (loopAllele.getDonorAllele2() == null || !loopAllele.getDonorAllele2())) {
-                    loopAllele.setDonorTypeForCompat(false);
-                }
-                if((loopAllele.getRecipientAllele1() == null || !loopAllele.getRecipientAllele1()) && (loopAllele.getRecipientAllele2() == null || !loopAllele.getRecipientAllele2())) {
-                    loopAllele.setRecipientTypeForCompat(false);
-                }
-            });
-            if(!updateAllele.getDonorTypeForCompat().equals(allele.getDonorTypeForCompat())) {
-                allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());
-            }
-            if(!updateAllele.getRecipientTypeForCompat().equals(allele.getRecipientTypeForCompat())) {
-                allele.setRecipientTypeForCompat(updateAllele.getRecipientTypeForCompat());
-            }
-            if(!updateAllele.getRecipientAntibodyForCompat().equals(allele.getRecipientAntibodyForCompat())) {
-                // Not allowing antibodies to specified for alleles that are not the
-                // subject of a single antigen bead.
-                if(allele.getSingleAntigenBead()) {
-                    allele.setRecipientAntibodyForCompat(updateAllele.getRecipientAntibodyForCompat());
-                }
-            }
-            SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
+
+            // 1. Set the reference allele for the difference report.
             if(updateAllele.getReferenceForMatches()) {
                 // This will concurrently un-assign the current reference allele.
                 SessionFilter.alleleFinder.get().assignHypervariableRegionVariantMatches(alleleName);
             }
+            
+            // 2. Set the donor, recipient, and recipient antibody types for a
+            //    full compatibility evaluation.
+            allele.setDonorTypeForCompat(updateAllele.getDonorTypeForCompat());
+            allele.setRecipientTypeForCompat(updateAllele.getRecipientTypeForCompat());
+            // Not allowing antibodies to specified for alleles that are not the
+            // subject of a single antigen bead.
+            if(allele.getSingleAntigenBead()) {
+                allele.setRecipientAntibodyForCompat(updateAllele.getRecipientAntibodyForCompat());
+            }
+
+            // 3. If the donor/recipient allele #1/#2 fields are being used by
+            //    a client that cares to keep track of what is allele #1 and
+            //    what is allele #2, then process those properties.
+            if("true".equals(enumeratedAlleleMode)) {
+                allele.setDonorAllele1(updateAllele.getDonorAllele1());
+                if(allele.getDonorAllele1() != null && allele.getDonorAllele1()) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (allele != loopAllele)).forEach((loopAllele) -> { loopAllele.setDonorAllele1(false); });
+                }
+                allele.setDonorAllele2(updateAllele.getDonorAllele2());
+                if(allele.getDonorAllele2() != null && allele.getDonorAllele2()) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (allele != loopAllele)).forEach((loopAllele) -> { loopAllele.setDonorAllele2(false); });
+                }
+                allele.setRecipientAllele1(updateAllele.getRecipientAllele1());
+                if(allele.getRecipientAllele1() != null && allele.getRecipientAllele1()) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (allele != loopAllele)).forEach((loopAllele) -> { loopAllele.setRecipientAllele1(false); });
+                }
+                allele.setRecipientAllele2(updateAllele.getRecipientAllele2());
+                if(allele.getRecipientAllele2() != null && allele.getRecipientAllele2()) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (allele != loopAllele)).forEach((loopAllele) -> { loopAllele.setRecipientAllele2(false); });
+                }
+                SessionFilter.alleleFinder.get().getAlleleList().stream().forEach((loopAllele) -> {
+                    loopAllele.setDonorTypeForCompat(false);
+                    if((loopAllele.getDonorAllele1() != null && loopAllele.getDonorAllele1()) || (loopAllele.getDonorAllele2() != null && loopAllele.getDonorAllele2())) {
+                        loopAllele.setDonorTypeForCompat(true);
+                    }
+                    loopAllele.setRecipientTypeForCompat(false);
+                    if((loopAllele.getRecipientAllele1() != null && loopAllele.getRecipientAllele1()) || (loopAllele.getRecipientAllele2() != null && loopAllele.getRecipientAllele2())) {
+                        loopAllele.setRecipientTypeForCompat(true);
+                    }
+                });
+            }
+
+            // 4. Do the compatibility evaluation.
+            SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
+
         }
+        
     }
     
 }

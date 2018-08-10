@@ -41,15 +41,18 @@ public class HypervariableRegions {
     @Path("{hypervariableRegionName}")
     @Consumes("application/json")
     public void putJsonAllele(@PathParam("hypervariableRegionName") String hypervariableRegionName, HypervariableRegion updateHypervariableRegion) {
+
         synchronized(SessionFilter.sessionMutex.get()) {
+
             HypervariableRegion hypervariableRegion = SessionFilter.hypervariableRegionFinder.get().getHypervariableRegion(hypervariableRegionName);
             hypervariableRegion.getVariantMap().values().forEach((hvrVariant) -> {
-                if(!updateHypervariableRegion.getVariantMap().get(hvrVariant.getVariantId()).getKnownReactiveEpitopeForCompat().equals(hvrVariant.getKnownReactiveEpitopeForCompat())) {
-                    hvrVariant.setKnownReactiveEpitopeForCompat(updateHypervariableRegion.getVariantMap().get(hvrVariant.getVariantId()).getKnownReactiveEpitopeForCompat());
-                }
+                hvrVariant.setKnownReactiveEpitopeForCompat(updateHypervariableRegion.getVariantMap().get(hvrVariant.getVariantId()).getKnownReactiveEpitopeForCompat());
             });
+
             SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
+
         }
+
     }
     
 }

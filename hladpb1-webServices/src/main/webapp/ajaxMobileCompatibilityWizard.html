@@ -16,8 +16,15 @@
         table.grid {
             border-collapse: collapse;
         }
-        table.grid th, table.grid td {
+        table.grid th {
             border: 1px solid black;
+            padding: 5px;
+            vertical-align: bottom;
+            text-align: center;
+        }
+        table.grid td {
+            border: 1px solid black;
+            padding: 5px;
             vertical-align: top;
         }
 
@@ -223,19 +230,19 @@
                 </p>
                 <p>
                     <table>
-                        <tr><td>Donor Allele #1</td><td>:</td><td><span id="repDonorHlaType1" style="line-height: 2; border: 1px solid black; background: white; padding: 3px;"></span> <span id="repDonorHlaType1CompatibilityPrediction" style="font-style: italic;"></span></td></tr>
-                        <tr><td>Donor Allele #2</td><td>:</td><td><span id="repDonorHlaType2" style="line-height: 2; border: 1px solid black; background: white; padding: 3px;"></span> <span id="repDonorHlaType2CompatibilityPrediction" style="font-style: italic;"></span></td></tr>
+                        <tr><td>Donor Allele #1</td><td>:</td><td><span id="repDonorHlaType1" style="line-height: 2; border: 1px solid black; background: white; padding: 3px;"></span></td><td><span id="repDonorHlaType1CompatibilityPrediction" style="font-weight: bold; font-style: italic;"></span></td></tr>
+                        <tr><td>Donor Allele #2</td><td>:</td><td><span id="repDonorHlaType2" style="line-height: 2; border: 1px solid black; background: white; padding: 3px;"></span></td><td><span id="repDonorHlaType2CompatibilityPrediction" style="font-weight: bold; font-style: italic;"></span></td></tr>
                     </table>
                 </p>
                 <p>All HLA-DPB1 alleles by compatibility:</p>
                 <p>
                     <table class="grid">
                         <tr>
-                            <td style="color: red;">incompatible <a href="#popupIncompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></td>
-                            <td style="color: orange;">likely incompatible <a href="#popupLikelyIncompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></td>
-                            <td style="color: green;">likely compatible <a href="#popupLikelyCompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></td>
-                            <td>possible autoantibody <a href="#popupPossibleAutoantibody" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></td></tr>
-                        <tr><td id="incompatible"></td><td id="likelyIncompatible"></td><td id="likelyCompatible"></td><td id="possibleAutoantibody"></td></tr>
+                            <th style="font-weight: bold; color: white; background-color: red;">Incompatible<br/><a href="#popupIncompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th>
+                            <th style="font-weight: bold; color: white; background-color: orange;">Likely<br/>Incompatible<br/><a href="#popupLikelyIncompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th>
+                            <th style="font-weight: bold; color: white; background-color: green;">Likely<br/>Compatible<br/><a href="#popupLikelyCompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th>
+                            <th style="font-weight: bold; color: white; background-color: blue;">Autoantibody<br/><a href="#popupPossibleAutoantibody" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th></tr>
+                        <tr><td id="incompatible" style="color: red;"></td><td id="likelyIncompatible" style="color: orange;"></td><td id="likelyCompatible" style="color: green;"></td><td id="possibleAutoantibody" style="color: blue;"></td></tr>
                     </table>
                 </p>
             </div>
@@ -281,6 +288,12 @@ var alleleMap = new Object(); // a map of alleles, indexed by allele name
 var hypervariableRegions = []; // the array of hypervariableRegions
 var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region name + variant ID
 var hvrvMap = new Object(); // a map of hypervariable region variants, indexd by hypervariable region anme + variant ID
+var compatibilityMap = {
+    "I":  {text: "Incompatibile"       , color: "red"    },
+    "LI": {text: "Likely Incompatibile", color: "orange" },
+    "LC": {text: "Likely Compatible"   , color: "green"  },
+    "AA": {text: "Autoantibody"        , color: "blue"   }
+}
 
 function getSessionId() {
     $(".multiId-working").show();
@@ -363,7 +376,7 @@ function getAlleles() {
 function putAllele(allele) {
     $(".multiId-working").show();
     return $.ajax({
-        url: "/hladpb1/resources/alleles/" + allele.alleleName + "?noCodons=true",
+        url: "/hladpb1/resources/alleles/" + allele.alleleName + "?enumeratedAlleleMode=true",
         dataType: "json",
         type: "PUT",
         contentType: "application/json",
@@ -577,26 +590,30 @@ $("#donorHlaTypePage").bind("pageshow", function () {
     
 $("#compatibilityReportPage").bind("pageshow", function () {
 
-    initData(true).done(function() {
+    // Putting an allele here (alleles[0]) to make sure the enumerated allele
+    // logic evaluates. This could help prevent confusion if someone is using
+    // a non-enumerated and enumerated view with the same session (not sure
+    // why this would ever happen, but it is worth defending against).
+    initData(true).then(function() { return putAllele(alleles[0]); }).done(function() {
 
         var recipientAllele1 = alleles.find(function(allele) { return allele.recipientAllele1; });
         if(recipientAllele1) {
             $("#repRecipientHlaType1").html(recipientAllele1.alleleName);
-            $("#repRecipientHlaType1Epitopes").html(Object.values(recipientAllele1.hvrVariantMap).map(hvrv => hvrv.hypervariableRegionName + hvrv.variantId).join(", "));
+            //$("#repRecipientHlaType1Epitopes").html(Object.values(recipientAllele1.hvrVariantMap).map(hvrv => hvrv.hypervariableRegionName + hvrv.variantId).join(", "));
         }
         else {
             $("#repRecipientHlaType1").html("not selected");
-            $("#repRecipientHlaType1Epitopes").html("");
+            //$("#repRecipientHlaType1Epitopes").html("");
         }
 
         var recipientAllele2 = alleles.find(function(allele) { return allele.recipientAllele2; });
         if(recipientAllele2) {
             $("#repRecipientHlaType2").html(recipientAllele2.alleleName);
-            $("#repRecipientHlaType2Epitopes").html(Object.values(recipientAllele2.hvrVariantMap).map(hvrv => hvrv.hypervariableRegionName + hvrv.variantId).join(", "));
+            //$("#repRecipientHlaType2Epitopes").html(Object.values(recipientAllele2.hvrVariantMap).map(hvrv => hvrv.hypervariableRegionName + hvrv.variantId).join(", "));
         }
         else {
             $("#repRecipientHlaType2").html("not selected");
-            $("#repRecipientHlaType2Epitopes").html("");
+            //$("#repRecipientHlaType2Epitopes").html("");
         }
 
         var recipientAntibodies = alleles.filter(function(allele) { return allele.recipientAntibodyForCompat; }).map(allele => allele.alleleName);
@@ -617,21 +634,39 @@ $("#compatibilityReportPage").bind("pageshow", function () {
         $("#repRecipientEpitopesPrediction").html(predictedReactiveEpitopes.length > 0 ? predictedReactiveEpitopes.join(", ") : "none");
 
         var donorAllele1 = alleles.find(function(allele) { return allele.donorAllele1; });
-        $("#repDonorHlaType1").html(donorAllele1 ? donorAllele1.alleleName : "not selected");
+        if(donorAllele1) {
+            $("#repDonorHlaType1").html(donorAllele1.alleleName);
+            $("#repDonorHlaType1").css("color", compatibilityMap[donorAllele1.compatInterpretation].color);
+            $("#repDonorHlaType1CompatibilityPrediction").html(compatibilityMap[donorAllele1.compatInterpretation].text);
+            $("#repDonorHlaType1CompatibilityPrediction").css("color", compatibilityMap[donorAllele1.compatInterpretation].color);
+        }
+        else {
+            $("#repDonorHlaType1").html("not selected");
+            $("#repDonorHlaType1CompatibilityPrediction").html("");
+        }
 
         var donorAllele2 = alleles.find(function(allele) { return allele.donorAllele2; });
-        $("#repDonorHlaType2").html(donorAllele2 ? donorAllele2.alleleName : "not selected");
+        if(donorAllele2) {
+            $("#repDonorHlaType2").html(donorAllele2.alleleName);
+            $("#repDonorHlaType2").css("color", compatibilityMap[donorAllele2.compatInterpretation].color);
+            $("#repDonorHlaType2CompatibilityPrediction").html(compatibilityMap[donorAllele2.compatInterpretation].text);
+            $("#repDonorHlaType2CompatibilityPrediction").css("color", compatibilityMap[donorAllele2.compatInterpretation].color);
+        }
+        else {
+            $("#repDonorHlaType2").html("not selected");
+            $("#repDonorHlaType2CompatibilityPrediction").html("");
+        }
 
-        var lcs = alleles.filter(function(allele) { return allele.compatInterpretation == "LC"; }).map(allele => allele.alleleName);
+        var lcs = alleles.filter(function(allele) { return allele.compatInterpretation == "LC"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
         $("#likelyCompatible").html(lcs.length > 0 ? lcs.join("<br/>") : "none");
 
-        var is = alleles.filter(function(allele) { return allele.compatInterpretation == "I"; }).map(allele => allele.alleleName);
+        var is = alleles.filter(function(allele) { return allele.compatInterpretation == "I"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
         $("#incompatible").html(is.length > 0 ? is.join("<br/>") : "none");
 
-        var lis = alleles.filter(function(allele) { return allele.compatInterpretation == "LI"; }).map(allele => allele.alleleName);
+        var lis = alleles.filter(function(allele) { return allele.compatInterpretation == "LI"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
         $("#likelyIncompatible").html(lis.length > 0 ? lis.join("<br/>") : "none");
 
-        var aas = alleles.filter(function(allele) { return allele.compatInterpretation == "AA"; }).map(allele => allele.alleleName);
+        var aas = alleles.filter(function(allele) { return allele.compatInterpretation == "AA"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
         $("#possibleAutoantibody").html(aas.length > 0 ? aas.join("<br/>") : "none");
     
         $(".multiId-working").fadeOut();
