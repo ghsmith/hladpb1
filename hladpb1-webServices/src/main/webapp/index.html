@@ -255,17 +255,17 @@
                 <td>boolean</td>
                 <td>
                     If set to true, use the enumerated allele properties
-                    (donorAlle1, donorAllele2, recipientAllele1, and
-                    recipientAllele2) and allow the system to automatically
-                    set donorTypeForCompat and recipientTypeForCompat
+                    (<i>donorAlle1</i>, <i>donorAllele2</i>, <i>recipientAllele1</i>, and
+                    <i>recipientAllele2</i>) and allow the system to automatically
+                    set <i>donorTypeForCompat</i> and <i>recipientTypeForCompat</i>
                     for the compatiblity evaluation. When an enumerated
                     allele property is set for an allele, it is automatically
                     unset for all other alleles. This is intended for use
                     by clients that maintain a distinction
                     between recipient allele #1 and #2 and donor allele #1
                     and #2. Clients that don't care about this distinction
-                    should not set the enumeratedAlleleMode property and
-                    just use the donorTypeForCompat and recipientTypeForCompat
+                    should not use the <i>enumeratedAlleleMode</i> query parameter and
+                    just use the <i>donorTypeForCompat</i> and <i>recipientTypeForCompat</i>
                     properties, which are usually easier to work with.
                 </td>
                 <td>false</td>
