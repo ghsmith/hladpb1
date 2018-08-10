@@ -244,8 +244,34 @@
             compatibility evaluation. A JSON representation of an allele is
             presented in the previous example usage. A JSON representation of a
             hypervariable region is presented in the subsequent example usage.
-            This method takes no parameters and has no output.
+            This method has no output.
         </p>
+        <h4>Query Parameters</h4>
+        <table class="parameters">
+            <tr><th>name</th><th>required</th><th>type</th><th>description</th><th>default</th><th>example</th></tr>
+            <tr>
+                <td>enumeratedAlleleMode</td>
+                <td>no</td>
+                <td>boolean</td>
+                <td>
+                    If set to true, use the enumerated allele properties
+                    (donorAlle1, donorAllele2, recipientAllele1, and
+                    recipientAllele2) and allow the system to automatically
+                    set donorTypeForCompat and recipientTypeForCompat
+                    for the compatiblity evaluation. When an enumerated
+                    allele property is set for an allele, it is automatically
+                    unset for all other alleles. This is intended for use
+                    by clients that maintain a distinction
+                    between recipient allele #1 and #2 and donor allele #1
+                    and #2. Clients that don't care about this distinction
+                    should not set the enumeratedAlleleMode property and
+                    just use the donorTypeForCompat and recipientTypeForCompat
+                    properties, which are usually easier to work with.
+                </td>
+                <td>false</td>
+                <td>enumeratedAlleleMode=true</td>
+            </tr>
+        </table>
         <h4>Modifiable Properties</h4>
         <table class="parameters">
             <tr><th>name</th><th>type</th><th>description</th><th>example</th></tr>
