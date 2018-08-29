@@ -303,7 +303,7 @@ public class AlleleFinder {
                     allele.setCompatInterpretation("LI");
                 }
                 else {
-                    allele.setCompatInterpretation("LC");
+                    allele.setCompatInterpretation("NEI");
                 }
             }
         });
