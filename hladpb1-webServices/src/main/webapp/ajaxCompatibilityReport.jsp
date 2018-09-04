@@ -89,7 +89,7 @@ table.statusDescriptionTable td {
     </p>
     <p>
         <table class="statusDescriptionTable">
-            <tr><td>NEI</td><td>no&nbsp;evidence&nbsp;of&nbsp;incompatibility</td><td>the single antigen bead (SAB) corresponding to the donor allele is NOT positive and antibody specificity for an epitope of the donor allele is NOT inferred</td></tr>
+            <tr><td>NEI</td><td>no&nbsp;electronic&nbsp;incompatibility</td><td>the single antigen bead (SAB) corresponding to the donor allele is NOT positive and antibody specificity for an epitope of the donor allele is NOT inferred</td></tr>
             <tr><td>LI</td><td>likely&nbsp;incompatible</i></td><td>antibody specificity for an epitope of the donor allele is inferred</td></tr>
             <tr><td>I</td><td>incompatible</i></td><td>the single antigen bead corresponding to the donor allele is positive</td></tr>
             <tr><td>AA</td><td>auto-antibody</td><td>the single antigen bead is positive, but is also a recipient allele</td></tr>

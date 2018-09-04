@@ -240,7 +240,7 @@
                         <tr>
                             <th style="font-weight: bold; color: white; background-color: red;">Incompatible<br/><a href="#popupIncompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th>
                             <th style="font-weight: bold; color: white; background-color: orange;">Likely<br/>Incompatible<br/><a href="#popupLikelyIncompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th>
-                            <th style="font-weight: bold; color: white; background-color: green;">No&nbsp;Evidence<br/>Incompatibility<br/><a href="#popupLikelyCompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th>
+                            <th style="font-weight: bold; color: white; background-color: green;">No&nbsp;Electronic<br/>Incompatibility<br/><a href="#popupLikelyCompatible" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th>
                             <th style="font-weight: bold; color: white; background-color: blue;">Autoantibody<br/><a href="#popupPossibleAutoantibody" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="Learn more">Learn more</a></th></tr>
                         <tr><td id="incompatible" style="color: red;"></td><td id="likelyIncompatible" style="color: orange;"></td><td id="likelyCompatible" style="color: green;"></td><td id="possibleAutoantibody" style="color: blue;"></td></tr>
                     </table>
@@ -289,10 +289,10 @@ var hypervariableRegions = []; // the array of hypervariableRegions
 var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region name + variant ID
 var hvrvMap = new Object(); // a map of hypervariable region variants, indexd by hypervariable region anme + variant ID
 var compatibilityMap = {
-    "I":   {text: "Incompatibile"                , color: "red"    },
-    "LI":  {text: "Likely Incompatibile"         , color: "orange" },
-    "NEI": {text: "No Evidence of Incompatiblity", color: "green"  },
-    "AA":  {text: "Autoantibody"                 , color: "blue"   }
+    "I":   {text: "Incompatibile"               , color: "red"    },
+    "LI":  {text: "Likely Incompatibile"        , color: "orange" },
+    "NEI": {text: "No Electronic Incompatiblity", color: "green"  },
+    "AA":  {text: "Autoantibody"                , color: "blue"   }
 }
 
 function getSessionId() {
