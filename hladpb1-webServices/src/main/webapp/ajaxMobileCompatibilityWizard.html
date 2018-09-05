@@ -289,10 +289,10 @@ var hypervariableRegions = []; // the array of hypervariableRegions
 var hvrMap = new Object(); // a map of hypervariable regions, indexed by hypervariable region name + variant ID
 var hvrvMap = new Object(); // a map of hypervariable region variants, indexd by hypervariable region anme + variant ID
 var compatibilityMap = {
-    "I":   {text: "Incompatibile"               , color: "red"    },
-    "LI":  {text: "Likely Incompatibile"        , color: "orange" },
-    "NEI": {text: "No Electronic Incompatiblity", color: "green"  },
-    "AA":  {text: "Autoantibody"                , color: "blue"   }
+    "I":   {text: "Incompatibile"                  , color: "red"    },
+    "EI":  {text: "Electronically Incompatible"    , color: "orange" },
+    "NEI": {text: "Not Electronically Incompatible", color: "green"  },
+    "AA":  {text: "Autoantibody"                   , color: "blue"   }
 }
 
 function getSessionId() {
@@ -663,7 +663,7 @@ $("#compatibilityReportPage").bind("pageshow", function () {
         var is = alleles.filter(function(allele) { return allele.compatInterpretation == "I"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
         $("#incompatible").html(is.length > 0 ? is.join("<br/>") : "none");
 
-        var lis = alleles.filter(function(allele) { return allele.compatInterpretation == "LI"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
+        var lis = alleles.filter(function(allele) { return allele.compatInterpretation == "EI"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
         $("#likelyIncompatible").html(lis.length > 0 ? lis.join("<br/>") : "none");
 
         var aas = alleles.filter(function(allele) { return allele.compatInterpretation == "AA"; }).map(allele => allele.alleleName.substring(allele.alleleName.indexOf("*") + 1));
