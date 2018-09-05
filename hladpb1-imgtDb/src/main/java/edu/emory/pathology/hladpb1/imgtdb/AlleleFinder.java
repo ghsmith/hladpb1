@@ -300,7 +300,7 @@ public class AlleleFinder {
                     }
                 });
                 if(epitopeAntibodyCount[0] > 0) {
-                    allele.setCompatInterpretation("LI");
+                    allele.setCompatInterpretation("EI");
                 }
                 else {
                     allele.setCompatInterpretation("NEI");
