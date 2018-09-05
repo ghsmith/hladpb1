@@ -130,7 +130,7 @@ public class AlleleFinder {
                 }
             });
             // Add sequence number for sorting.
-            int sequenceNumber = 1;
+            int sequenceNumber = 0;
             for(Allele allele : alleleList) {
                 allele.setSequenceNumber(sequenceNumber++);
             }
