@@ -392,7 +392,6 @@ function setUiState() {
                 }
             });
         });
-        
         $("#allelesLoaded").html($("#reportTable tbody tr").length);
         $("#allelesShown").html($("#reportTable tbody tr:visible").length);
         $("#allelesFiltered").html($("#reportTable tbody tr:hidden").length);
