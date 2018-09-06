@@ -25,8 +25,8 @@ public class Session {
     @PUT
     @Path("reset")
     @Produces("application/json")
-    public void getJson(@Context HttpServletRequest request) {
+    public void putReset(@Context HttpServletRequest request) {
         request.getSession().invalidate();
     }
-    
+
 }
