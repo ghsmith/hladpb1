@@ -654,42 +654,13 @@ $(document).ready(function() {
         url: "/hladpb1/resources/alleles?synonymous=false&sab=true&hvrMatchCount=3",
         dataType: "text"
     }).then(function(response) {
-        $("#exampleGetAllelesOutput").JSONView(response, { collapsed: true });
-        $("#exampleGetAllelesOutput").JSONView("expand", 0);
-        $("#exampleGetAllelesOutput").JSONView("expand", 1);
-    }).then(function() {
-    $.ajax({
-        url: "/hladpb1/resources/alleles/HLA-DPB1*01:01:01:01",
-        dataType: "text"
-    }).then(function(response) {
-        $("#exampleGetAlleleOutput").JSONView(response, { collapsed: false });
-    }).then(function() {
-    $.ajax({
-        url: "/hladpb1/resources/hypervariableRegions",
-        dataType: "text"
-    }).then(function(response) {
-        $("#exampleGetHvrsOutput").JSONView(response, { collapsed: true });
-        $("#exampleGetHvrsOutput").JSONView("expand", 0);
-        $("#exampleGetHvrsOutput").JSONView("expand", 1);
-    }).then(function() {
-    $.ajax({
-        url: "/hladpb1/resources/hypervariableRegions/f",
-        dataType: "text"
-    }).then(function(response) {
-        $("#exampleGetHvrOutput").JSONView(response, { collapsed: false });
-    }).then(function() {
-    $.ajax({
-        url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
-        dataType: "text"
-    }).then(function(response) {
-        $("#exampleGetReagentLotNumberOutput").JSONView(response, { collapsed: false });
-    }).then(function() {
-    $.ajax({
-        url: "/hladpb1/resources/session",
-        dataType: "text"
-    }).done(function(response) {
-        $("#exampleGetSessionOutput").html(response);
-    }); }); }); }); }); }); }); });
+        $("#exampleGetAllelesLink").click();
+        $("#exampleGetAlleleLink").click();
+        $("#exampleGetHvrsLink").click();
+        $("#exampleGetHvrLink").click();
+        $("#exampleGetReagentLotNumberLink").click();
+        $("#exampleGetSessionLink").click();
+    }); }); });
     $("img.imageZoom").elevateZoom();    
 });
 
