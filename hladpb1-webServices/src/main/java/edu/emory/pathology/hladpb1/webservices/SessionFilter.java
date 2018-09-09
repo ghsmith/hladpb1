@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
  * 
  * @author ghsmith
  */
-@WebFilter(filterName = "SessionFilter", urlPatterns = {"/*"})
+@WebFilter(filterName = "SessionFilter", urlPatterns = {"/resources/*"})
 public class SessionFilter implements Filter {
 
     protected static ThreadLocal<String> sessionMutex = new ThreadLocal<>();
