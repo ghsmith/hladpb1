@@ -80,6 +80,10 @@ table.statusDescriptionTable td {
     <h1>HLA-DPB1 Compatibility Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportPaginated.html">source code</a>)</h1>
     
     <p>
+        This is the paginated version of the report. An <a href="/hladpb1/ajaxCompatibilityReport.html">unpaginated version</a>
+        is also available, but may perform slowly on some clients.
+    </p>
+    <p>
         Select recipient antibodies and donor & recipient alleles below. An
         antibody for a hypervariable region epitope is inferred when (a) all
         single antigen beads with that epitope are positive and (b) the epitope
@@ -367,7 +371,7 @@ function setUiState() {
     var dfr = $.Deferred();
     $("#working").show();
     setTimeout(function() {
-        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil(alleles.length / pageSize)); x++) { $("#selectPage").append("<option " + (x == page ? "selected='true'" : "") + ">" + x + "</option>"); }
+        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil(alleles.filter(isRowVisible).length / pageSize)); x++) { $("#selectPage").append("<option " + (x == page ? "selected='true'" : "") + ">" + x + "</option>"); }
         $("#inputPageSize").val(pageSize);
         populateTableRows();
         $("#sessionId").html(sessionId);
@@ -394,8 +398,6 @@ function setUiState() {
         $("#reportTable tbody tr").each(function() {
             var alleleName = $(this).data("value");
             var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
-            if(isRowVisible(allele)) { $(this).show(); }
-            else                     { $(this).hide(); }
             $(this).children("td").each(function() {
                 if($(this).data("name").match(/.*ForCompat/)) {
                     $(this).children("input").prop("checked", eval($(this).data("name")));
@@ -533,7 +535,7 @@ $(document).ready(function() {
     $("#linkNextPage").click(function() {
         $("#working").show();
         setTimeout(function() {
-            if(page < Math.ceil(alleles.length / pageSize)) {
+            if(page < Math.ceil(alleles.filter(isRowVisible).length / pageSize)) {
                 page++;
                 $("#selectPage").val(page);
                 setUiState().done(function() { $("#working").hide(); });
