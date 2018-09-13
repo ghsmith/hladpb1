@@ -295,8 +295,8 @@
                     all alleles:
                     <ul>
                         <li>allele.matchesHvrCount</li>
-                        <li>allele.hvrVariantMap[].matchesReference</li>
-                        <li>allele.codonMap[].matchesReference</li>
+                        <li>allele.hvrVariantMap{}.matchesReference</li>
+                        <li>allele.codonMap{}.matchesReference</li>
                     </ul>
                 </td>
                 <td>{...<br/>referenceForMatches: true,<br/>...}</td>
@@ -315,10 +315,10 @@
                     variants:
                     <ul>
                         <li>allele.compatInterpretation</li>
-                        <li>hypervariableRegion.variantMap[].compatIsRecipientEptiope</li>
-                        <li>hypervariableRegion.variantMap[].compatPositiveSabCount</li>
-                        <li>hypervariableRegion.variantMap[].compatAntibodyConsideredPresent</li>
-                        <li>hypervariableRegion.variantMap[].beadAlleleRefList[].compatBeadPositive</li>
+                        <li>hypervariableRegion.variantMap{}.compatIsRecipientEptiope</li>
+                        <li>hypervariableRegion.variantMap{}.compatPositiveSabCount</li>
+                        <li>hypervariableRegion.variantMap{}.compatAntibodyConsideredPresent</li>
+                        <li>hypervariableRegion.variantMap{}.beadAlleleRefList{}.compatBeadPositive</li>
                     </ul>
                 </td>
                 <td>{...<br/>recipientAntibodyForCompat: true,<br/>...}</td>
@@ -434,7 +434,7 @@
         <table class="parameters">
             <tr><th>name</th><th>type</th><th>description</th><th>example</th></tr>
             <tr>
-                <td>hypervariableRegion<br/>&nbsp;.variantMap[]<br/>&nbsp;&nbsp;.knownReactiveEpitopeForCompat</td>
+                <td>hypervariableRegion<br/>&nbsp;.variantMap{}<br/>&nbsp;&nbsp;.knownReactiveEpitopeForCompat</td>
                 <td>boolean</td>
                 <td>
                     If set to true, the recipient is assumed to have an antibody
@@ -447,10 +447,10 @@
                     region variants:
                     <ul>
                         <li>allele.compatInterpretation</li>
-                        <li>hypervariableRegion.variantMap[].compatIsRecipientEptiope</li>
-                        <li>hypervariableRegion.variantMap[].compatPositiveSabCount</li>
-                        <li>hypervariableRegion.variantMap[].compatAntibodyConsideredPresent</li>
-                        <li>hypervariableRegion.variantMap[].beadAlleleRefList[].compatBeadPositive</li>
+                        <li>hypervariableRegion.variantMap{}.compatIsRecipientEptiope</li>
+                        <li>hypervariableRegion.variantMap{}.compatPositiveSabCount</li>
+                        <li>hypervariableRegion.variantMap{}.compatAntibodyConsideredPresent</li>
+                        <li>hypervariableRegion.variantMap{}.beadAlleleRefList{}.compatBeadPositive</li>
                     </ul>
                 </td>
                 <td>{...<br/>knownReactiveEpitopeForCompat: true,<br/>...}</td>
