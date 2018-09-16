@@ -638,6 +638,12 @@
     
 // Document ready! Let's go...
 $(document).ready(function() {
+
+    $("img.imageZoom").elevateZoom();    
+
+    if(document.cookie) { return; };
+    document.cookie = "inited";
+    
     var allele;
     $.ajax({
         url: "/hladpb1/resources/alleles/HLA-DPB1*01:01:01:01",
@@ -664,7 +670,7 @@ $(document).ready(function() {
         $("#exampleGetReagentLotNumberLink").click();
         $("#exampleGetSessionLink").click();
     }); }); });
-    $("img.imageZoom").elevateZoom();    
+    
 });
 
 </script>
