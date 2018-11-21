@@ -60,7 +60,7 @@ a.filterEnabled {
     <p>This is the abridged version of the report. A <a href="/hladpb1/ajaxDifferenceReportPaginated.html">full version<a> is also available.</p>
     <p>
         The reference allele for hypervariable region matching is highlighted in
-        yellow. This report only shows the lowest allele number for synonymous
+        yellow. This report only shows the longest protein sequence allele number for synonymous
         alleles. Select a reference allele from the list or click on a row to
         set that allele as the reference allele. By default, this report only
         shows alleles where there are at least 4 hypervariable region matches to
@@ -93,7 +93,7 @@ a.filterEnabled {
                 <th class="alleleName">[<a id="alleleNameSort" href="javascript:void(0);">sort</a>]</th>
                 <th>[<a id="sabFilter" href="javascript:void(0);">filter=Y</a>]</th>
                 <th>[<a id="matchesHvrCountGe4Filter" href="javascript:void(0);">filter&ge;4)</a>]<br/>[<a id="matchesHvrCountSort" href="javascript:void(0);">sort</a>]</th>
-                <th colspan="6" style="border-bottom: 1px solid black;">hypervariable<br/>region ID</th>
+                <th colspan="7" style="border-bottom: 1px solid black;">hypervariable<br/>region ID</th>
             </tr>
             <tr id="columnNames">
                 <th data-name="allele.alleleName" class="alleleName">allele name</th>
@@ -105,6 +105,7 @@ a.filterEnabled {
                 <th data-name="'d' + allele.hvrVariantMap['d'].variantId" data-container="allele.hvrVariantMap['d']" class="hvrId">d</th>
                 <th data-name="'e' + allele.hvrVariantMap['e'].variantId" data-container="allele.hvrVariantMap['e']" class="hvrId">e</th>
                 <th data-name="'f' + allele.hvrVariantMap['f'].variantId" data-container="allele.hvrVariantMap['f']" class="hvrId">f</th>
+                <th data-name="'g' + allele.hvrVariantMap['g'].variantId" data-container="allele.hvrVariantMap['g']" class="hvrId">g</th>
             </tr>
         </thead>
         <tbody>

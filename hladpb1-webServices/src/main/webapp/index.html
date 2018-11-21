@@ -138,7 +138,7 @@
                 <td>no</td>
                 <td>boolean</td>
                 <td>
-                    If set to false, only the first allele of sets of synonymous
+                    If set to false, only the longest protein sequence allele of sets of synonymous
                     alleles is returned. Allele order is based on the IMGT
                     database.
                 </td>
@@ -530,25 +530,6 @@
             module of an electronic medical record system.
         </p>
 
-        <h3><a href="/hladpb1/staticDifferenceReport.jsp">HLA-DPB1 Allele Difference Report (static - does not use REST API)</a></h3>
-        <p>
-            For a given HLA-DPB1 reference allele, this report sorts all
-            other HLA-DPB1 alleles from most similar to least similar based on
-            hypervariable region epitopes. This report is implemented as a
-            Java Server Page (JSP) where all of the HTML is generated on the
-            server and is downloaded to the client as a static document. Every
-            operation requires the entire page to be re-downloaded to the
-            client. <span style="background-color: yellow;">This report does not
-            use the HLA-DPB1 REST API and is provided as an example of an
-            undesirable implementation style.</span>
-        </p>
-        <p>
-            Source code: <a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/staticDifferenceReport.jsp">https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/staticDifferenceReport.jsp</a>
-        </p>
-        <p>
-            <img class="imageZoom" src="images/staticDifferenceReport.png" width="25%" height="25%" data-zoom-image="images/staticDifferenceReport.png"/>                    
-        </p>
-                    
         <h3><a href="/hladpb1/ajaxDifferenceReportPaginated.html">HLA-DPB1 Allele Difference Report (AJAX - uses REST API)</a></h3>
         <p>
             For a given HLA-DPB1 reference allele, this highly interactive

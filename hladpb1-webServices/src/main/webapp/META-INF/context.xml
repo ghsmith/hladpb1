@@ -2,5 +2,5 @@
 <Context path="/hladpb1">
   <Parameter name="imgtXmlFileName" value="/tmp/hla.xml"/>
   <Parameter name="emoryXmlFileName" value="/tmp/hladpb1HypervariableRegion.xml"/>
-  <Parameter name="reagentLotNumber" value="10"/>
+  <Parameter name="reagentLotNumber" value="12"/>
 </Context>
