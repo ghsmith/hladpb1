@@ -52,6 +52,7 @@ public class Allele implements Serializable {
     private String synonymousAlleleName;
     private Boolean synonymousAlleleProteinShorter;
     private Boolean singleAntigenBead;
+    private Integer proteinSequenceLength;
     private Boolean referenceForMatches;
     private Integer matchesHvrCount;
     private Boolean recipientAntibodyForCompat = false;
@@ -217,6 +218,14 @@ public class Allele implements Serializable {
 
     public void setDonorAllele2(Boolean donorAllele2) {
         this.donorAllele2 = donorAllele2;
+    }
+
+    public Integer getProteinSequenceLength() {
+        return proteinSequenceLength;
+    }
+
+    public void setProteinSequenceLength(Integer proteinSequenceLength) {
+        this.proteinSequenceLength = proteinSequenceLength;
     }
     
 }

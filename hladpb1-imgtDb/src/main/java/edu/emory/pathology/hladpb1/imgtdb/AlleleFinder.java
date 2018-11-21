@@ -95,6 +95,15 @@ public class AlleleFinder {
                     throw new RuntimeException(allele.getAlleleName() + " translation too long");
                 }
                 allele.setNullAllele(allele.getAlleleName().endsWith("N"));
+                {
+                    String proteinSequence = allele.getCodonMap().values().stream().map(Codon::getAminoAcid).collect(Collectors.joining());
+                    if(allele.getNullAllele()) {
+                        if(proteinSequence.endsWith("X")) {
+                            proteinSequence = proteinSequence.substring(0, proteinSequence.length() - 1);
+                        }
+                    }
+                    allele.setProteinSequenceLength(proteinSequence.length());
+                }
                 // Synonymous logic requires alleles to be processed in order
                 // (i.e., the "master" allele first).
                 {
@@ -139,8 +148,33 @@ public class AlleleFinder {
             getAlleleList().stream().forEach((allele) -> { allele.setCodonMap(allele.getCodonMap().subMap(1, 100)); });
             LOG.info(String.format("%d HLA-DPB1 alleles loaded", alleleList.size()));
             LOG.info(String.format("version is %s", alleleList.get(0).getVersion()));
+            
+            // This is a little fix-up that will set the "master" allele for a
+            // set of synonmous alleles to the allele with the LONGEST protein
+            // sequence.
+            {
+                for(Allele allele : alleleList) {
+                    if(allele.getSynonymousAlleleName() != null && allele.getSynonymousAlleleProteinShorter()) {
+                        LOG.info(String.format("setting master synonymous allele from %s to %s", allele.getSynonymousAlleleName(), allele.getAlleleName()));
+                        allele.setSynonymousAlleleName(null);
+                        allele.setSynonymousAlleleProteinShorter(null);
+                        Pattern pattern = Pattern.compile("(HLA-DPB1\\*[0-9]*:[0-9]*)[:0-9N]*");
+                        Matcher matcherThis = pattern.matcher(allele.getAlleleName());
+                        matcherThis.find();
+                        for(Allele candidateSynonymousAllele : alleleList) {
+                            Matcher matcherSyn = pattern.matcher(candidateSynonymousAllele.getAlleleName());
+                            matcherSyn.find();
+                            if(allele != candidateSynonymousAllele && matcherThis.group(1).equals(matcherSyn.group(1))) {
+                                candidateSynonymousAllele.setSynonymousAlleleName(allele.getAlleleName());
+                                candidateSynonymousAllele.setSynonymousAlleleProteinShorter(allele.getProteinSequenceLength() < candidateSynonymousAllele.getProteinSequenceLength());
+                            }
+                        }
+                    }
+                }
+            }
+            
         }
-        
+            
         return alleleList;
         
     }
@@ -156,7 +190,7 @@ public class AlleleFinder {
             )) {
                 throw new RuntimeException("Hypervariable region " + hypervariableRegion.getHypervariableRegionName() + " variant " + variant.getVariantId() + " bead allele " + beadAlleleRef.getAlleleName() + " does not exist in IMGT database");
             }
-            getAlleleList().stream().filter((allele) -> (allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().ifPresent((allele) -> {
+            getAlleleList().stream().filter((allele) -> (allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName())) && allele.getSynonymousAlleleName() == null).findFirst().ifPresent((allele) -> {
                 StringBuilder hvrProteinSequence = new StringBuilder();
                 hypervariableRegion.getCodonNumberList().stream().forEach((codonNumber) -> {
                     Codon codon = allele.getCodonMap().get(codonNumber);
@@ -210,12 +244,14 @@ public class AlleleFinder {
             allele.setReferenceForMatches(referenceAllele.equals(allele));
             allele.setMatchesHvrCount(
                 (int)referenceAllele.getHvrVariantMap().values().stream().filter((hvrVariant) -> (
-                    hvrVariant.getVariantId().equals(allele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId()))
+                    !hvrVariant.getVariantId().contains("*")
+                    && hvrVariant.getVariantId().equals(allele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId()))
                 ).count()
             );
             allele.getHvrVariantMap().values().stream().forEach((hvrVariant) -> {
                 hvrVariant.setMatchesReference(
-                    referenceAllele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId().equals(hvrVariant.getVariantId())
+                    !hvrVariant.getVariantId().contains("*")
+                    && referenceAllele.getHvrVariantMap().get(hvrVariant.getHypervariableRegionName()).getVariantId().equals(hvrVariant.getVariantId())
                 );
             });
             allele.getCodonMap().values().stream().forEach((codon) -> {
@@ -246,7 +282,9 @@ public class AlleleFinder {
         //    recipient epitopes.
         getAlleleList().stream().filter((allele) -> (allele.getRecipientTypeForCompat())).forEach((allele) -> {
             allele.getHvrVariantMap().values().stream().forEach((hvrVariant) -> {
-                hypervariableRegionFinder.getHypervariableRegion(hvrVariant.getHypervariableRegionName()).getVariantMap().get(hvrVariant.getVariantId()).setCompatIsRecipientEpitope(true);
+                if(hvrVariant.getVariantId().matches("[0-9]*")) {
+                    hypervariableRegionFinder.getHypervariableRegion(hvrVariant.getHypervariableRegionName()).getVariantMap().get(hvrVariant.getVariantId()).setCompatIsRecipientEpitope(true);
+                }
             });
         });
 
