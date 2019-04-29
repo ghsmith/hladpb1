@@ -225,6 +225,7 @@ function populateTableRows() {
     var selectHtml = [];
     var rowNumber = 0;
     alleles.forEach(function(allele) {
+        selectHtml.push("<option value='" + allele.alleleName + "'>" + allele.alleleName + "</option>");
         if(!isRowVisible(allele)) {
             return;
         }
@@ -243,13 +244,13 @@ function populateTableRows() {
                 }
             });
             rowHtml.push("</tr>");
-            selectHtml.push("<option value='" + allele.alleleName + "'>" + allele.alleleName + "</option>");
-            rowHtml.push("</tr>");
         }
         rowNumber++;
     });
     $("#reportTable tbody").append(rowHtml.join(""));
-    $("#referenceAlleleSelect").append(selectHtml.join(""));
+    if($("#referenceAlleleSelect option").length == 0) {
+      $("#referenceAlleleSelect").append(selectHtml.join(""));
+    }
 }
 
 // Set the UI state based on the hypervariable region matches.
@@ -273,13 +274,20 @@ function setUiState() {
             var allele = alleles[0];
             $(this).html(eval($(this).data("name")));
         });
+        alleles.forEach(function(allele) {
+            if(allele.referenceForMatches) {
+                $("#referenceAlleleSelect").val(allele.alleleName);
+            }
+        })
         $("#reportTable tbody tr").each(function() {
             var alleleName = $(this).data("value");
             var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
             $(this).removeClass("referenceAllele");
             if(allele.referenceForMatches) {
                 $(this).addClass("referenceAllele");
-                $("#referenceAlleleSelect").val(allele.alleleName);
+                // This won't work if the reference allele isn't in the current page.
+                // I've moved it to just before this block.
+                //$("#referenceAlleleSelect").val(allele.alleleName);
             }
             $(this).children("td").each(function() {
                 if($(this).data("name") == "allele.matchesHvrCount") {
