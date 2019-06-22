@@ -2,9 +2,6 @@ package edu.emory.pathology.epitopeFinder.client;
 
 import edu.emory.pathology.epitopeFinder.imgtdb.data.Allele;
 import edu.emory.pathology.epitopeFinder.imgtdb.data.EpRegEpitope;
-import static edu.emory.pathology.hladpb1.client.Table1.getHypervariableRegions;
-import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
-import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegionVariant;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
