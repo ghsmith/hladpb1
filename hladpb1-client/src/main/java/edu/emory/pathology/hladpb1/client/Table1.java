@@ -2,19 +2,20 @@ package edu.emory.pathology.hladpb1.client;
 
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
 import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
+import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegionVariant;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -114,8 +115,8 @@ public class Table1 {
         + "    ldc.day_collect_dt "
         + ") "
         + "select "
-        + "  ar.patient_id patient_id, "
-        + "  ar.day_collect_dt day_collect_dt, "
+        + "  to_char(ar.day_collect_dt, 'YYYY-MM-DD') day_collect_dt, "
+        + "  substr(lower(rawtohex(utl_raw.cast_to_raw(sys.dbms_obfuscation_toolkit.md5(input_string => ar.patient_id || '***')))), 1, 8) pt_hash, "
         + "  trim(replace(regexp_replace(ar.doc, '.*Specificity:(.*)Comments:(.*)Antibody.MFI.*', '\\1', 1, 1, 'n'), chr(10), ' ')) specificity, "
         + "  trim(replace(regexp_replace(ar.doc, '.*Specificity:(.*)Comments:(.*)Antibody.MFI.*', '\\2', 1, 1, 'n'), chr(10), ' ')) comments, "
         + "  trim(replace(tr.doc, chr(10), ' ')) hla_type "
@@ -125,13 +126,12 @@ public class Table1 {
         + "where "
         + "  ar.patient_id = tr.patient_id "
         + "  and tr.rn = 1 "
-        + "  and ar.day_collect_dt >= '01-MAY-2019' "
+        + "  and ar.day_collect_dt >= '01-DEC-2018' "
         + "  and ar.day_collect_dt < '01-JUN-2019' "
         + "  and regexp_like(ar.doc, '.*Specificity:(.*(DP[0-9]|DP:).*)Comments:(.*)Antibody.MFI.*', 'n') /* watch out for DPA */ "
         + "  and tr.doc like '[LOW RES]%' "
-        + "  and 1 = 2 "
         + "order by "
-        + "  1, "
+        + "  ar.day_collect_dt desc, "
         + "  2 ";
 
     // HLA-DPB1 web service endpoints (Jersey REST client)
@@ -141,7 +141,6 @@ public class Table1 {
         return client
             .target("https://rest.hlatools.org/hladpb1/resources/alleles")
             .queryParam("synonymous", "false")
-            .queryParam("sab", "true")
             .queryParam("noCodons", "true")
             .request(MediaType.APPLICATION_JSON)
             .get(new GenericType<List<Allele>>(){});
@@ -152,11 +151,11 @@ public class Table1 {
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.entity(allele, MediaType.APPLICATION_JSON));
     }
-    static public HypervariableRegion getHypervariableRegion(String hvrName) {
+    static public List<HypervariableRegion> getHypervariableRegions() {
         return client
-            .target("https://rest.hlatools.org/hladpb1/resources/hypervariableRegions/" + hvrName)
+            .target("https://rest.hlatools.org/hladpb1/resources/hypervariableRegions")
             .request(MediaType.APPLICATION_JSON)
-            .get(HypervariableRegion.class);
+            .get(new GenericType<List<HypervariableRegion>>(){});
     }
     static public void reset() {
         client
@@ -167,36 +166,115 @@ public class Table1 {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
-        /*Class.forName("oracle.jdbc.driver.OracleDriver");
+        Class.forName("oracle.jdbc.driver.OracleDriver");
         conn = DriverManager.getConnection("jdbc:oracle:thin:@***:1521/***","***","***");
         conn.setAutoCommit(false);
         conn.createStatement().execute("set role all");
 
-        ResultSet rs = conn.createStatement().executeQuery(resultSelect);*/
+        // report header
+        {
+            List<HypervariableRegion> hvrs = getHypervariableRegions();
+            System.out.print("collectionDt, ptHash, abCount");
+            for(HypervariableRegion hvr : hvrs) {
+                for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
+                    System.out.print(String.format(", %s%s",
+                        hvr.getHypervariableRegionName(),
+                        hvrv.getVariantId()
+                    ));
+                }
+            }
+            System.out.print(", hlaTypes, abSpecs");
+            System.out.println();
+        }
         
-        List<Allele> alleles;
-        Allele allele1;
-        HypervariableRegion hvr;
-        alleles = getAlleles();
-        allele1 = alleles.stream().filter((allele) -> (allele.getAlleleName().startsWith("HLA-DPB1*01:01:01:01"))).findFirst().get();
-        allele1.setRecipientAntibodyForCompat(true);
-        putAllele(allele1);
-        allele1 = alleles.stream().filter((allele) -> (allele.getAlleleName().startsWith("HLA-DPB1*03:01"))).findFirst().get();
-        allele1.setRecipientAntibodyForCompat(true);
-        putAllele(allele1);
-        alleles = getAlleles();
-        hvr = getHypervariableRegion("f");
-        System.out.println(hvr.getVariantMap().get("1").getCompatPositiveSabCount());
+        ResultSet rs = conn.createStatement().executeQuery(resultSelect);
         
-        /*while(rs.next()) {
+        while(rs.next()) {
 
-            System.out.println(rs.getString("SPECIFICITY"));
-            //System.out.println(String.format("%s %s %s", rs.getString(1), rs.getString(2), rs.getString(3)));
+            List<String> specificities = new ArrayList<>();
+            List<String> hlaTypes = new ArrayList<>();
+
+            // parse the DP specificities
+            String specificityUnparsed = rs.getString("SPECIFICITY").replace(":", ""); // some people using "DP:" and some people don't
+            {
+                Pattern pat = Pattern.compile("DP([0-9 ]*)");
+                Matcher mat = pat.matcher(specificityUnparsed);
+                mat.find();
+                for(String a : mat.group(1).split(" ")) {
+                    specificities.add(String.format("%02d:", Integer.parseInt(a))); // pad to 2 digits and add colon
+                }
+            }
+
+            // parse the "allele-specific" specificities from the comments
+            String commentsUnparsed = rs.getString("COMMENTS");
+            if(commentsUnparsed != null) {
+                Pattern pat = Pattern.compile("DPB1\\*([0-9:]*)");
+                Matcher mat = pat.matcher(commentsUnparsed);
+                while(mat.find()) {
+                    specificities.add(mat.group(1));
+                }
+            }
+
+            // parse the HLA type
+            String hlaTypeUnparsed = rs.getString("HLA_TYPE");
+            {
+                Pattern pat = Pattern.compile("DPB1\\*.([0-9:]*)[A-Z]?.(([0-9:]*)[A-Z]?|XX)"); // some of the things that look like spaces aren't (vertical tabs?)
+                Matcher mat = pat.matcher(hlaTypeUnparsed);
+                if(!mat.find()) {
+                    continue;
+                }
+                hlaTypes.add(mat.group(1) + (mat.group(1).contains(":") ? "" : ":")); // add colon if one is not present
+                if(mat.group(3) != null && mat.group(3).length() > 0) {
+                    hlaTypes.add(mat.group(3) + (mat.group(3).contains(":") ? "" : ":")); // add colon if one is not present
+                }
+            }
+            
+            // use the web service
+            reset();
+            List<Allele> alleles = getAlleles();
+            for(String specificity : specificities) {
+                alleles.stream().filter((a) -> a.getAlleleName().startsWith("HLA-DPB1*" + specificity)).forEach(
+                    (a) -> {
+                        a.setRecipientAntibodyForCompat(true);
+                        putAllele(a);
+                    }
+                );
+            }
+            for(String hlaType : hlaTypes) {
+                alleles.stream().filter((a) -> a.getAlleleName().startsWith("HLA-DPB1*" + hlaType)).forEach(
+                    (a) -> {
+                        a.setRecipientTypeForCompat(true);
+                        putAllele(a);
+                    }
+                );
+            }
+            alleles = getAlleles();
+            List<HypervariableRegion> hvrs = getHypervariableRegions();
+
+            // report body
+            System.out.print(String.format("%s, %s, %d",
+                rs.getString("DAY_COLLECT_DT"),
+                rs.getString("PT_HASH"),
+                alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat()).count()
+            ));
+            for(HypervariableRegion hvr : hvrs) {
+                for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
+                    System.out.print(String.format(", %d/%d/%d%s",
+                        hvrv.getBeadAlleleRefList().size(),
+                        hvrv.getBeadAlleleRefList().size() - hvrv.getCompatPositiveSabCount(),
+                        alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat()).count() - hvrv.getCompatPositiveSabCount(),
+                        hvrv.getCompatIsRecipientEpitope() ? "*" : ""
+                    ));
+                }
+            }
+            System.out.print(String.format(", \"%s\"", hlaTypes));
+            System.out.print(String.format(", \"%s\"", specificities));
+            System.out.println();
             
         }
 
         rs.close();
-        conn.close();*/
+        conn.close();
         
     }
     
