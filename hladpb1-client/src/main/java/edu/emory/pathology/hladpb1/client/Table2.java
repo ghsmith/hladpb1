@@ -1,4 +1,4 @@
-package edu.emory.pathology.epitopeFinder.client;
+package edu.emory.pathology.hladpb1.client;
 
 import edu.emory.pathology.epitopeFinder.imgtdb.data.Allele;
 import edu.emory.pathology.epitopeFinder.imgtdb.data.EpRegEpitope;
@@ -135,7 +135,7 @@ public class Table2 {
         + "  ar.day_collect_dt desc, "
         + "  2 ";
 
-    // HLA-DPB1 web service endpoints (Jersey REST client)
+    // Epitope Finder web service endpoints for locus group "DP" (Jersey REST client)
     static ClientConfig cc = new ClientConfig().connectorProvider(new ApacheConnectorProvider());        
     static Client client = ClientBuilder.newClient(cc);
     static public List<Allele> getAlleles() {

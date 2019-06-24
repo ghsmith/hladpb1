@@ -16,6 +16,7 @@
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>2.25.1</version>
         </dependency>
+        <!-- mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=1 -Dpackaging=jar -Dfile=ojdbc8.jar -DgeneratePom=true -->
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc8</artifactId>
