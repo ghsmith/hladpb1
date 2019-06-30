@@ -138,6 +138,12 @@ public class Table2 {
     // Epitope Finder web service endpoints for locus group "DP" (Jersey REST client)
     static ClientConfig cc = new ClientConfig().connectorProvider(new ApacheConnectorProvider());        
     static Client client = ClientBuilder.newClient(cc);
+    static public void putReagentLot(String reagentLotNumber) {
+        client
+            .target("https://rest.hlatools.org/epitopeFinder/resources/session/reagentLot")
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.entity(reagentLotNumber, MediaType.APPLICATION_JSON));
+    }
     static public List<Allele> getAlleles() {
         return client
             .target("https://rest.hlatools.org/epitopeFinder/resources/alleles")
@@ -212,7 +218,11 @@ public class Table2 {
                 Matcher mat = pat.matcher(specificityUnparsed);
                 mat.find();
                 for(String a : mat.group(1).split(" ")) {
-                    specificities.add(String.format("%02d:", Integer.parseInt(a))); // pad to 2 digits and add colon
+                    specificities.add(String.format("%02d:01", Integer.parseInt(a))); // pad to 2 digits
+                    // if "DP4," also add "04:02"
+                    if(a.equals("4")) {
+                        specificities.add("04:02");
+                    }
                 }
             }
 
@@ -242,6 +252,7 @@ public class Table2 {
             
             // use the web service
             reset();
+            putReagentLot("12-truncated");
             List<Allele> alleles = getAlleles();
             for(String specificity : specificities) {
                 alleles.stream().filter((a) -> a.getAlleleName().startsWith("HLA-DPB1*" + specificity)).forEach(
@@ -270,7 +281,7 @@ public class Table2 {
                 alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat()).count()
             ));
             for(EpRegEpitope ep : eps) {
-                if(ep.getCompatSabPanelPctPresent() > 0) {
+                if(ep.getCompatSabPanelPctPresent() != null && ep.getCompatSabPanelPctPresent() > 0) {
                     System.out.print(String.format(", %d/%d/%d",
                         ep.getCompatSabPanelCountPresent() + ep.getCompatSabPanelCountAbsent(),
                         ep.getCompatSabPanelCountAbsent(),
