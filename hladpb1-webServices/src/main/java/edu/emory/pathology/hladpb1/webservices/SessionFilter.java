@@ -73,6 +73,7 @@ public class SessionFilter implements Filter {
                 reagentLotFinder = new ReagentLotFinder(request.getServletContext().getInitParameter("emoryXmlFileName"));
                 ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
                 ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
+                ((HttpServletRequest)request).getSession().setAttribute("reagentLotFinder", reagentLotFinder);
             }
             SessionFilter.sessionMutex.set(sessionMutex);
             SessionFilter.alleleFinder.set(alleleFinder);
