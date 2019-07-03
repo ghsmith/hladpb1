@@ -81,7 +81,7 @@ a.filterEnabled {
     <p>
         The IMGT allele database version is <span id="imgtDbVersion">...</span>
         and the single antigen bead (SAB) reagent lot number is
-        <span id="reagentLotNumber">...</span>. The session ID is
+        <select id="reagentLotNumberSelect"></select>. The session ID is
         <span id="sessionId">...</span>
         (<a id="resetSessionLink" href="javascript:void(0);">reset session</a>).
     </p>
@@ -155,6 +155,7 @@ var reagentLotNumber; // the single antigen bead reagent lot number
 var alleles = []; // the array of alleles
 var sabOnly = false; // only show single antigen bead alleles
 var matchesHvrCountGe4Only = true; // only show alleles where the match count is ge 4
+var reagentLots = [];
 
 function getSessionId() {
     $("#working").show();
@@ -181,7 +182,7 @@ function getReagentLotNumber() {
     $("#working").show();
     return $.ajax({
         url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
-        dataType: "json"
+        dataType: "text"
     }).then(function(response) {
         reagentLotNumber = response;
     });
@@ -208,6 +209,27 @@ function putAllele(allele) {
         type: "PUT",
         contentType: "application/json",
         data: JSON.stringify(allele)
+    });
+}
+
+function getReagentLots() {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/reagentLots",
+        dataType: "json"
+    }).then(function(response) {
+        reagentLots = response;
+    });
+}
+
+function putReagentLot(reagentLot) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/session/reagentLot",
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: reagentLot
     });
 }
 
@@ -239,6 +261,13 @@ function populateTableRows() {
     });
     $("#reportTable tbody").append(rowHtml.join(""));
     $("#referenceAlleleSelect").append(selectHtml.join(""));
+    {
+      var reagentLotNumberSelectHtml = [];
+      reagentLots.forEach(function(reagentLot) {
+        reagentLotNumberSelectHtml.push("<option value='" + reagentLot.lotNumber + "'>" + reagentLot.lotNumber + "</option>");
+      });
+      $("#reagentLotNumberSelect").append(reagentLotNumberSelectHtml.join(""));
+    }
 }
 
 // Set the UI state based on the hypervariable region matches.
@@ -248,7 +277,7 @@ function setUiState() {
     setTimeout(function() {
         $("#sessionId").html(sessionId);
         $("#imgtDbVersion").html(alleles[0].version);
-        $("#reagentLotNumber").html(reagentLotNumber);
+        $("#reagentLotNumberSelect").val(reagentLotNumber);
         $("#sabFilter").removeClass("filterEnabled");
         if(sabOnly) { $("#sabFilter").addClass("filterEnabled"); }
         $("#matchesHvrCountGe4Filter").removeClass("filterEnabled");
@@ -328,10 +357,10 @@ function matchesHvrCountSort(a, b) {
 $(document).ready(function() {
 
     // Initial population of report table.
-    getSessionId().then(getReagentLotNumber).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+    getSessionId().then(getReagentLots).then(getReagentLotNumber).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
 
     $("#resetSessionLink").click(function() {
-        resetSession().then(getSessionId).then(getReagentLotNumber).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
+        resetSession().then(getSessionId).then(getReagentLots).then(getReagentLotNumber).then(getAlleles).then(populateTableRows).then(setUiState).done(function() { $("#working").hide(); });
     });
 
     // Select a reference allele from the list. Handled by web service.
@@ -387,7 +416,12 @@ $(document).ready(function() {
             $("#working").hide();
         }, 1);
     });
-    
+
+    $("#reagentLotNumberSelect").change(function() {
+        reagentLotNumber = $(this).val();
+        putReagentLot(reagentLotNumber).done(function() { window.location.reload(); } );
+    });
+
 });
 
 </script>

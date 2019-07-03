@@ -168,7 +168,7 @@ function getReagentLotNumber() {
     $("#working").show();
     return $.ajax({
         url: "/hladpb1/resources/hypervariableRegions/reagentLotNumber",
-        dataType: "json"
+        dataType: "text"
     }).then(function(response) {
         reagentLotNumber = response;
     });
