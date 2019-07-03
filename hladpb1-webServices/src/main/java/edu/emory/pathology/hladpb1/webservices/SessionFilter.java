@@ -2,6 +2,7 @@ package edu.emory.pathology.hladpb1.webservices;
 
 import edu.emory.pathology.hladpb1.imgtdb.AlleleFinder;
 import edu.emory.pathology.hladpb1.imgtdb.HypervariableRegionFinder;
+import edu.emory.pathology.hladpb1.imgtdb.ReagentLotFinder;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -28,6 +29,7 @@ public class SessionFilter implements Filter {
     protected static ThreadLocal<String> sessionMutex = new ThreadLocal<>();
     protected static ThreadLocal<AlleleFinder> alleleFinder = new ThreadLocal<>();
     protected static ThreadLocal<HypervariableRegionFinder> hypervariableRegionFinder = new ThreadLocal<>();
+    protected static ThreadLocal<ReagentLotFinder> reagentLotFinder = new ThreadLocal<>();
     
     private static final boolean debug = false;
 
@@ -61,18 +63,21 @@ public class SessionFilter implements Filter {
         synchronized(sessionMutex) {
             AlleleFinder alleleFinder = (AlleleFinder)((HttpServletRequest)request).getSession().getAttribute("alleleFinder");
             HypervariableRegionFinder hypervariableRegionFinder = (HypervariableRegionFinder)((HttpServletRequest)request).getSession().getAttribute("hypervariableRegionFinder");
+            ReagentLotFinder reagentLotFinder = (ReagentLotFinder)((HttpServletRequest)request).getSession().getAttribute("reagentLotFinder");
             if(alleleFinder == null || hypervariableRegionFinder == null) {
                 alleleFinder = new AlleleFinder(request.getServletContext().getInitParameter("imgtXmlFileName"));
                 hypervariableRegionFinder = new HypervariableRegionFinder(request.getServletContext().getInitParameter("emoryXmlFileName"), request.getServletContext().getInitParameter("reagentLotNumber"));
                 alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionFinder);
                 alleleFinder.assignHypervariableRegionVariantMatches(alleleFinder.getAlleleList().get(0).getAlleleName());
                 alleleFinder.computeCompatInterpretation(hypervariableRegionFinder);
+                reagentLotFinder = new ReagentLotFinder(request.getServletContext().getInitParameter("emoryXmlFileName"));
                 ((HttpServletRequest)request).getSession().setAttribute("alleleFinder", alleleFinder);
                 ((HttpServletRequest)request).getSession().setAttribute("hypervariableRegionFinder", hypervariableRegionFinder);
             }
             SessionFilter.sessionMutex.set(sessionMutex);
             SessionFilter.alleleFinder.set(alleleFinder);
             SessionFilter.hypervariableRegionFinder.set(hypervariableRegionFinder);
+            SessionFilter.reagentLotFinder.set(reagentLotFinder);
         }
         
     }    
