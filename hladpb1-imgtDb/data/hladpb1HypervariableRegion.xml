@@ -446,6 +446,7 @@
               <bead alleleName="HLA-DPB1*30:01"/>
               <bead alleleName="HLA-DPB1*105:01"/-->
             </beads>
+          </hvrVariant>
         </hvrVariants>
       </hypervariableRegion>
       
