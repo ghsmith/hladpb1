@@ -280,7 +280,7 @@ function populateTableRows() {
     if($("#referenceAlleleSelect option").length == 0) {
       $("#referenceAlleleSelect").append(selectHtml.join(""));
     }
-    {
+    if($("#reagentLotNumberSelect option").length == 0) {
       var reagentLotNumberSelectHtml = [];
       reagentLots.forEach(function(reagentLot) {
         reagentLotNumberSelectHtml.push("<option value='" + reagentLot.lotNumber + "'>" + reagentLot.lotNumber + "</option>");
