@@ -242,6 +242,9 @@ public class Table1 {
             }
             
             // use the web service
+            //
+            // since this is using a starts-with allele name match, it will set
+            // the antibody flag on the primary and all alternate alleles
             reset();
             putReagentLot("LABScreen Class II Standard w/combinatorial HVRVs (various lots)");
             List<Allele> alleles = getAlleles();
@@ -265,17 +268,22 @@ public class Table1 {
             List<HypervariableRegion> hvrs = getHypervariableRegions();
 
             // report body
+            //
+            // note that the total antibody count only considers the primary and
+            // not alterate alleles; both primary and alternate alleles are
+            // specified as antibodies (alterate alleles names end with a
+            // closing square bracket)
             System.out.print(String.format("%s, %s, %d",
                 rs.getString("DAY_COLLECT_DT"),
                 rs.getString("PT_HASH"),
-                alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat()).count()
+                alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat() && !a.getAlleleName().endsWith("]")).count()
             ));
             for(HypervariableRegion hvr : hvrs) {
                 for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
                     System.out.print(String.format(", %d/%d/%d%s",
                         hvrv.getBeadAlleleRefList().size(),
                         hvrv.getBeadAlleleRefList().size() - hvrv.getCompatPositiveSabCount(),
-                        alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat()).count() - hvrv.getCompatPositiveSabCount(),
+                        alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat() && !a.getAlleleName().endsWith("]")).count() - hvrv.getCompatPositiveSabCount(),
                         hvrv.getCompatIsRecipientEpitope() ? "*" : ""
                     ));
                 }
