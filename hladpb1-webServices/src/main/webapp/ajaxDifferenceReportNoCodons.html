@@ -291,12 +291,20 @@ function isRowVisible(allele) {
 }
 
 // Sort function.
+var re = /HLA-DPB1\*([0-9]*):(.*)/;
 function alleleNameSort(a, b) {
-    var A = $(a).data("sequence");
-    var B = $(b).data("sequence");
-    if(A < B)      { return -1; }
-    else if(A > B) { return  1; }
-    else           { return  0; }
+    var A1 = Number((re.exec(a.alleleName))[1]);
+    console.log(b.alleleName)
+    var B1 = Number((re.exec(b.alleleName))[1]);
+    if(A1 < B1)      { return -1; }
+    else if(A1 > B1) { return  1; }
+    else {
+        var A2 = (re.exec(a.alleleName))[2];
+        var B2 = (re.exec(b.alleleName))[2];
+        if(A2 < B2)      { return -1; }
+        else if(A2 > B2) { return  1; }
+        else { return 0; }
+    }
 };
 
 // Sort function.
