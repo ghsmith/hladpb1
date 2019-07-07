@@ -177,6 +177,8 @@ public class Table1 {
         conn.setAutoCommit(false);
         conn.createStatement().execute("set role all");
 
+        putReagentLot("LABScreen Class II Standard w/combinatorial HVRVs (various lots)");
+        
         // report header
         {
             List<HypervariableRegion> hvrs = getHypervariableRegions();
@@ -241,7 +243,7 @@ public class Table1 {
             
             // use the web service
             reset();
-            putReagentLot("12-truncated");
+            putReagentLot("LABScreen Class II Standard w/combinatorial HVRVs (various lots)");
             List<Allele> alleles = getAlleles();
             for(String specificity : specificities) {
                 alleles.stream().filter((a) -> a.getAlleleName().startsWith("HLA-DPB1*" + specificity)).forEach(

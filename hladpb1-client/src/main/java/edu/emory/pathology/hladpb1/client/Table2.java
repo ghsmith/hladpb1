@@ -2,6 +2,7 @@ package edu.emory.pathology.hladpb1.client;
 
 import edu.emory.pathology.epitopeFinder.imgtdb.data.Allele;
 import edu.emory.pathology.epitopeFinder.imgtdb.data.EpRegEpitope;
+import static edu.emory.pathology.hladpb1.client.Table1.putReagentLot;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -190,6 +191,8 @@ public class Table2 {
         conn.setAutoCommit(false);
         conn.createStatement().execute("set role all");
 
+        putReagentLot("LABScreen Class II Standard w/combinatorial HVRVs (various lots)");
+            
         // report header
         {
             List<EpRegEpitope> eps = getEpitopes();
@@ -252,7 +255,7 @@ public class Table2 {
             
             // use the web service
             reset();
-            putReagentLot("12-truncated");
+            putReagentLot("LABScreen Class II Standard w/combinatorial HVRVs (various lots)");
             List<Allele> alleles = getAlleles();
             for(String specificity : specificities) {
                 alleles.stream().filter((a) -> a.getAlleleName().startsWith("HLA-DPB1*" + specificity)).forEach(
