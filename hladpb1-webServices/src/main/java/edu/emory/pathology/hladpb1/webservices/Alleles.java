@@ -64,6 +64,7 @@ public class Alleles {
         synchronized(SessionFilter.sessionMutex.get()) {
 
             Allele allele = SessionFilter.alleleFinder.get().getAllele(alleleName);
+            Allele virginAllele = (Allele)SerializationUtils.clone((Serializable)allele);
 
             // 1. Set the reference allele for the difference report.
             if(updateAllele.getReferenceForMatches()) {
@@ -113,7 +114,50 @@ public class Alleles {
                 });
             }
 
-            // 4. Do the compatibility evaluation.
+            // 4. When a recipient or donor type is specified, make sure all of the
+            //    alleles (primary and alternate) are also specified. This seems
+            //    like the prudent thing to do to me. Antibodies may be specified
+            //    as a particular allele (primary or alternate), but not recipient
+            //    and donor types (e.g., if you select 04:01 as a recipient or
+            //    donor type, then you are also selecting 04:01[a], 04:01[b],
+            //    and 04:01[c].
+            {
+                String baseAlleleName = allele.getAlleleName().replaceAll("\\[.*\\]", "");
+                if(
+                    (allele.getRecipientTypeForCompat() != null && allele.getRecipientTypeForCompat())
+                    && (virginAllele.getRecipientTypeForCompat() == null || !virginAllele.getRecipientTypeForCompat())
+                ) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (loopAllele.getAlleleName().startsWith(baseAlleleName))).forEach((loopAllele) -> {
+                        loopAllele.setRecipientTypeForCompat(true);
+                    });
+                }
+                if(
+                    (allele.getRecipientTypeForCompat() == null || !allele.getRecipientTypeForCompat())
+                    && (virginAllele.getRecipientTypeForCompat() != null && virginAllele.getRecipientTypeForCompat())
+                ) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (loopAllele.getAlleleName().startsWith(baseAlleleName))).forEach((loopAllele) -> {
+                        loopAllele.setRecipientTypeForCompat(false);
+                    });
+                }
+                if(
+                    (allele.getDonorTypeForCompat() != null && allele.getDonorTypeForCompat())
+                    && (virginAllele.getDonorTypeForCompat() == null || !virginAllele.getDonorTypeForCompat())
+                ) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (loopAllele.getAlleleName().startsWith(baseAlleleName))).forEach((loopAllele) -> {
+                        loopAllele.setDonorTypeForCompat(true);
+                    });
+                }
+                if(
+                    (allele.getDonorTypeForCompat() == null || !allele.getDonorTypeForCompat())
+                    && (virginAllele.getDonorTypeForCompat() != null && virginAllele.getDonorTypeForCompat())
+                ) {
+                    SessionFilter.alleleFinder.get().getAlleleList().stream().filter((loopAllele) -> (loopAllele.getAlleleName().startsWith(baseAlleleName))).forEach((loopAllele) -> {
+                        loopAllele.setDonorTypeForCompat(false);
+                    });
+                }
+            }
+            
+            // 5. Do the compatibility evaluation.
             SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
 
         }
