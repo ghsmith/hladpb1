@@ -3,14 +3,20 @@ package edu.emory.pathology.hladpb1.imgtdb;
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
 import edu.emory.pathology.hladpb1.imgtdb.data.Codon;
 import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
+import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegionVariant;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * This finder class loads our local data classes from the IMGT data classes.
@@ -138,7 +144,9 @@ public class AlleleFinder {
                     }
                 }
             });
-            // Add sequence number for sorting.
+            // Add sequence number for sorting. This isn't really used for
+            // anything, but reflects the natural IMGT order, so I'll leave it
+            // here just in case.
             int sequenceNumber = 0;
             for(Allele allele : alleleList) {
                 allele.setSequenceNumber(sequenceNumber++);
@@ -208,9 +216,25 @@ public class AlleleFinder {
         }); }); });
 
         // 2. Assign hypervariable region variants to alleles.
-        getAlleleList().stream().forEach((allele) -> {
-            allele.setHvrVariantMap(new TreeMap<>());
-            hypervariableRegionList.stream().forEach((hypervariableRegion) -> {
+        
+        // Note that I am accessing alleleList directly because I might be
+        // adding alleles to the list in the loop that I want to be iterated
+        // over. This is a form of recursion.
+        Map<String, Character> alleleSuffixes = new HashMap<>();
+        for(int i = 0; i < alleleList.size(); i++) {
+            
+            Allele allele = alleleList.get(i);
+
+            if(allele.getHvrVariantMap() == null) {
+                allele.setHvrVariantMap(new TreeMap<>());
+            }
+            
+            for(HypervariableRegion hypervariableRegion : hypervariableRegionList) {
+
+                if(allele.getHvrVariantMap().get(hypervariableRegion.getHypervariableRegionName()) != null) {
+                    continue;
+                }
+                
                 StringBuilder hvrProteinSequence = new StringBuilder();
                 hypervariableRegion.getCodonNumberList().stream().forEach((codonNumber) -> {
                     Codon codon = allele.getCodonMap().get(codonNumber);
@@ -224,16 +248,42 @@ public class AlleleFinder {
                 hvrvRef.setHypervariableRegionName(hypervariableRegion.getHypervariableRegionName());
                 hvrvRef.setVariantId(hvrProteinSequence.toString()); // default if the protein sequence does not match an established hypervariable region variant
                 allele.setSingleAntigenBead(false);
-                hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
-                    variant.getProteinSequenceList().stream().filter((proteinSequence) -> (hvrProteinSequence.toString().equals(proteinSequence))).findFirst().ifPresent((proteinSequence) -> {
-                        hvrvRef.setVariantId(variant.getVariantId());
-                        variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (allele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().ifPresent((beadAlleleRef) -> {
-                            allele.setSingleAntigenBead(true);
-                        });
-                    });
-                });
-            });
-        });
+                
+                // If an allele matches multiple HVRVs, then new alleles with
+                // "[a]", "[b]", "[c]", ... suffixes are created for all but
+                // the first HVRV match. This preserves the cardinality of the
+                // HVRV:allele as 1:many (avoids many:many) at the expense of
+                // creating additional alleles.
+                int matchIndex = 0;
+                for(HypervariableRegionVariant variant : hypervariableRegion.getVariantMap().values()) {
+                    for(String proteinSequence : variant.getProteinSequenceList()) {
+                        if(hvrProteinSequence.toString().equals(proteinSequence)) {
+                            Allele workingAllele;
+                            if(matchIndex == 0) {
+                                workingAllele = allele;
+                            }
+                            else {
+                                workingAllele = (Allele)SerializationUtils.clone((Serializable)allele);
+                                String baseAlleleName = workingAllele.getAlleleName().replaceAll("\\[.*\\]", "");
+                                char alleleSuffix = alleleSuffixes.get(baseAlleleName) != null ? ((char)((int)alleleSuffixes.get(baseAlleleName) + 1)) : 'a';
+                                alleleSuffixes.put(baseAlleleName, alleleSuffix);
+                                workingAllele.setAlleleName(String.format("%s[%c]", baseAlleleName, alleleSuffix));
+                                alleleList.add(workingAllele);
+                            }
+                            workingAllele.getHvrVariantMap().get(hypervariableRegion.getHypervariableRegionName()).setVariantId(variant.getVariantId());
+                            variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (workingAllele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().ifPresent((beadAlleleRef) -> {
+                                workingAllele.setSingleAntigenBead(true);
+                            });
+                            matchIndex++;
+                        }
+                    }
+                }
+                
+            };
+            
+        };
+        
+        Collections.sort(alleleList);
         
     }
 
