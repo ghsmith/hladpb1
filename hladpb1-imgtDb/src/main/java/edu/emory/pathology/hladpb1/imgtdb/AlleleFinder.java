@@ -217,13 +217,13 @@ public class AlleleFinder {
 
         // 2. Assign hypervariable region variants to alleles.
         
-        // Note that I am accessing alleleList directly because I might be
-        // adding alleles to the list in the loop that I want to be iterated
-        // over. This is a form of recursion.
+        // Note that I might add alleles to the list in the loop and that I want
+        // the loop to iterate over those additional alleles. This is a form of
+        // recursion.
         Map<String, Character> alleleSuffixes = new HashMap<>();
-        for(int i = 0; i < alleleList.size(); i++) {
+        for(int i = 0; i < getAlleleList().size(); i++) {
             
-            Allele allele = alleleList.get(i);
+            Allele allele = getAlleleList().get(i);
 
             if(allele.getHvrVariantMap() == null) {
                 allele.setHvrVariantMap(new TreeMap<>());
@@ -253,7 +253,10 @@ public class AlleleFinder {
                 // "[a]", "[b]", "[c]", ... suffixes are created for all but
                 // the first HVRV match. This preserves the cardinality of the
                 // HVRV:allele as 1:many (avoids many:many) at the expense of
-                // creating additional alleles.
+                // creating additional alleles. I'm going to call these
+                // additional alleles "alternate alleles" to distinguish them
+                // from the "primary allele" for the moment and hope they go
+                // away.
                 int matchIndex = 0;
                 for(HypervariableRegionVariant variant : hypervariableRegion.getVariantMap().values()) {
                     for(String proteinSequence : variant.getProteinSequenceList()) {
@@ -268,7 +271,7 @@ public class AlleleFinder {
                                 char alleleSuffix = alleleSuffixes.get(baseAlleleName) != null ? ((char)((int)alleleSuffixes.get(baseAlleleName) + 1)) : 'a';
                                 alleleSuffixes.put(baseAlleleName, alleleSuffix);
                                 workingAllele.setAlleleName(String.format("%s[%c]", baseAlleleName, alleleSuffix));
-                                alleleList.add(workingAllele);
+                                getAlleleList().add(workingAllele);
                             }
                             workingAllele.getHvrVariantMap().get(hypervariableRegion.getHypervariableRegionName()).setVariantId(variant.getVariantId());
                             variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (workingAllele.getAlleleName().startsWith(beadAlleleRef.getAlleleName()))).findFirst().ifPresent((beadAlleleRef) -> {
@@ -283,7 +286,7 @@ public class AlleleFinder {
             
         };
         
-        Collections.sort(alleleList);
+        Collections.sort(getAlleleList());
         
     }
 
