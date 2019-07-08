@@ -844,16 +844,18 @@
           </hvrVariant>
           <hvrVariant variantId="6" proteinSequences="DED,DEE">
             <beads>
+              <bead alleleName="HLA-DPB1*03:01"/>
+              <bead alleleName="HLA-DPB1*06:01"/>
+              <bead alleleName="HLA-DPB1*09:01"/>
+              <bead alleleName="HLA-DPB1*14:01"/>
+              <bead alleleName="HLA-DPB1*17:01"/>
+              <bead alleleName="HLA-DPB1*20:01"/>
               <bead alleleName="HLA-DPB1*02:01"/>
               <bead alleleName="HLA-DPB1*04:02"/>
               <bead alleleName="HLA-DPB1*10:01"/>
               <bead alleleName="HLA-DPB1*18:01"/>
               <bead alleleName="HLA-DPB1*28:01"/>
-              <bead alleleName="HLA-DPB1*05:01"/>
-              <bead alleleName="HLA-DPB1*19:01"/>
-              <!--bead alleleName="HLA-DPB1*105:01"/>
-              <bead alleleName="HLA-DPB1*02:02"/>
-              <bead alleleName="HLA-DPB1*30:01"/-->
+              <!--bead alleleName="HLA-DPB1*105:01"/-->
             </beads>
           </hvrVariant>
         </hvrVariants>
