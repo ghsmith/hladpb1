@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 
-
 <html>
 
 <head>
@@ -130,6 +129,8 @@ table.statusDescriptionTable td {
                 <th>[<a id="statusSort" href="javascript:void(0);">sort</a>]</th>
                 <th colspan="49" style="border-bottom: 1px solid black;">hypervariable region name</th>
             </tr>
+            <!-- Set up for a maximum of 7 hypervariable region variants per
+                 hypervariable region. This is reasonable to start with. -->
             <tr id="columnNames">
                 <th data-name="allele.alleleName" class="alleleName">allele name</th>
                 <th data-name="allele.singleAntigenBead ? 'Y' : '&nbsp;'">SAB</th>
@@ -145,8 +146,16 @@ table.statusDescriptionTable td {
                 <th colspan="7" data-hvr-id="f" class="hvrId index">f</th>
                 <th colspan="7" data-hvr-id="g" class="hvrId index indexRight">g</th>
             </tr>
-            <!-- Set up for a maximum of 7 hypervariable region variants per
-                 hypervariable region. This is reasonable to start with. -->
+            <tr id="codonPositions" style="border: 1px solid black;">
+                <th colspan="6" style="text-align: right;">position(s) &Longrightarrow;</th>
+                <th colspan="7" data-name="hvrMap['a'].codonNumberList == undefined ? '&nbsp;' : hvrMap['a'].codonNumberList.join(',')" data-hvr-id="a" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['b'].codonNumberList == undefined ? '&nbsp;' : hvrMap['b'].codonNumberList.join(',')" data-hvr-id="b" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['c'].codonNumberList == undefined ? '&nbsp;' : hvrMap['c'].codonNumberList.join(',')" data-hvr-id="c" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['d'].codonNumberList == undefined ? '&nbsp;' : hvrMap['d'].codonNumberList.join(',')" data-hvr-id="d" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['e'].codonNumberList == undefined ? '&nbsp;' : hvrMap['e'].codonNumberList.join(',')" data-hvr-id="e" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['f'].codonNumberList == undefined ? '&nbsp;' : hvrMap['f'].codonNumberList.join(',')" data-hvr-id="f" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['g'].codonNumberList == undefined ? '&nbsp;' : hvrMap['g'].codonNumberList.join(',')" data-hvr-id="g" class="codonPosition index indexRight">g</th>
+            </tr>
             <tr id="hvrVariantIds" style="border: 1px solid black;">
                 <th colspan="6" style="text-align: right;">hypervariable region variant ID &Longrightarrow;</th>
                 <th data-name="allele.hvrVariantMap['a'] != undefined && 1 == allele.hvrVariantMap['a'].variantId ? 1 : '&nbsp;'" data-hvr-id="a" class="variantId index">1</th><th data-name="allele.hvrVariantMap['a'] != undefined && 2 == allele.hvrVariantMap['a'].variantId ? 2 : '&nbsp;'" data-hvr-id="a" class="variantId ">2</th><th data-name="allele.hvrVariantMap['a'] != undefined && 3 == allele.hvrVariantMap['a'].variantId ? 3 : '&nbsp;'" data-hvr-id="a" class="variantId ">3</th><th data-name="allele.hvrVariantMap['a'] != undefined && 4 == allele.hvrVariantMap['a'].variantId ? 4 : '&nbsp;'" data-hvr-id="a" class="variantId ">4</th><th data-name="allele.hvrVariantMap['a'] != undefined && 5 == allele.hvrVariantMap['a'].variantId ? 5 : '&nbsp;'" data-hvr-id="a" class="variantId ">5</th><th data-name="allele.hvrVariantMap['a'] != undefined && 6 == allele.hvrVariantMap['a'].variantId ? 6 : '&nbsp;'" data-hvr-id="a" class="variantId ">6</th>
@@ -407,7 +416,7 @@ function setUiState() {
         $("#reagentLotNumberSelect").val(reagentLotNumber);
         $("#sabFilter").removeClass("filterEnabled");      if(sabOnly )     { $("#sabFilter").addClass("filterEnabled"); }
         $("#selectedFilter").removeClass("filterEnabled"); if(selectedOnly) { $("#selectedFilter").addClass("filterEnabled"); }
-        $("#hvrVariantSeqs th.variantSeq, #hvrRecipientEpitopes th.recipientEpitope, #hvrPctBeadsPositives th.pctBeadsPositive").each(function() {
+        $("#codonPositions th.codonPosition, #hvrVariantSeqs th.variantSeq, #hvrRecipientEpitopes th.recipientEpitope, #hvrPctBeadsPositives th.pctBeadsPositive").each(function() {
             $(this).html(eval($(this).data("name")));
         });
         $("#reportTable th, #reportTable td").removeClass("mismatch");

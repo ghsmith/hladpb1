@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 
-
 <html>
 
 <head>
@@ -151,6 +150,16 @@ table.statusDescriptionTable td {
                 <th colspan="7" data-hvr-id="e" class="hvrId index">e</th>
                 <th colspan="7" data-hvr-id="f" class="hvrId index">f</th>
                 <th colspan="7" data-hvr-id="g" class="hvrId index indexRight">g</th>
+            </tr>
+            <tr id="codonPositions" style="border: 1px solid black;">
+                <th colspan="6" style="text-align: right;">position(s) &Longrightarrow;</th>
+                <th colspan="7" data-name="hvrMap['a'].codonNumberList == undefined ? '&nbsp;' : hvrMap['a'].codonNumberList.join(',')" data-hvr-id="a" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['b'].codonNumberList == undefined ? '&nbsp;' : hvrMap['b'].codonNumberList.join(',')" data-hvr-id="b" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['c'].codonNumberList == undefined ? '&nbsp;' : hvrMap['c'].codonNumberList.join(',')" data-hvr-id="c" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['d'].codonNumberList == undefined ? '&nbsp;' : hvrMap['d'].codonNumberList.join(',')" data-hvr-id="d" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['e'].codonNumberList == undefined ? '&nbsp;' : hvrMap['e'].codonNumberList.join(',')" data-hvr-id="e" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['f'].codonNumberList == undefined ? '&nbsp;' : hvrMap['f'].codonNumberList.join(',')" data-hvr-id="f" class="codonPosition index"></th>
+                <th colspan="7" data-name="hvrMap['g'].codonNumberList == undefined ? '&nbsp;' : hvrMap['g'].codonNumberList.join(',')" data-hvr-id="g" class="codonPosition index indexRight">g</th>
             </tr>
             <!-- Set up for a maximum of 7 hypervariable region variants per
                  hypervariable region. This is reasonable to start with. -->
@@ -424,7 +433,7 @@ function setUiState() {
         $("#reagentLotNumberSelect").val(reagentLotNumber);
         $("#sabFilter").removeClass("filterEnabled");      if(sabOnly )     { $("#sabFilter").addClass("filterEnabled"); }
         $("#selectedFilter").removeClass("filterEnabled"); if(selectedOnly) { $("#selectedFilter").addClass("filterEnabled"); }
-        $("#hvrVariantSeqs th.variantSeq, #hvrRecipientEpitopes th.recipientEpitope, #hvrPctBeadsPositives th.pctBeadsPositive").each(function() {
+        $("#codonPositions th.codonPosition, #hvrVariantSeqs th.variantSeq, #hvrRecipientEpitopes th.recipientEpitope, #hvrPctBeadsPositives th.pctBeadsPositive").each(function() {
             $(this).html(eval($(this).data("name")));
         });
         $("#reportTable th, #reportTable td").removeClass("mismatch");
