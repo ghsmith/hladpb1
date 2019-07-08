@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <reagentLots xmlns="http://pathology.emory.edu/hladpb1HypervariableRegion" xmlns:xs="http://www.w3.org/2001/XMLSchema" xs:noNamespaceSchemaLocation="http://pathology.emory.edu/hladpb1HypervariableRegion.xsd">
 
-  <reagentLot lotNumber="LABScreen Class II Standard + Supplemental (various lots)">
+  <reagentLot lotNumber="LABScreen Class II Standard + Supplement (various lots)">
 
     <hypervariableRegions>
 
@@ -657,7 +657,7 @@
   
   </reagentLot>
 
-  <reagentLot lotNumber="LABScreen Class II Standard w/combinatorial HVRVs (various lots)">
+  <reagentLot lotNumber="LABScreen Class II Standard w/combo HVRVs (various lots)">
 
     <hypervariableRegions>
 
