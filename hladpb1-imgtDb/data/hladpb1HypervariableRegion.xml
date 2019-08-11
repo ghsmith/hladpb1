@@ -711,7 +711,7 @@
       
       <hypervariableRegion hvrName="b" codonNumbers="35,36">
         <hvrVariants>
-          <hvrVariant variantId="1" proteinSequences="FV">
+          <!--hvrVariant variantId="1" proteinSequences="FV">
             <beads>
               <bead alleleName="HLA-DPB1*02:01"/>
               <bead alleleName="HLA-DPB1*03:01"/>
@@ -725,10 +725,10 @@
               <bead alleleName="HLA-DPB1*19:01"/>
               <bead alleleName="HLA-DPB1*23:01"/>
               <bead alleleName="HLA-DPB1*20:01"/>
-              <!--bead alleleName="HLA-DPB1*30:01"/>
-              <bead alleleName="HLA-DPB1*105:01"/-->
+              <!-bead alleleName="HLA-DPB1*30:01"/>
+              <bead alleleName="HLA-DPB1*105:01"/->
             </beads>
-          </hvrVariant>
+          </hvrVariant-->
           <hvrVariant variantId="2" proteinSequences="YA">
             <beads>
               <bead alleleName="HLA-DPB1*01:01"/>
@@ -741,13 +741,13 @@
               <bead alleleName="HLA-DPB1*107:01"/-->
             </beads>
           </hvrVariant>
-          <hvrVariant variantId="3" proteinSequences="FA">
+          <!--hvrVariant variantId="3" proteinSequences="FA">
             <beads>
               <bead alleleName="HLA-DPB1*04:01"/>
               <bead alleleName="HLA-DPB1*28:01"/>
-              <!--bead alleleName="HLA-DPB1*31:01"/-->
+              <!-bead alleleName="HLA-DPB1*31:01"/->
             </beads>
-          </hvrVariant>
+          </hvrVariant-->
           <hvrVariant variantId="4" proteinSequences="LV">
             <beads>
               <bead alleleName="HLA-DPB1*05:01"/>
@@ -780,7 +780,7 @@
       
       <hypervariableRegion hvrName="c" codonNumbers="55,56,57">
         <hvrVariants>
-          <hvrVariant variantId="1" proteinSequences="AAE">
+          <!--hvrVariant variantId="1" proteinSequences="AAE">
             <beads>
               <bead alleleName="HLA-DPB1*01:01"/>
               <bead alleleName="HLA-DPB1*04:01"/>
@@ -788,11 +788,11 @@
               <bead alleleName="HLA-DPB1*13:01"/>
               <bead alleleName="HLA-DPB1*15:01"/>
               <bead alleleName="HLA-DPB1*23:01"/>
-              <!--bead alleleName="HLA-DPB1*26:01"/>
+              <!-bead alleleName="HLA-DPB1*26:01"/>
               <bead alleleName="HLA-DPB1*31:01"/>
               <bead alleleName="HLA-DPB1*40:01"/>
               <bead alleleName="HLA-DPB1*85:01"/>
-              <bead alleleName="HLA-DPB1*107:01"/-->
+              <bead alleleName="HLA-DPB1*107:01"/->
             </beads>
           </hvrVariant>
           <hvrVariant variantId="2" proteinSequences="DED">
@@ -812,17 +812,17 @@
               <bead alleleName="HLA-DPB1*10:01"/>
               <bead alleleName="HLA-DPB1*18:01"/>
               <bead alleleName="HLA-DPB1*28:01"/>
-              <!--bead alleleName="HLA-DPB1*105:01"/-->
+              <!-bead alleleName="HLA-DPB1*105:01"/->
             </beads>
           </hvrVariant>
           <hvrVariant variantId="4" proteinSequences="EAE">
             <beads>
               <bead alleleName="HLA-DPB1*05:01"/>
               <bead alleleName="HLA-DPB1*19:01"/>
-              <!--bead alleleName="HLA-DPB1*02:02"/>
-              <bead alleleName="HLA-DPB1*30:01"/-->
+              <!-bead alleleName="HLA-DPB1*02:02"/>
+              <bead alleleName="HLA-DPB1*30:01"/->
             </beads>
-          </hvrVariant>
+          </hvrVariant-->
           <hvrVariant variantId="5" proteinSequences="AAE,EAE">
             <beads>
               <bead alleleName="HLA-DPB1*01:01"/>
