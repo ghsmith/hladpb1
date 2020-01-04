@@ -4,6 +4,7 @@ import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
 import edu.emory.pathology.hladpb1.imgtdb.data.Codon;
 import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
 import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegionVariant;
+import edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.CDNAindel;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,11 +64,35 @@ public class AlleleFinder {
                     for(int cdnaCoordinate = feature.getCDNACoordinates().getStart().intValueExact(); cdnaCoordinate <= feature.getCDNACoordinates().getEnd().intValueExact(); cdnaCoordinate++) {
                         int codonNumber = ((cdnaCoordinate - 1) / 3) + 1; // codon number starts at one (not zero)
                         int positionInCodon = (cdnaCoordinate - 1) - (((cdnaCoordinate - 1) / 3) * 3) + 1; // position in codon starts at one (not zero)
+
                         // -HARD-CODED SIGNAL PEPTIDE LENGTH--------------------
                         codonNumber = codonNumber - 29; // signal peptide is 29 codons
                         // -----------------------------------------------------
+
+                        // -BRITTLE DELETION LOGIC -----------------------------
+                        // (deletions are not represented in the translation)
+                        boolean inDeletion = false;
+                        for(CDNAindel cDNAindel : feature.getCDNAindel()) {
+                            if(cDNAindel.getType().equals("deletion")) {
+                                if(cdnaCoordinate >= cDNAindel.getStart().intValueExact() && cdnaCoordinate <= cDNAindel.getEnd().intValueExact()) {
+                                    inDeletion = true;
+                                    LOG.info(String.format("%s deletion at %d %d", allele.getAlleleName(), cdnaCoordinate, codonNumber));
+                                    break;
+                                }
+                            }
+                        }
+                        // -----------------------------------------------------
+
                         if(allele.getCodonMap().get(codonNumber) == null) {
-                            if(translationIterator.hasNext()) {
+                            if(inDeletion) {
+                                if(allele.getCodonMap().size() > 0 || positionInCodon == 1) { // IMGT translation starts with first whole codon
+                                    Codon codon = new Codon();
+                                    codon.setCodonNumber(codonNumber);
+                                    allele.getCodonMap().put(codon.getCodonNumber(), codon);
+                                    codon.setAminoAcid(String.format("%c", '.'));
+                                }
+                            }
+                            else if(translationIterator.hasNext()) {
                                 if(allele.getCodonMap().size() > 0 || positionInCodon == 1) { // IMGT translation starts with first whole codon
                                     Codon codon = new Codon();
                                     codon.setCodonNumber(codonNumber);
@@ -98,7 +123,10 @@ public class AlleleFinder {
                     // should not have any leftover translation
                     translationIterator.hasNext() 
                 ) {
-                    throw new RuntimeException(allele.getAlleleName() + " translation too long");
+                    //throw new RuntimeException(allele.getAlleleName() + " translation too long");
+                    while(translationIterator.hasNext()) {
+                        LOG.info(String.format("%s unused translation %c", allele.getAlleleName(), translationIterator.next()));
+                    }
                 }
                 allele.setNullAllele(allele.getAlleleName().endsWith("N"));
                 {
@@ -108,7 +136,7 @@ public class AlleleFinder {
                             proteinSequence = proteinSequence.substring(0, proteinSequence.length() - 1);
                         }
                     }
-                    allele.setProteinSequenceLength(proteinSequence.length());
+                    allele.setProteinSequenceLength(proteinSequence.replace(".", "").length());
                 }
                 // Synonymous logic requires alleles to be processed in order
                 // (i.e., the "master" allele first).
