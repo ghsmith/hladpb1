@@ -169,7 +169,7 @@ tr:hover {
 <script>
 
 var page = 1;
-var pageSize = 50;
+var pageSize = 25;
 
 var sessionId;
 var reagentLotNumber; // the single antigen bead reagent lot number
@@ -177,6 +177,7 @@ var alleles = []; // the array of alleles
 var sabOnly = false; // only show single antigen bead alleles
 var matchesHvrCountGe4Only = true; // only show alleles where the match count is ge 4
 var reagentLots = [];
+var lastSort;
 
 function getSessionId() {
     $("#working").show();
@@ -264,9 +265,29 @@ function populateTableRows() {
     var rowHtml = [];
     var selectHtml = [];
     var rowNumber = 0;
+
+    // put the reference allele at the top of every page
+    {
+        var allele = alleles.find(function(allele) { return allele.referenceForMatches; });
+        rowHtml.push("<tr data-value='" + allele.alleleName + "' data-sequence='" + allele.sequenceNumber + "' " + (!isRowVisible(allele) ? "style='display: none;'" : "") + ">");
+        $("#columnNames th").each(function() {
+            var name = $(this).data("name");
+            if(name == undefined) {
+                rowHtml.push("<td>&nbsp;</td>");
+            }
+            else {
+                var val = eval(name);
+                var tagAttributes = $(this)[0].outerHTML;
+                tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));
+                rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "&nbsp;" : val) + "</td>");
+            }
+        });
+        rowHtml.push("</tr>");
+    }
+    
     alleles.forEach(function(allele) {
         selectHtml.push("<option value='" + allele.alleleName + "'>" + allele.alleleName + "</option>");
-        if(!isRowVisible(allele)) {
+        if(!isRowVisible(allele) || allele.referenceForMatches) {
             return;
         }
         if((rowNumber >= ((page - 1)) * pageSize) && rowNumber < (page * pageSize)) {
@@ -305,7 +326,7 @@ function setUiState() {
     var dfr = $.Deferred();
     $("#working").show();
     setTimeout(function() {
-        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil(alleles.filter(isRowVisible).length / pageSize)); x++) { $("#selectPage").append("<option " + (x == page ? "selected='true'" : "") + ">" + x + "</option>"); }
+        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil(alleles.filter(isRowVisible).length / pageSize)); x++) { $("#selectPage").append("<option value = " + x + (x == page ? " selected='true'" : "") + ">" + x + (lastSort == null || lastSort == "alleleName" ? " - " + alleles.filter(isRowVisible)[(x - 1) * pageSize].alleleName : "") + "</option>"); }
         $("#inputPageSize").val(pageSize);
         populateTableRows();
         $("#sessionId").html(sessionId);
@@ -414,6 +435,7 @@ $(document).ready(function() {
         var alleleName = $(this).val();
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
         allele.referenceForMatches = true;
+        lastSort = null;
         putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     });
 
@@ -422,6 +444,7 @@ $(document).ready(function() {
         var alleleName = $(this).data("value");
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
         allele.referenceForMatches = true;
+        lastSort = null;
         putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     });
 
@@ -451,6 +474,7 @@ $(document).ready(function() {
     $("#alleleNameSort").click(function() {
         $("#working").show();
         setTimeout(function() {
+            lastSort = "alleleName";
             alleles.sort(alleleNameSort);
             page = 1;
             $("#selectPage").val(1);
@@ -462,6 +486,7 @@ $(document).ready(function() {
     $("#matchesHvrCountSort").click(function() {
         $("#working").show();
         setTimeout(function() {
+            lastSort = "hvrCountSort";
             alleles.sort(matchesHvrCountSort);
             page = 1;
             $("#selectPage").val(1);
