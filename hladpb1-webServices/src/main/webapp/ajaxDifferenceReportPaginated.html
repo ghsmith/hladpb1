@@ -326,7 +326,7 @@ function setUiState() {
     var dfr = $.Deferred();
     $("#working").show();
     setTimeout(function() {
-        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil(alleles.filter(isRowVisible).length / pageSize)); x++) { $("#selectPage").append("<option value = " + x + (x == page ? " selected='true'" : "") + ">" + x + (lastSort == null || lastSort == "alleleName" ? " - " + alleles.filter(isRowVisible)[(x - 1) * pageSize].alleleName : "") + "</option>"); }
+        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil(alleles.filter(isRowVisible).length / pageSize)); x++) { $("#selectPage").append("<option value = " + x + (x == page ? " selected='true'" : "") + ">" + x + (lastSort == null || lastSort == "alleleName" ? " - " + alleles.filter(isRowVisible)[(x - 1) * pageSize + (alleles.find(function(allele){return allele.referenceForMatches;}).sequenceNumber<alleles.filter(isRowVisible)[(x-1)*pageSize].sequenceNumber ? 1 : 0)].alleleName : "") + "</option>"); }
         $("#inputPageSize").val(pageSize);
         populateTableRows();
         $("#sessionId").html(sessionId);
@@ -398,7 +398,6 @@ function isRowVisible(allele) {
 var re = /HLA-DPB1\*([0-9]*):(.*)/;
 function alleleNameSort(a, b) {
     var A1 = Number((re.exec(a.alleleName))[1]);
-    console.log(b.alleleName)
     var B1 = Number((re.exec(b.alleleName))[1]);
     if(A1 < B1)      { return -1; }
     else if(A1 > B1) { return  1; }
@@ -435,6 +434,7 @@ $(document).ready(function() {
         var alleleName = $(this).val();
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
         allele.referenceForMatches = true;
+        page = 1;
         lastSort = null;
         putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     });
@@ -444,6 +444,7 @@ $(document).ready(function() {
         var alleleName = $(this).data("value");
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
         allele.referenceForMatches = true;
+        page = 1;
         lastSort = null;
         putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     });
