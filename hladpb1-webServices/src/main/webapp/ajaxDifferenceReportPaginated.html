@@ -424,10 +424,8 @@ function matchesHvrCountSort(a, b) {
 // Sort function.
 var hvrToSort;
 function hvrvSort(a, b) {
-    var A = a.hvrVariantMap[hvrToSort].variantId;
-    var B = b.hvrVariantMap[hvrToSort].variantId;
-    if(A == "*") { A = "ZZZZ"; }
-    if(B == "*") { B = "ZZZZ"; }
+    var A = a.hvrVariantMap[hvrToSort].variantId.replace("*", "Z");
+    var B = b.hvrVariantMap[hvrToSort].variantId.replace("*", "Z");
     if(A < B)      { return -1; }
     else if(A > B) { return  1; }
     else           { return  0; }
