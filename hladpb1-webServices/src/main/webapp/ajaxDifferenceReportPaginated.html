@@ -389,8 +389,10 @@ function setUiState() {
 // Row filtering function.
 function isRowVisible(allele) {
     rowVisible = true;
-    if(sabOnly && !allele.singleAntigenBead)                 { rowVisible = false; }
-    if(matchesHvrCountGe4Only && allele.matchesHvrCount < 4) { rowVisible = false; }
+    if(!allele.referenceForMatches) {
+        if(sabOnly && !allele.singleAntigenBead)                 { rowVisible = false; }
+        if(matchesHvrCountGe4Only && allele.matchesHvrCount < 4) { rowVisible = false; }
+    }
     return rowVisible;
 }
 
