@@ -24,11 +24,17 @@ table {
 #reportTable tr:hover {
     background-color: lightblue;
 } 
-#reportTable tr.referenceAllele, tr.referenceAllele:hover {
-    background-color: yellow;
+#reportTable tr.referenceAllele {
+    font-weight: bold;
 }
-#reportTable tr.recipientAntibodyForCompat, tr.recipientAntibodyForCompat:hover {
+#reportTable tr.recipientTypeForCompat, tr.recipientTypeForCompat:hover, #marked-left {
     background-color: orange;
+}
+#reportTable tr.donorTypeForCompat, tr.donorTypeForCompat:hover, #marked-right {
+    background-color: lightgreen;
+}
+#reportTable tr.recipientTypeForCompat.donorTypeForCompat, tr.recipientTypeForCompat.donorTypeForCompat:hover, #marked-left-and-right {
+    background: repeating-linear-gradient(to right, orange, lightgreen, orange, lightgreen, orange, lightgreen, orange, lightgreen, orange, lightgreen, orange, lightgreen, orange, lightgreen, orange, lightgreen);
 }
 th, td {
     text-align: center;
@@ -109,6 +115,9 @@ a.filterEnabled {
         </tr></table>
     </div>
     <p>
+        clicked allele counts: <span id="marked-left">&nbsp;L=<span id="marked-left-count">0</span>&nbsp;</span> <span id ="marked-left-and-right">L&amp;R=<span id="marked-left-and-right-count">0</span></span> <span id="marked-right">&nbsp;R=<span id="marked-right-count">0</span>&nbsp;</span> [<a id="markedFilter" href="javascript:void(0);">filter=<i>clicked</i></a>]
+    </p>
+    <p>
         reference allele: <select id="referenceAlleleSelect"></select>
     </p>
     
@@ -179,6 +188,7 @@ var reagentLotNumber; // the single antigen bead reagent lot number
 var alleles = []; // the array of alleles
 var sabOnly = false; // only show single antigen bead alleles
 var matchesHvrCountGe4Only = true; // only show alleles where the match count is ge 4
+var markedOnly = false; // only show marked alleles (clicked)
 var reagentLots = [];
 var lastSort;
 
@@ -339,6 +349,8 @@ function setUiState() {
         if(sabOnly) { $("#sabFilter").addClass("filterEnabled"); }
         $("#matchesHvrCountGe4Filter").removeClass("filterEnabled");
         if(matchesHvrCountGe4Only) { $("#matchesHvrCountGe4Filter").addClass("filterEnabled"); }
+        $("#markedFilter").removeClass("filterEnabled");
+        if(markedOnly) { $("#markedFilter").addClass("filterEnabled"); }
         $("#hypervariableRegionNames").children("th").each(function() {
             // This assumes that the first allele has all hypervariable regions
             // represented.
@@ -359,6 +371,12 @@ function setUiState() {
                 // This won't work if the reference allele isn't in the current page.
                 // I've moved it to just before this block.
                 //$("#referenceAlleleSelect").val(allele.alleleName);
+            }
+            if(allele.recipientTypeForCompat) {
+                $(this).addClass("recipientTypeForCompat");
+            }
+            if(allele.donorTypeForCompat) {
+                $(this).addClass("donorTypeForCompat");
             }
             $(this).children("td").each(function() {
                 if($(this).data("name") == "allele.matchesHvrCount") {
@@ -384,6 +402,9 @@ function setUiState() {
         $("#allelesLoaded").html($("#reportTable tbody tr").length);
         $("#allelesShown").html($("#reportTable tbody tr:visible").length);
         $("#allelesFiltered").html($("#reportTable tbody tr:hidden").length);
+        $("#marked-left-count").html(alleles.filter(function(allele) { return allele.recipientTypeForCompat; }).length);
+        $("#marked-left-and-right-count").html(alleles.filter(function(allele) { return allele.recipientTypeForCompat && allele.donorTypeForCompat; }).length);
+        $("#marked-right-count").html(alleles.filter(function(allele) { return allele.donorTypeForCompat; }).length);
         dfr.resolve();
     }, 1);
     return dfr.promise();
@@ -392,9 +413,10 @@ function setUiState() {
 // Row filtering function.
 function isRowVisible(allele) {
     rowVisible = true;
-    if(!allele.referenceForMatches) {
+    if(!allele.referenceForMatches && !allele.recipientTypeForCompat && !allele.donorTypeForCompat) {
         if(sabOnly && !allele.singleAntigenBead)                 { rowVisible = false; }
         if(matchesHvrCountGe4Only && allele.matchesHvrCount < 4) { rowVisible = false; }
+        if(markedOnly) { rowVisible = false; }
     }
     return rowVisible;
 }
@@ -466,21 +488,45 @@ $(document).ready(function() {
     //    putAllele(allele).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); } );
     //});
 
-    // Left-click on a row to mark it.
+    // Left-click on a row to mark it. (Using one color for recipient type...)
     $("#reportTable tbody").on("click", "tr", function() {
         var alleleName = $(this).data("value");
         var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
-        if(allele.referenceForMatches) {
-            return;
-        }
-        if(!allele.recipientAntibodyForCompat) {
-          $(this).addClass("recipientAntibodyForCompat");
+        //if(allele.referenceForMatches) {
+        //    return;
+        //}
+        allele.recipientTypeForCompat = !allele.recipientTypeForCompat;
+        if(allele.recipientTypeForCompat) {
+          $(this).addClass("recipientTypeForCompat");
         }
         else {
-          $(this).removeClass("recipientAntibodyForCompat");
+          $(this).removeClass("recipientTypeForCompat");
         }
-        allele.recipientAntibodyForCompat = !allele.recipientAntibodyForCompat;
+        $("#marked-left-count").html(alleles.filter(function(allele) { return allele.recipientTypeForCompat; }).length);
+        $("#marked-left-and-right-count").html(alleles.filter(function(allele) { return allele.recipientTypeForCompat && allele.donorTypeForCompat; }).length);
+        $("#marked-right-count").html(alleles.filter(function(allele) { return allele.donorTypeForCompat; }).length);
         putAllele(allele).done(function() { $("#working").hide(); } );
+    });
+
+    // Righs-click on a row to mark it. (...and another color for donor type.)
+    $("#reportTable tbody").on("contextmenu", "tr", function() {
+        var alleleName = $(this).data("value");
+        var allele = alleles.find(function(allele) { return alleleName == allele.alleleName; });
+        //if(allele.referenceForMatches) {
+        //    return false;
+        //}
+        allele.donorTypeForCompat = !allele.donorTypeForCompat;
+        if(allele.donorTypeForCompat) {
+          $(this).addClass("donorTypeForCompat");
+        }
+        else {
+          $(this).removeClass("donorTypeForCompat");
+        }
+        $("#marked-left-count").html(alleles.filter(function(allele) { return allele.recipientTypeForCompat; }).length);
+        $("#marked-left-and-right-count").html(alleles.filter(function(allele) { return allele.recipientTypeForCompat && allele.donorTypeForCompat; }).length);
+        $("#marked-right-count").html(alleles.filter(function(allele) { return allele.donorTypeForCompat; }).length);
+        putAllele(allele).done(function() { $("#working").hide(); } );
+        return false; // don't show context menu
     });
 
     // Single antigen bead filter toggle on/off. This is handled locally.
@@ -499,6 +545,17 @@ $(document).ready(function() {
         $("#working").show();
         setTimeout(function() {
             matchesHvrCountGe4Only = !matchesHvrCountGe4Only;
+            page = 1;
+            $("#selectPage").val(1);
+            setUiState().done(function() { $("#working").hide(); });
+        }, 1);
+    });
+
+    // Marked filter toggle on/off. This is handled locally.
+    $("#markedFilter").click(function() {
+        $("#working").show();
+        setTimeout(function() {
+            markedOnly = !markedOnly;
             page = 1;
             $("#selectPage").val(1);
             setUiState().done(function() { $("#working").hide(); });
