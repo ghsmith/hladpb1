@@ -81,6 +81,11 @@ public class Allele implements Serializable, Comparable<Allele> {
     private Boolean recipientAllele2;
     private Boolean donorAllele1;
     private Boolean donorAllele2;
+
+    // These fields are not used by any algorithms and are only provided as
+    // a convenience for clients.
+    private Boolean selection1;
+    private Boolean selection2;
     
     public Integer getSequenceNumber() {
         return sequenceNumber;
@@ -240,6 +245,22 @@ public class Allele implements Serializable, Comparable<Allele> {
 
     public void setProteinSequenceLength(Integer proteinSequenceLength) {
         this.proteinSequenceLength = proteinSequenceLength;
+    }
+
+    public Boolean getSelection1() {
+        return selection1;
+    }
+
+    public void setSelection1(Boolean selection1) {
+        this.selection1 = selection1;
+    }
+
+    public Boolean getSelection2() {
+        return selection2;
+    }
+
+    public void setSelection2(Boolean selection2) {
+        this.selection2 = selection2;
     }
     
 }
