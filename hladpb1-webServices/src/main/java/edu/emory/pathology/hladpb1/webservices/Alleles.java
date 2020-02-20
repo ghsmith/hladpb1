@@ -120,7 +120,9 @@ public class Alleles {
             //    as a particular allele (primary or alternate), but not recipient
             //    and donor types (e.g., if you select 04:01 as a recipient or
             //    donor type, then you are also selecting 04:01[a], 04:01[b],
-            //    and 04:01[c].
+            //    and 04:01[c]. In practice, having alleles assigned to multiple
+            //    HVRV in the same HVR is probably too complicated, so all this
+            //    stuff is probably not worth thinking too hard about.
             {
                 String baseAlleleName = allele.getAlleleName().replaceAll("\\[.*\\]", "");
                 if(
@@ -160,6 +162,10 @@ public class Alleles {
             // 5. Do the compatibility evaluation.
             SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
 
+            // 6. Set the selection attributes.
+            allele.setSelection1(updateAllele.getSelection1());
+            allele.setSelection2(updateAllele.getSelection2());
+            
         }
         
     }
