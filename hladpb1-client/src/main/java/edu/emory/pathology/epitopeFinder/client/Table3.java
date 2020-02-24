@@ -1,14 +1,15 @@
-package edu.emory.pathology.hladpb1.client;
+package edu.emory.pathology.epitopeFinder.client;
 
+import edu.emory.pathology.epitopeFinder.imgtdb.data.EpRegEpitope;
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
 import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegion;
-import edu.emory.pathology.hladpb1.imgtdb.data.HypervariableRegionVariant;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.ws.rs.client.Client;
@@ -23,7 +24,7 @@ import org.glassfish.jersey.client.ClientConfig;
  *
  * @author Geoffrey H. Smith
  */
-public class Table1 {
+public class Table3 {
 
     // data warehouse (JDBC)
     static Connection conn;
@@ -169,134 +170,80 @@ public class Table1 {
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.entity("", MediaType.APPLICATION_JSON));
     }
+
+    // for sorting the epitope list (I'm surprised I didn't do this in the service)
+    public static class EpitopeComparator implements Comparator<EpRegEpitope> {
+        Pattern pat = Pattern.compile("^([0-9]*)(.*)");
+        @Override
+        public int compare(EpRegEpitope o1, EpRegEpitope o2) {
+            Matcher mat1 = pat.matcher(o1.getEpitopeName()); mat1.find();
+            Matcher mat2 = pat.matcher(o2.getEpitopeName()); mat2.find();
+            String s1 = String.format("%05d%s", Integer.parseInt(mat1.group(1)), mat1.group(2));
+            String s2 = String.format("%05d%s", Integer.parseInt(mat2.group(1)), mat2.group(2));
+            return s1.compareTo(s2);
+        }
+    }
     
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, FileNotFoundException {
 
-        Class.forName("oracle.jdbc.driver.OracleDriver");
-        conn = DriverManager.getConnection("jdbc:oracle:thin:@***:1521/***","***","***");
-        conn.setAutoCommit(false);
-        conn.createStatement().execute("set role all");
-
-        putReagentLot("LABScreen Class II Standard w/combinatorial HVRVs (various lots)");
-        
-        // report header
-        {
-            List<HypervariableRegion> hvrs = getHypervariableRegions();
-            System.out.print("collectionDt, ptHash, abCount");
-            for(HypervariableRegion hvr : hvrs) {
-                for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
-                    System.out.print(String.format(", %s%s",
-                        hvr.getHypervariableRegionName(),
-                        hvrv.getVariantId()
-                    ));
+        putReagentLot("LABScreen Class II Standard w/combo HVRVs (various lots)");
+        Set<String> perfectMatches = new HashSet<>();
+        Set<String> perfectMatchesNoG = new HashSet<>();
+        Set<String> imperfectMatchesNoG_5 = new HashSet<>();
+        Set<String> imperfectMatchesNoG_4 = new HashSet<>();
+        Set<String> imperfectMatchesNoG_3 = new HashSet<>();
+        Set<String> imperfectMatchesNoG_2 = new HashSet<>();
+        Set<String> imperfectMatchesNoG_1 = new HashSet<>();
+        Set<String> imperfectMatchesNoG_0 = new HashSet<>();
+        List<Allele> as = getAlleles();
+        as.stream().filter(a -> a.getSingleAntigenBead()).forEach(a -> {
+            a.setReferenceForMatches(true);
+            putAllele(a);
+            List<Allele> bs = getAlleles();
+            bs.stream().filter(b -> !b.getSingleAntigenBead() && !b.getNullAllele()).forEach(b -> {
+                if(b.getMatchesHvrCount() == 7) {
+                    perfectMatches.add(b.getAlleleName());
                 }
-            }
-            System.out.print(", hlaTypes, abSpecs");
-            System.out.println();
-        }
-        
-        ResultSet rs = conn.createStatement().executeQuery(resultSelect);
-        
-        while(rs.next()) {
-
-            List<String> specificities = new ArrayList<>();
-            List<String> hlaTypes = new ArrayList<>();
-
-            // parse the DP specificities
-            String specificityUnparsed = rs.getString("SPECIFICITY").replace(":", ""); // some people using "DP:" and some people don't
-            {
-                Pattern pat = Pattern.compile("DP([0-9 ]*)");
-                Matcher mat = pat.matcher(specificityUnparsed);
-                mat.find();
-                for(String a : mat.group(1).split(" ")) {
-                    specificities.add(String.format("%02d:01", Integer.parseInt(a))); // pad to 2 digits
-                    // if "DP4," also add "04:02"
-                    if(a.equals("4")) {
-                        specificities.add("04:02");
-                    }
+                if((b.getMatchesHvrCount() == 6 && !b.getHvrVariantMap().get("g").getMatchesReference())
+                   || (b.getMatchesHvrCount() == 7 && b.getHvrVariantMap().get("g").getMatchesReference())) {
+                    perfectMatchesNoG.add(b.getAlleleName());
                 }
-            }
-
-            // parse the "allele-specific" specificities from the comments
-            String commentsUnparsed = rs.getString("COMMENTS");
-            if(commentsUnparsed != null) {
-                Pattern pat = Pattern.compile("DPB1\\*([0-9:]*)");
-                Matcher mat = pat.matcher(commentsUnparsed);
-                while(mat.find()) {
-                    specificities.add(mat.group(1));
+                if((b.getMatchesHvrCount() == 5 && !b.getHvrVariantMap().get("g").getMatchesReference())
+                   || (b.getMatchesHvrCount() == 6 && b.getHvrVariantMap().get("g").getMatchesReference())) {
+                    imperfectMatchesNoG_5.add(b.getAlleleName());
                 }
-            }
-
-            // parse the HLA type
-            String hlaTypeUnparsed = rs.getString("HLA_TYPE");
-            {
-                Pattern pat = Pattern.compile("DPB1\\*.([0-9:]*)[A-Z]?.(([0-9:]*)[A-Z]?|XX)"); // some of the things that look like spaces aren't (vertical tabs?)
-                Matcher mat = pat.matcher(hlaTypeUnparsed);
-                if(!mat.find()) {
-                    continue;
+                if((b.getMatchesHvrCount() == 4 && !b.getHvrVariantMap().get("g").getMatchesReference())
+                   || (b.getMatchesHvrCount() == 5 && b.getHvrVariantMap().get("g").getMatchesReference())) {
+                    imperfectMatchesNoG_4.add(b.getAlleleName());
                 }
-                hlaTypes.add(mat.group(1) + (mat.group(1).contains(":") ? "" : ":")); // add colon if one is not present
-                if(mat.group(3) != null && mat.group(3).length() > 0) {
-                    hlaTypes.add(mat.group(3) + (mat.group(3).contains(":") ? "" : ":")); // add colon if one is not present
+                if((b.getMatchesHvrCount() == 3 && !b.getHvrVariantMap().get("g").getMatchesReference())
+                   || (b.getMatchesHvrCount() == 4 && b.getHvrVariantMap().get("g").getMatchesReference())) {
+                    imperfectMatchesNoG_3.add(b.getAlleleName());
                 }
-            }
-            
-            // use the web service
-            //
-            // since this is using a starts-with allele name match, it will set
-            // the antibody flag on the primary and all alternate alleles
-            reset();
-            putReagentLot("LABScreen Class II Standard w/combinatorial HVRVs (various lots)");
-            List<Allele> alleles = getAlleles();
-            for(String specificity : specificities) {
-                alleles.stream().filter((a) -> a.getAlleleName().startsWith("HLA-DPB1*" + specificity)).forEach(
-                    (a) -> {
-                        a.setRecipientAntibodyForCompat(true);
-                        putAllele(a);
-                    }
-                );
-            }
-            for(String hlaType : hlaTypes) {
-                alleles.stream().filter((a) -> a.getAlleleName().startsWith("HLA-DPB1*" + hlaType)).forEach(
-                    (a) -> {
-                        a.setRecipientTypeForCompat(true);
-                        putAllele(a);
-                    }
-                );
-            }
-            alleles = getAlleles();
-            List<HypervariableRegion> hvrs = getHypervariableRegions();
-
-            // report body
-            //
-            // note that the total antibody count only considers the primary and
-            // not alterate alleles; both primary and alternate alleles are
-            // specified as antibodies (alterate alleles names end with a
-            // closing square bracket)
-            System.out.print(String.format("%s, %s, %d",
-                rs.getString("DAY_COLLECT_DT"),
-                rs.getString("PT_HASH"),
-                alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat() && !a.getAlleleName().endsWith("]")).count()
-            ));
-            for(HypervariableRegion hvr : hvrs) {
-                for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
-                    System.out.print(String.format(", %d/%d/%d%s",
-                        hvrv.getBeadAlleleRefList().size(),
-                        hvrv.getBeadAlleleRefList().size() - hvrv.getCompatPositiveSabCount(),
-                        alleles.stream().filter((a) -> a.getRecipientAntibodyForCompat() && !a.getAlleleName().endsWith("]")).count() - hvrv.getCompatPositiveSabCount(),
-                        hvrv.getCompatIsRecipientEpitope() ? "*" : ""
-                    ));
+                if((b.getMatchesHvrCount() == 2 && !b.getHvrVariantMap().get("g").getMatchesReference())
+                   || (b.getMatchesHvrCount() == 3 && b.getHvrVariantMap().get("g").getMatchesReference())) {
+                    imperfectMatchesNoG_2.add(b.getAlleleName());
                 }
-            }
-            System.out.print(String.format(", \"%s\"", hlaTypes));
-            System.out.print(String.format(", \"%s\"", specificities));
-            System.out.println();
-            
-        }
-
-        rs.close();
-        conn.close();
-        
+                if((b.getMatchesHvrCount() == 1 && !b.getHvrVariantMap().get("g").getMatchesReference())
+                   || (b.getMatchesHvrCount() == 2 && b.getHvrVariantMap().get("g").getMatchesReference())) {
+                    imperfectMatchesNoG_1.add(b.getAlleleName());
+                }
+                if((b.getMatchesHvrCount() == 0 && !b.getHvrVariantMap().get("g").getMatchesReference())
+                   || (b.getMatchesHvrCount() == 1 && b.getHvrVariantMap().get("g").getMatchesReference())) {
+                    imperfectMatchesNoG_0.add(b.getAlleleName());
+                }
+            });
+        });
+        System.out.println(as.size());
+        System.out.println(as.stream().filter(a -> !a.getNullAllele()).count());
+        System.out.println(perfectMatches.size());
+        System.out.println(perfectMatchesNoG.size());
+        System.out.println(imperfectMatchesNoG_5.size());
+        System.out.println(imperfectMatchesNoG_4.size());
+        System.out.println(imperfectMatchesNoG_3.size());
+        System.out.println(imperfectMatchesNoG_2.size());
+        System.out.println(imperfectMatchesNoG_1.size());
+        System.out.println(imperfectMatchesNoG_0.size());
     }
     
 }

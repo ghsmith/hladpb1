@@ -2,12 +2,26 @@ package edu.emory.pathology.hladpb1.imgtdb.data;
 
 import java.io.Serializable;
 import java.util.SortedMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Data class for an allele.
  * @author ghsmith
  */
-public class Allele implements Serializable {
+public class Allele implements Serializable, Comparable<Allele> {
+
+    Pattern pat = Pattern.compile("HLA-DPB1\\*([0-9]*):(.*)");
+    
+    @Override
+    public int compareTo(Allele o) {
+        Matcher matThis = pat.matcher(this.getAlleleName());
+        matThis.find();
+        Matcher matOther = pat.matcher(o.getAlleleName());
+        matOther.find();
+        return(String.format("%04d:%s", Integer.parseInt(matThis.group(1)), matThis.group(2))
+            .compareTo(String.format("%04d:%s", Integer.parseInt(matOther.group(1)), matOther.group(2))));
+    }
 
     // Inner class to make it convenient to reference hypervariable region with
     // the matchesReference attribute.
@@ -67,6 +81,11 @@ public class Allele implements Serializable {
     private Boolean recipientAllele2;
     private Boolean donorAllele1;
     private Boolean donorAllele2;
+
+    // These fields are not used by any algorithms and are only provided as
+    // a convenience for clients.
+    private Boolean selection1;
+    private Boolean selection2;
     
     public Integer getSequenceNumber() {
         return sequenceNumber;
@@ -226,6 +245,22 @@ public class Allele implements Serializable {
 
     public void setProteinSequenceLength(Integer proteinSequenceLength) {
         this.proteinSequenceLength = proteinSequenceLength;
+    }
+
+    public Boolean getSelection1() {
+        return selection1;
+    }
+
+    public void setSelection1(Boolean selection1) {
+        this.selection1 = selection1;
+    }
+
+    public Boolean getSelection2() {
+        return selection2;
+    }
+
+    public void setSelection2(Boolean selection2) {
+        this.selection2 = selection2;
     }
     
 }
