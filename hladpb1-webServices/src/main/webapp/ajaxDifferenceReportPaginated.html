@@ -108,6 +108,12 @@ a.sort {
         (<a id="resetSessionLink" href="javascript:void(0);">reset session</a>).
     </p>
     <p>
+        Set MFI values from <a href="https://github.com/IHIW/Converters/blob/master/IHIW-haml_version_w0_3_3.xsd">HAML</a> file:
+        <input id="hamlFile" type="file" name="file" style="border: 1px solid lightgray;"/>
+        (optional threshold MFI: <input id="mfiThreshold" type="text" size="6"/>)
+        <input id="uploadHamlButton" type="button" value="Upload"/>
+    </p>
+    <p>
         This report is for research use only.
     </p>
     <div style="margin-top: 10px; margin-bottom: 10px; border: 1px solid black; width: 100%; background-color: lightgray;">
@@ -130,8 +136,9 @@ a.sort {
     <table id="reportTable">
         <thead>
             <tr>
-                <th class="alleleName"></th>
+                <th class="alleleName">&nbsp;</th>
                 <th>[<a id="sabFilter" href="javascript:void(0);">filter=Y</a>]</th>
+                <th>&nbsp;</th>
                 <th>[<a id="matchesHvrCountGe4Filter" href="javascript:void(0);">filter&ge;4)</a>]</th>
                 <th colspan="7" style="border-bottom: 1px solid black;">hypervariable<br/>region ID</th>
                 <th>&nbsp;</th>
@@ -140,6 +147,7 @@ a.sort {
             <tr id="columnNames">
                 <th data-name="allele.alleleName" class="alleleName">allele name</th>
                 <th data-name="allele.singleAntigenBead ? 'Y' : '&nbsp;'">SAB</th>
+                <th data-name="allele.mfi">MFI</th>
                 <th data-name="allele.matchesHvrCount" class="matches">matches</th>
                 <th data-hvr="a" data-name="'a' + allele.hvrVariantMap['a'].variantId" data-container="allele.hvrVariantMap['a']" class="hvrId">a</th>
                 <th data-hvr="b" data-name="'b' + allele.hvrVariantMap['b'].variantId" data-container="allele.hvrVariantMap['b']" class="hvrId">b</th>
@@ -154,6 +162,7 @@ a.sort {
             <tr id="hypervariableRegionNames">
                 <th style="text-align: left;">[<a class="sort alleleNameSort" href="javascript:void(0);">&darr;</a>]</th>
                 <th>&nbsp;</th>
+                <th>[<a class="sort mfiSort" href="javascript:void(0);">&darr;</a>]</th>
                 <th>[<a class="sort matchesSort" href="javascript:void(0);">&darr;</a>]</th>
                 <th>[<a class="sort hvrvSort hvrvSort-a" data-hvr="a" href="javascript:void(0);">&darr;</a>]</th>
                 <th>[<a class="sort hvrvSort hvrvSort-b" data-hvr="b" href="javascript:void(0);">&darr;</a>]</th>
@@ -274,6 +283,23 @@ function putReagentLot(reagentLot) {
     });
 }
 
+function uploadHaml() {
+    var fd = new FormData();
+    fd.append("file", $("#hamlFile")[0].files[0]);
+    fd.append("mfiThreshold", $("#mfiThreshold").val());
+    return $.ajax({
+       url: "/hladpb1/resources/alleles/uploadHaml",
+       type: "PUT",
+       data: fd,
+       processData: false,
+       contentType: false,
+       error: function(jqXHR, textStatus, errorMessage) {
+           alert(errorMessage);
+           $("#working").hide();           
+       }
+    });
+}  
+
 // Populate rows in the report table from the alleles array. Note that this is
 // only done once. All sorting and filtering is done locally. Changing the
 // reference allele does involve a getAlleles() call, but the HTML table rows
@@ -298,6 +324,7 @@ function populateTableRows() {
                 var val = eval(name);
                 var tagAttributes = $(this)[0].outerHTML;
                 tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));                
+                if(name == "allele.mfi") { tagAttributes = " style='text-align: right;'"; }
                 rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "&nbsp;" : val) + "</td>");
             }
         });
@@ -320,6 +347,7 @@ function populateTableRows() {
                     var val = eval(name);
                     var tagAttributes = $(this)[0].outerHTML;
                     tagAttributes = tagAttributes.substring(4, tagAttributes.indexOf(">"));
+                    if(name == "allele.mfi") { tagAttributes = " style='text-align: right;'"; }
                     rowHtml.push("<td " + tagAttributes + ">" + (val == undefined ? "&nbsp;" : val) + "</td>");
                 }
             });
@@ -444,6 +472,15 @@ function alleleNameSort(a, b) {
         else { return 0; }
     }
 };
+
+// Sort function.
+function mfiSort(a, b) {
+    var A = a.mfi == null ? -1 : a.mfi;
+    var B = b.mfi == null ? -1 : b.mfi;
+    if(A < B)      { return 1; }
+    else if(A > B) { return -1; }
+    else           { return alleleNameSort(a, b); }
+}
 
 // Sort function.
 function matchesHvrCountSort(a, b) {
@@ -590,6 +627,18 @@ $(document).ready(function() {
     });
     
     // Click on sort. This is handled locally.
+    $("th a.mfiSort").click(function() {
+        $("#working").show();
+        setTimeout(function() {
+            lastSort = "mfiSort";
+            alleles.sort(mfiSort);
+            page = 1;
+            $("#selectPage").val(1);
+            setUiState().done(function() { $("#working").hide(); });
+        }, 1);
+    });
+    
+    // Click on sort. This is handled locally.
     $("th a.matchesSort").click(function() {
         $("#working").show();
         setTimeout(function() {
@@ -664,6 +713,17 @@ $(document).ready(function() {
         reagentLotNumber = $(this).val();
         putReagentLot(reagentLotNumber).done(function() { window.location.reload(); } );
     });
+
+    $("#uploadHamlButton").click(function() {
+        if($("#hamlFile")[0].files.length > 0) {
+            $("#working").show();
+            setTimeout(function() {
+                lastSort = null;
+                uploadHaml().then(getAlleles).then(setUiState).done(function() { $("#working").hide(); });
+            }, 1);
+        }
+    });
+
 
 });
 

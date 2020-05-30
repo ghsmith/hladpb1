@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:HAML.Namespace" targetNamespace="urn:HAML.Namespace" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <!-- XML Schema Generated from XML Document on Fri May 31 2019 11:59:48 GMT-0500 (Central Daylight Time) -->
+  <!-- with XmlGrid.net Free Online Service http://xmlgrid.net -->
+  <xs:element name="haml">
+    <!-- 
+             Description:
+             ____________
+             Version: w0.3 - The workshop haml.xsd is limited to the essential aspects that can directly be extracted from the vendors' export files. 
+			 Requested options for full version are excluded. See Full version for these aspects.
+             Root element of the document identifying it as an HAML message. 
+             Must contain the version of HAML that the modeled data in this document uses.
+             
+             Children: 
+             ____________ 
+             - patient-antibody-assessment (required, qty: 1 or more) 
+             
+             Attributes:
+             ____________ 
+             - version: Version of HAML the document. 
+             -->
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="patient-antibody-assessment" minOccurs="1" maxOccurs="unbounded">
+          <!-- 
+                           Description:
+                           ____________
+                           The patient-antibody-assessment element defines the characteristics of the sample that was analyzed. 
+            
+                           Children: 
+                           ____________ 
+                           - solid-phase-panel (optional, qty: 0 or more)
+            
+                           Attributes:
+                           ____________ 
+                           - sampleID
+                           - patientID
+                           - reporting-centerID
+                           - sample-test-date
+						   - negative-control-MFI
+						   - positive-control-MFI
+                           -->
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="solid-phase-panel" minOccurs="0" maxOccurs="unbounded">
+                <!-- Description:
+                                             ____________
+                                             The solid-phase-panel element defines the characteristics and results of the Luminex Single/Multi Antigen assay that was executed. 
+            
+                                             Children: 
+                                             ____________ 
+                                             - bead              (optional, qty: 1 or more)
+                                             Attributes:
+                                             ____________ 
+                                             - kit-manufacturer
+                                             - kit-version
+                                             - lot-number
+                                             -->
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="bead" minOccurs="1" maxOccurs="unbounded">
+                      <!-- 
+                                                       Description:
+                                                       ____________
+                                                       The bead element defines the characteristics of each specific Luminex Single/Multi Antigen bead that was used in the analyses. 
+    
+                                                       Children: 
+                                                       ____________ 
+                                                       -  
+     
+                                                       Attributes:
+                                                       ____________ 
+                                                       - HLA-allele-specificity [PM pos beads en neg beads: how to name?]
+                                                       - raw-mfi
+                                                  -->
+                      <xs:complexType>
+                        <xs:attribute name="HLA-allele-specificity" type="xs:string" />
+                        <xs:attribute name="raw-MFI" type="xs:int" />
+                        <xs:attribute name="Ranking" type="xs:int" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="kit-manufacturer">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="OneLambda" />
+                        <xs:enumeration value="Immucor" />
+                        <xs:enumeration value="Other" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="lot" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="sampleID" type="xs:string" />
+            <xs:attribute name="patientID" type="xs:string" />
+            <xs:attribute name="reporting-centerID" type="xs:string" />
+            <xs:attribute name="sample-test-date" type="xs:date" />
+			<xs:attribute name="negative-control-MFI" type="xs:int" />
+			<xs:attribute name="positive-control-MFI" type="xs:int" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" />
+      <!-- in workshop version the haml version will be hardcoded. -->
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
