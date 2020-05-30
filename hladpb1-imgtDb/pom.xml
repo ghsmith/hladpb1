@@ -18,7 +18,7 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/imgt/hla.xsd</include>
+                                <include>jaxb/hla.xsd</include>
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-imgt.episode</episodeFile>
                             <generatePackage>edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt</generatePackage>
@@ -31,7 +31,7 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/imgt/hladpb1HypervariableRegion.xsd</include>
+                                <include>jaxb/hladpb1HypervariableRegion.xsd</include>
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-emory.episode</episodeFile>
                             <generatePackage>edu.emory.pathology.hladpb1.imgtdb.jaxb.emory</generatePackage>

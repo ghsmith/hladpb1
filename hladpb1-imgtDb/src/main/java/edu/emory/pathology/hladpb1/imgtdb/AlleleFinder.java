@@ -311,6 +311,10 @@ public class AlleleFinder {
                 // additional alleles "alternate alleles" to distinguish them
                 // from the "primary allele" for the moment and hope they go
                 // away.
+                // THIS IS WAY TOO COMPLICATED. I HAVE EFFECTIVELY RETIRED THIS
+                // BY NOT CREATING ANY REAGENT LOTS WHERE ONE ALLELE HAS
+                // MULTIPLE HYPERVARIABLE REGION VARIANT ASSIGNMENTS FOR THE
+                // SAME HYPERVARIABLE REGION.
                 int matchIndex = 0;
                 for(HypervariableRegionVariant variant : hypervariableRegion.getVariantMap().values()) {
                     for(String proteinSequence : variant.getProteinSequenceList()) {

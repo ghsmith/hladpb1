@@ -11,6 +11,13 @@ public class ReagentLot implements Serializable {
    
     private String lotNumber;
 
+    public ReagentLot() {
+    }
+
+    public ReagentLot(String lotNumber) {
+        this.lotNumber = lotNumber;
+    }
+    
     public String getLotNumber() {
         return lotNumber;
     }

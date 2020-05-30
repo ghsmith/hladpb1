@@ -12,7 +12,7 @@ public class HypervariableRegionVariant implements Serializable {
 
     // Inner class to make it convenient to reference single antigen beads and
     // their positivitiy.
-    public static class BeadAlleleRef {
+    public static class BeadAlleleRef implements Serializable {
         
         private String alleleName;
         private Boolean compatBeadPositive;

@@ -16,6 +16,8 @@ public class ReagentLotFinder {
     private static final Logger LOG = Logger.getLogger(ReagentLotFinder.class.getName());
     
     private String xmlFileName;
+    
+    private List<ReagentLot> reagentLots = null;
 
     public ReagentLotFinder() {
     }
@@ -26,15 +28,21 @@ public class ReagentLotFinder {
     }
 
     public List<ReagentLot> getReagentLots() {
-        List<ReagentLot> reagentLots = new ArrayList<>();
-        JaxbEmoryFinder emoryFinder = new JaxbEmoryFinder(xmlFileName);
-        edu.emory.pathology.hladpb1.imgtdb.jaxb.emory.ReagentLots emoryReagentLots = emoryFinder.getReagentLots();
-        emoryReagentLots.getReagentLot().stream().forEach((rl) -> {
-            ReagentLot reagentLot = new ReagentLot();
-            reagentLot.setLotNumber(rl.getLotNumber());
-            reagentLots.add(reagentLot);
-        });
+        if(reagentLots == null) {
+            reagentLots = new ArrayList<>();
+            JaxbEmoryFinder emoryFinder = new JaxbEmoryFinder(xmlFileName);
+            edu.emory.pathology.hladpb1.imgtdb.jaxb.emory.ReagentLots emoryReagentLots = emoryFinder.getReagentLots();
+            emoryReagentLots.getReagentLot().stream().forEach((rl) -> {
+                ReagentLot reagentLot = new ReagentLot();
+                reagentLot.setLotNumber(rl.getLotNumber());
+                reagentLots.add(reagentLot);
+            });
+        }
         return reagentLots;
     }
 
+    public ReagentLot getReagentLot(String lotNumber) {
+        return getReagentLots().stream().filter((reagentLot) -> (lotNumber.equals(reagentLot.getLotNumber()))).findFirst().get();
+    }
+    
 }

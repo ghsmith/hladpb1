@@ -72,4 +72,9 @@ public class HypervariableRegionFinder {
         return reagentLotNumber;
     }
 
+    public void setCustomPanel(List<HypervariableRegion> customHypervariableRegionList, String customReagentLotNumber) {
+        hypervariableRegionList = customHypervariableRegionList;
+        reagentLotNumber = customReagentLotNumber;
+    }
+    
 }
