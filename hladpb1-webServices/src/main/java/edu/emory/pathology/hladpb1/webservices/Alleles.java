@@ -1,8 +1,6 @@
 package edu.emory.pathology.hladpb1.webservices;
 
 import edu.emory.pathology.hladpb1.imgtdb.data.Allele;
-import edu.emory.pathology.hladpb1.webservices.jaxb.haml.Haml;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,13 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.apache.commons.lang.SerializationUtils;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
  * This class implements the Alleles RESTful web services.
@@ -176,41 +168,6 @@ public class Alleles {
             
         }
         
-    }
-    
-    @PUT
-    @Path("/uploadHaml")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public void uploadHaml(@FormDataParam("file") InputStream uploadedInputStream, @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("mfiThreshold") String mfiThreshold) throws JAXBException {
-        Integer parsedMfiThreshold = null;
-        try {
-            parsedMfiThreshold = Integer.valueOf(mfiThreshold);
-        }
-        catch(Exception e) {}
-        System.out.println(parsedMfiThreshold);
-        JAXBContext jc = JAXBContext.newInstance(new Class[] { Haml.class });
-        Unmarshaller unmarshaller = jc.createUnmarshaller();
-        Haml haml = (Haml)unmarshaller.unmarshal(uploadedInputStream);
-        for(Allele allele : SessionFilter.alleleFinder.get().getAlleleList()) {
-            allele.setMfi(null);
-            if(parsedMfiThreshold != null) {
-                allele.setSelection1(false);
-            }
-        }
-        for(Haml.PatientAntibodyAssessment.SolidPhasePanel spp : haml.getPatientAntibodyAssessment().get(0).getSolidPhasePanel()) {
-            for(Haml.PatientAntibodyAssessment.SolidPhasePanel.Bead bead : spp.getBead()) {
-                for(String alleleName : bead.getHLAAlleleSpecificity().split(",")) {
-                    for(Allele allele : SessionFilter.alleleFinder.get().getAlleleList()) {
-                        if(allele.getAlleleName().contains(alleleName)) {
-                            allele.setMfi(bead.getRawMFI());
-                            if(parsedMfiThreshold != null) {
-                                allele.setSelection1(allele.getMfi() >= parsedMfiThreshold);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
     
 }

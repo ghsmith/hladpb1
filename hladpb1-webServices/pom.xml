@@ -71,7 +71,7 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/haml/IHIW-haml_version_w0_3_3.xsd</include>
+                                <include>jaxb/IHIW-haml_version_w0_3_3.xsd</include>
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-haml.episode</episodeFile>
                             <generatePackage>edu.emory.pathology.hladpb1.webservices.jaxb.haml</generatePackage>

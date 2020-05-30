@@ -108,9 +108,8 @@ a.sort {
         (<a id="resetSessionLink" href="javascript:void(0);">reset session</a>).
     </p>
     <p>
-        Set MFI values from <a href="https://github.com/IHIW/Converters/blob/master/IHIW-haml_version_w0_3_3.xsd">HAML</a> file:
+        Custom <a href="https://github.com/IHIW/Converters/blob/master/IHIW-haml_version_w0_3_3.xsd">HAML</a> panel:
         <input id="hamlFile" type="file" name="file" style="border: 1px solid lightgray;"/>
-        (optional threshold MFI: <input id="mfiThreshold" type="text" size="6"/>)
         <input id="uploadHamlButton" type="button" value="Upload"/>
     </p>
     <p>
@@ -286,9 +285,8 @@ function putReagentLot(reagentLot) {
 function uploadHaml() {
     var fd = new FormData();
     fd.append("file", $("#hamlFile")[0].files[0]);
-    fd.append("mfiThreshold", $("#mfiThreshold").val());
     return $.ajax({
-       url: "/hladpb1/resources/alleles/uploadHaml",
+       url: "/hladpb1/resources/session/uploadHaml",
        type: "PUT",
        data: fd,
        processData: false,
@@ -715,15 +713,11 @@ $(document).ready(function() {
     });
 
     $("#uploadHamlButton").click(function() {
+        $("#working").show();
         if($("#hamlFile")[0].files.length > 0) {
-            $("#working").show();
-            setTimeout(function() {
-                lastSort = null;
-                uploadHaml().then(getAlleles).then(setUiState).done(function() { $("#working").hide(); });
-            }, 1);
+            uploadHaml().done(function() { window.location.reload(); });
         }
     });
-
 
 });
 
