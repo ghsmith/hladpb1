@@ -87,6 +87,8 @@ public class Allele implements Serializable, Comparable<Allele> {
     private Boolean selection1;
     private Boolean selection2;
     
+    private Integer mfi;
+    
     public Integer getSequenceNumber() {
         return sequenceNumber;
     }
@@ -261,6 +263,14 @@ public class Allele implements Serializable, Comparable<Allele> {
 
     public void setSelection2(Boolean selection2) {
         this.selection2 = selection2;
+    }
+
+    public Integer getMfi() {
+        return mfi;
+    }
+
+    public void setMfi(Integer mfi) {
+        this.mfi = mfi;
     }
     
 }
