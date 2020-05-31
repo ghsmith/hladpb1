@@ -412,17 +412,20 @@ public class AlleleFinder {
         });
         hypervariableRegionFinder.getHypervariableRegionList().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
             variant.setCompatPositiveSabCount(new Long(variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue());
-            variant.setCompatPositiveSabPct(
-                (100 * new Long(variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue())
-                / new Long(variant.getBeadAlleleRefList().stream().count()).intValue()
-            );
+            variant.setCompatPositiveSabPct(null);
+            if(new Long(variant.getBeadAlleleRefList().stream().count()).intValue() > 0) {
+                variant.setCompatPositiveSabPct(
+                    (100 * new Long(variant.getBeadAlleleRefList().stream().filter((beadAlleleRef) -> (beadAlleleRef.getCompatBeadPositive())).count()).intValue())
+                    / new Long(variant.getBeadAlleleRefList().stream().count()).intValue()
+                );
+            }
         }); });
 
         // 4. Determine is an antibody for each hypervariable region variant
         //    epitope is considered to be present.
         hypervariableRegionFinder.getHypervariableRegionList().stream().forEach((hypervariableRegion) -> { hypervariableRegion.getVariantMap().values().stream().forEach((variant) -> {
             variant.setCompatAntibodyConsideredPresent(
-                (variant.getCompatPositiveSabPct().equals(100) || variant.getKnownReactiveEpitopeForCompat())
+                (variant.getCompatPositiveSabPct() != null && variant.getCompatPositiveSabPct().equals(100) || variant.getKnownReactiveEpitopeForCompat())
                 && !variant.getCompatIsRecipientEpitope()
             );
         }); });
