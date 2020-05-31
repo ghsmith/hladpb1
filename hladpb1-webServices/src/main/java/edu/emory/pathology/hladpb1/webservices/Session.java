@@ -12,6 +12,10 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -89,37 +93,31 @@ public class Session {
         for(Allele allele : alleleFinder.getAlleleList()) {
             allele.setSingleAntigenBead(false);
         }
+        Pattern pattern = Pattern.compile("^(HLA-DPB1\\*[^:]+:[^:]+).*$");
         for(HypervariableRegion hvr : customHypervariableRegionList) {
             for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
                 hvrv.setBeadAlleleRefList(new ArrayList<>());
                 for(Haml.PatientAntibodyAssessment.SolidPhasePanel spp : haml.getPatientAntibodyAssessment().get(0).getSolidPhasePanel()) {
                     for(Haml.PatientAntibodyAssessment.SolidPhasePanel.Bead bead : spp.getBead()) {
                         for(String alleleName : bead.getHLAAlleleSpecificity().split(",")) {
-                            for(Allele allele : alleleFinder.getAlleleList()) {
+                            for(Allele allele : alleleFinder.getAlleleList().stream().filter(a -> a.getSynonymousAlleleName() == null).collect(Collectors.toList())) {
                                 if(allele.getAlleleName().contains(alleleName)) {
+                                    Matcher matcher = pattern.matcher(allele.getAlleleName());
+                                    matcher.matches();
+                                    String shortAlleleName = matcher.group(1);
                                     allele.setSingleAntigenBead(true);
                                     if(allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId().equals(hvrv.getVariantId())) {
-                                        HypervariableRegionVariant.BeadAlleleRef beadAlleleRef = new HypervariableRegionVariant.BeadAlleleRef();
-                                        beadAlleleRef.setAlleleName(alleleName);
-                                        hvrv.getBeadAlleleRefList().add(beadAlleleRef);
+                                        if(hvrv.getBeadAlleleRefList().stream().filter(b -> b.getAlleleName().equals(shortAlleleName)).count() == 0) {
+                                            HypervariableRegionVariant.BeadAlleleRef beadAlleleRef = new HypervariableRegionVariant.BeadAlleleRef();
+                                            beadAlleleRef.setAlleleName(shortAlleleName);
+                                            hvrv.getBeadAlleleRefList().add(beadAlleleRef);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-        // What if the custom panel doesn't have an HVRV represented?
-        for(HypervariableRegion hvr : customHypervariableRegionList) {
-            List<HypervariableRegionVariant> deleteList = new ArrayList<>();
-            for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
-                if(hvrv.getBeadAlleleRefList().size() == 0) {
-                    deleteList.add(hvrv);
-                }
-            }
-            for(HypervariableRegionVariant delete : deleteList) {
-                hvr.getVariantMap().remove(delete.getVariantId());
             }
         }
         
@@ -150,6 +148,24 @@ public class Session {
             }
         }
 
+    }
+
+    @PUT
+    @Path("mfiThreshold")
+    @Produces("application/json")
+    public void putMfiThreshold(@Context HttpServletRequest request, String mfiThreshold) {
+        try {
+            Integer parsedMfiThreshold = Integer.valueOf(mfiThreshold);
+            SessionFilter.alleleFinder.get().getAlleleList().stream().filter(allele -> allele.getSynonymousAlleleName() == null).forEach(new Consumer<Allele>() {
+                @Override
+                public void accept(Allele allele) {
+                    allele.setSelection1(allele.getMfi() != null && (allele.getMfi() >= parsedMfiThreshold));
+                    allele.setRecipientAntibodyForCompat(allele.getMfi() != null && (allele.getMfi() >= parsedMfiThreshold));
+                }
+            });
+            SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
+        }
+        catch(NumberFormatException e) {}
     }
     
 }

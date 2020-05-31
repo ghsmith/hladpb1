@@ -130,6 +130,7 @@ a.sort {
     </p>
     <p>
         reference allele: <select id="referenceAlleleSelect"></select>
+        MFI threshold for selection: <input id="mfiThreshold" type="text" size="5"/>
     </p>
     
     <table id="reportTable">
@@ -200,6 +201,7 @@ var pageSize = 25;
 var sessionId;
 var reagentLotNumber; // the single antigen bead reagent lot number
 var alleles = []; // the array of alleles
+var oldAlleles = null; // if sort order needs to be preserved
 var sabOnly = false; // only show single antigen bead alleles
 var matchesHvrCountGe4Only = true; // only show alleles where the match count is ge 4
 var selectedOnly = false; // only show selected alleles (clicked)
@@ -298,6 +300,17 @@ function uploadHaml() {
     });
 }  
 
+function putMfiThreshold(mfiThreshold) {
+    $("#working").show();
+    return $.ajax({
+        url: "/hladpb1/resources/session/mfiThreshold",
+        dataType: "json",
+        type: "PUT",
+        contentType: "application/json",
+        data: mfiThreshold
+    });
+}
+
 // Populate rows in the report table from the alleles array. Note that this is
 // only done once. All sorting and filtering is done locally. Changing the
 // reference allele does involve a getAlleles() call, but the HTML table rows
@@ -308,6 +321,15 @@ function populateTableRows() {
     var rowHtml = [];
     var selectHtml = [];
     var rowNumber = 0;
+
+    if(oldAlleles != null) {
+        var allelesInOldOrder = [];
+        oldAlleles.forEach(function(oldAllele) {
+            allelesInOldOrder.push(alleles.find(function(allele) { return allele.alleleName == oldAllele.alleleName; }))
+        });
+        alleles = allelesInOldOrder;
+        oldAlleles = null;
+    }
 
     // put the reference allele at the top of every page
     {
@@ -717,6 +739,14 @@ $(document).ready(function() {
         if($("#hamlFile")[0].files.length > 0) {
             uploadHaml().done(function() { window.location.reload(); });
         }
+    });
+
+    $("#mfiThreshold").change(function() {
+        $("#working").show();
+        setTimeout(function() {
+            oldAlleles = alleles;
+            putMfiThreshold($("#mfiThreshold").val()).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); });
+        }, 1);
     });
 
 });
