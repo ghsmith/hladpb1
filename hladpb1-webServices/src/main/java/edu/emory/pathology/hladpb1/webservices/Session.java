@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -89,11 +88,9 @@ public class Session {
         ReagentLotFinder reagentLotFinder = new ReagentLotFinder(request.getServletContext().getInitParameter("emoryXmlFileName"));
         alleleFinder.assignHypervariableRegionVariantIds(hypervariableRegionFinder);
 
-        List<HypervariableRegion> customHypervariableRegionList = (List<HypervariableRegion>)SerializationUtils.clone((Serializable)hypervariableRegionFinder.getHypervariableRegionList());
-        for(Allele allele : alleleFinder.getAlleleList()) {
-            allele.setSingleAntigenBead(false);
-        }
         Pattern pattern = Pattern.compile("^(HLA-DPB1\\*[^:]+:[^:]+).*$");
+        List<HypervariableRegion> customHypervariableRegionList = (List<HypervariableRegion>)SerializationUtils.clone((Serializable)hypervariableRegionFinder.getHypervariableRegionList());
+        alleleFinder.getAlleleList().stream().filter(a -> a.getSynonymousAlleleName() == null).forEach((a) -> { a.setSingleAntigenBead(false); });
         for(HypervariableRegion hvr : customHypervariableRegionList) {
             for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
                 hvrv.setBeadAlleleRefList(new ArrayList<>());
@@ -132,15 +129,19 @@ public class Session {
         SessionFilter.alleleFinder.set(alleleFinder);
         SessionFilter.hypervariableRegionFinder.set(hypervariableRegionFinder);
         SessionFilter.reagentLotFinder.set(reagentLotFinder);
-        
-        for(Allele allele : SessionFilter.alleleFinder.get().getAlleleList()) {
-            allele.setMfi(null);
-        }
+
+        alleleFinder.getAlleleList().stream().filter(a -> a.getSynonymousAlleleName() == null).forEach((a) -> { a.setMfi(null); });
         for(Haml.PatientAntibodyAssessment.SolidPhasePanel spp : haml.getPatientAntibodyAssessment().get(0).getSolidPhasePanel()) {
             for(Haml.PatientAntibodyAssessment.SolidPhasePanel.Bead bead : spp.getBead()) {
-                for(String alleleName : bead.getHLAAlleleSpecificity().split(",")) {
-                    for(Allele allele : SessionFilter.alleleFinder.get().getAlleleList()) {
-                        if(allele.getAlleleName().contains(alleleName)) {
+                for(String hamlAlleleName : bead.getHLAAlleleSpecificity().split(",")) {
+                    for(Allele allele : alleleFinder.getAlleleList().stream().filter(a -> a.getSynonymousAlleleName() == null).collect(Collectors.toList())) {
+                        if(
+                            allele.getAlleleName().contains(hamlAlleleName)
+                            && (
+                              allele.getMfi() == null
+                              || bead.getRawMFI() >= allele.getMfi()  
+                            )
+                        ) {
                             allele.setMfi(bead.getRawMFI());
                         }
                     }
@@ -153,15 +154,12 @@ public class Session {
     @PUT
     @Path("mfiThreshold")
     @Produces("application/json")
-    public void putMfiThreshold(@Context HttpServletRequest request, String mfiThreshold) {
+    public void putMfiThreshold(String mfiThreshold) {
         try {
             Integer parsedMfiThreshold = Integer.valueOf(mfiThreshold);
-            SessionFilter.alleleFinder.get().getAlleleList().stream().filter(allele -> allele.getSynonymousAlleleName() == null).forEach(new Consumer<Allele>() {
-                @Override
-                public void accept(Allele allele) {
-                    allele.setSelection1(allele.getMfi() != null && (allele.getMfi() >= parsedMfiThreshold));
-                    allele.setRecipientAntibodyForCompat(allele.getMfi() != null && (allele.getMfi() >= parsedMfiThreshold));
-                }
+            SessionFilter.alleleFinder.get().getAlleleList().stream().filter(a -> a.getSynonymousAlleleName() == null).forEach((a) -> {
+                a.setSelection1(a.getMfi() != null && (a.getMfi() >= parsedMfiThreshold));
+                a.setRecipientAntibodyForCompat(a.getMfi() != null && (a.getMfi() >= parsedMfiThreshold));
             });
             SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
         }
