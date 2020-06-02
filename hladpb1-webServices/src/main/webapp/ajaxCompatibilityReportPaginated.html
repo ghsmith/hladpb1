@@ -778,7 +778,7 @@ function getCpra(antigenList) {
 }
 
 function getCpraAntigenListBead() {
-    antigenList = "";
+    var antigenList = "";
     alleles.filter(function(allele) { return allele.recipientAntibodyForCompat; }).forEach(function(allele) {
         antigenList += " " + allele.alleleName.replace(/HLA-(DPB1\*[^:]+:[^:]+).*/, "$1");
     });
@@ -786,7 +786,7 @@ function getCpraAntigenListBead() {
 }
 
 function getCpraAntigenListHvr() {
-    antigenList = "";
+    var antigenList = "";
     hypervariableRegions.forEach(function(hvr) {
         Object.keys(hvr.variantMap).forEach(function(hvrvId) {
             var hvrv = hvr.variantMap[hvrvId];
