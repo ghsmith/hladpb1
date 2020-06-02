@@ -66,6 +66,18 @@ table.statusDescriptionTable td {
     border: 1px solid black;
 }
 
+table.cpraTable {
+    font-family: monospace;
+    font-size: medium;
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+table.cpraTable th, table.cpraTable td {
+    text-align: left;
+    white-space: normal;
+    padding: 4px;
+}
+
 </style>
 
 <title>HLA-DPB1 Compatibility Report</title>
@@ -90,14 +102,14 @@ table.statusDescriptionTable td {
         be evaluated for compatibility with the recipient and assigned a
         compatibility status:
     </p>
-    <p>
+    <!--p-->
         <table class="statusDescriptionTable">
             <tr><td>NEI</td><td>not&nbsp;electronically&nbsp;incompatible</td><td>the single antigen bead (SAB) corresponding to the donor allele is NOT positive and antibody specificity for an epitope of the donor allele is NOT inferred</td></tr>
-            <tr><td>EI</td><td>electronically&nbsp;incompatible</i></td><td>antibody specificity for an epitope of the donor allele is inferred</td></tr>
-            <tr><td>I</td><td>incompatible</i></td><td>the single antigen bead corresponding to the donor allele is positive</td></tr>
+            <tr><td>EI</td><td>electronically&nbsp;incompatible</td><td>antibody specificity for an epitope of the donor allele is inferred</td></tr>
+            <tr><td>I</td><td>incompatible</td><td>the single antigen bead corresponding to the donor allele is positive</td></tr>
             <tr><td>AA</td><td>auto-antibody</td><td>the single antigen bead is positive, but is also a recipient allele</td></tr>
         </table>
-    </p>
+    <!--/p-->
     <p>
         Selection of antibodies to alleles that are not the subject of a single
         antigen bead is currently not allowed. Hypervariable region variants
@@ -126,13 +138,27 @@ table.statusDescriptionTable td {
 
     <div style="margin-top: 10px; margin-bottom: 10px; border: 1px solid black; width: 100%; background-color: lightgray;">
         <table style="width: 100%;"><tr>
-            <td style="text-align: left; white-space: nowrap;"><a id="linkPrevPage" href="javascript:void(0)">&Longleftarrow; previous page<a></td>
+            <td style="text-align: left; white-space: nowrap;"><a id="linkPrevPage" href="javascript:void(0)">&Longleftarrow; previous page</a></td>
             <td style="text-align: center; white-space: nowrap;">
                 page number:<select id="selectPage"></select>
                 (size:<input type="text" id="inputPageSize" size="4">)
             <td>
-            <td style="text-align: right; white-space: nowrap;"><a id="linkNextPage" href="javascript:void(0)">next page &Longrightarrow;<a></td>
+            <td style="text-align: right; white-space: nowrap;"><a id="linkNextPage" href="javascript:void(0)">next page &Longrightarrow;</a></td>
         </tr></table>
+    </div>
+
+    <div style="margin-top: 10px; margin-bottom: 10px; width: 100%; text-align: center;">
+      <div style="display: inline-block;">
+        <div style="color: white; background-color: #005837; padding: 3px;">
+            <table class="cpraTable">
+                <tr><td rowspan="2" style="font-size: 28pt; border: 1px solid white;">CPRA</td><td>computed from single antigen bead(s):</td><td style="width: 100px;"><a id="cpraBead" href="" style="color: white;">working...</a></td></tr>
+                <tr><td>computed from hypervariable regions(s):</td><td><a id="cpraHvr" href="" style="color: white;">working...</a></td></tr>
+            </table>
+        </div>
+        <div style="color: black; background-color: #00A4D7; padding: 3px;">
+          All CPRA calculations performed by <a href="//www.transplanttoolbox.org/nmdp_cpra/" style="color: white;">NMDP CPRA calculator</a>.
+        </div>
+      </div>
     </div>
     
     <table id="reportTable">
@@ -178,17 +204,17 @@ table.statusDescriptionTable td {
                 <th data-name="allele.hvrVariantMap['a'] != undefined && 1 == allele.hvrVariantMap['a'].variantId ? 1 : '&nbsp;'" data-hvr-id="a" class="variantId index">1</th><th data-name="allele.hvrVariantMap['a'] != undefined && 2 == allele.hvrVariantMap['a'].variantId ? 2 : '&nbsp;'" data-hvr-id="a" class="variantId ">2</th><th data-name="allele.hvrVariantMap['a'] != undefined && 3 == allele.hvrVariantMap['a'].variantId ? 3 : '&nbsp;'" data-hvr-id="a" class="variantId ">3</th><th data-name="allele.hvrVariantMap['a'] != undefined && 4 == allele.hvrVariantMap['a'].variantId ? 4 : '&nbsp;'" data-hvr-id="a" class="variantId ">4</th><th data-name="allele.hvrVariantMap['a'] != undefined && 5 == allele.hvrVariantMap['a'].variantId ? 5 : '&nbsp;'" data-hvr-id="a" class="variantId ">5</th><th data-name="allele.hvrVariantMap['a'] != undefined && 6 == allele.hvrVariantMap['a'].variantId ? 6 : '&nbsp;'" data-hvr-id="a" class="variantId ">6</th>
                     <th data-name="allele.hvrVariantMap['a'] != undefined && allele.hvrVariantMap['a'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['a'].variantId : '&nbsp;'" data-hvr-id="a" class="variantId indexRight">n/a</th>
                 <th data-name="allele.hvrVariantMap['b'] != undefined && 1 == allele.hvrVariantMap['b'].variantId ? 1 : '&nbsp;'" data-hvr-id="b" class="variantId index">1</th><th data-name="allele.hvrVariantMap['b'] != undefined && 2 == allele.hvrVariantMap['b'].variantId ? 2 : '&nbsp;'" data-hvr-id="b" class="variantId ">2</th><th data-name="allele.hvrVariantMap['b'] != undefined && 3 == allele.hvrVariantMap['b'].variantId ? 3 : '&nbsp;'" data-hvr-id="b" class="variantId ">3</th><th data-name="allele.hvrVariantMap['b'] != undefined && 4 == allele.hvrVariantMap['b'].variantId ? 4 : '&nbsp;'" data-hvr-id="b" class="variantId ">4</th><th data-name="allele.hvrVariantMap['b'] != undefined && 5 == allele.hvrVariantMap['b'].variantId ? 5 : '&nbsp;'" data-hvr-id="b" class="variantId ">5</th><th data-name="allele.hvrVariantMap['b'] != undefined && 6 == allele.hvrVariantMap['b'].variantId ? 6 : '&nbsp;'" data-hvr-id="b" class="variantId ">6</th>
-                    <th data-name="allele.hvrVariantMap['b'] != undefined && allele.hvrVariantMap['b'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['b'].variantId : '&nbsp;'" data-hvr-id="b" class="variantId indexRight"}">n/a</th>
+                    <th data-name="allele.hvrVariantMap['b'] != undefined && allele.hvrVariantMap['b'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['b'].variantId : '&nbsp;'" data-hvr-id="b" class="variantId indexRight">n/a</th>
                 <th data-name="allele.hvrVariantMap['c'] != undefined && 1 == allele.hvrVariantMap['c'].variantId ? 1 : '&nbsp;'" data-hvr-id="c" class="variantId index">1</th><th data-name="allele.hvrVariantMap['c'] != undefined && 2 == allele.hvrVariantMap['c'].variantId ? 2 : '&nbsp;'" data-hvr-id="c" class="variantId ">2</th><th data-name="allele.hvrVariantMap['c'] != undefined && 3 == allele.hvrVariantMap['c'].variantId ? 3 : '&nbsp;'" data-hvr-id="c" class="variantId ">3</th><th data-name="allele.hvrVariantMap['c'] != undefined && 4 == allele.hvrVariantMap['c'].variantId ? 4 : '&nbsp;'" data-hvr-id="c" class="variantId ">4</th><th data-name="allele.hvrVariantMap['c'] != undefined && 5 == allele.hvrVariantMap['c'].variantId ? 5 : '&nbsp;'" data-hvr-id="c" class="variantId ">5</th><th data-name="allele.hvrVariantMap['c'] != undefined && 6 == allele.hvrVariantMap['c'].variantId ? 6 : '&nbsp;'" data-hvr-id="c" class="variantId ">6</th>
-                    <th data-name="allele.hvrVariantMap['c'] != undefined && allele.hvrVariantMap['c'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['c'].variantId : '&nbsp;'" data-hvr-id="c" class="variantId indexRight"}">n/a</th>
+                    <th data-name="allele.hvrVariantMap['c'] != undefined && allele.hvrVariantMap['c'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['c'].variantId : '&nbsp;'" data-hvr-id="c" class="variantId indexRight">n/a</th>
                 <th data-name="allele.hvrVariantMap['d'] != undefined && 1 == allele.hvrVariantMap['d'].variantId ? 1 : '&nbsp;'" data-hvr-id="d" class="variantId index">1</th><th data-name="allele.hvrVariantMap['d'] != undefined && 2 == allele.hvrVariantMap['d'].variantId ? 2 : '&nbsp;'" data-hvr-id="d" class="variantId ">2</th><th data-name="allele.hvrVariantMap['d'] != undefined && 3 == allele.hvrVariantMap['d'].variantId ? 3 : '&nbsp;'" data-hvr-id="d" class="variantId ">3</th><th data-name="allele.hvrVariantMap['d'] != undefined && 4 == allele.hvrVariantMap['d'].variantId ? 4 : '&nbsp;'" data-hvr-id="d" class="variantId ">4</th><th data-name="allele.hvrVariantMap['d'] != undefined && 5 == allele.hvrVariantMap['d'].variantId ? 5 : '&nbsp;'" data-hvr-id="d" class="variantId ">5</th><th data-name="allele.hvrVariantMap['d'] != undefined && 6 == allele.hvrVariantMap['d'].variantId ? 6 : '&nbsp;'" data-hvr-id="d" class="variantId ">6</th>
-                    <th data-name="allele.hvrVariantMap['d'] != undefined && allele.hvrVariantMap['d'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['d'].variantId : '&nbsp;'" data-hvr-id="d" class="variantId indexRight"}">n/a</th>
+                    <th data-name="allele.hvrVariantMap['d'] != undefined && allele.hvrVariantMap['d'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['d'].variantId : '&nbsp;'" data-hvr-id="d" class="variantId indexRight">n/a</th>
                 <th data-name="allele.hvrVariantMap['e'] != undefined && 1 == allele.hvrVariantMap['e'].variantId ? 1 : '&nbsp;'" data-hvr-id="e" class="variantId index">1</th><th data-name="allele.hvrVariantMap['e'] != undefined && 2 == allele.hvrVariantMap['e'].variantId ? 2 : '&nbsp;'" data-hvr-id="e" class="variantId ">2</th><th data-name="allele.hvrVariantMap['e'] != undefined && 3 == allele.hvrVariantMap['e'].variantId ? 3 : '&nbsp;'" data-hvr-id="e" class="variantId ">3</th><th data-name="allele.hvrVariantMap['e'] != undefined && 4 == allele.hvrVariantMap['e'].variantId ? 4 : '&nbsp;'" data-hvr-id="e" class="variantId ">4</th><th data-name="allele.hvrVariantMap['e'] != undefined && 5 == allele.hvrVariantMap['e'].variantId ? 5 : '&nbsp;'" data-hvr-id="e" class="variantId ">5</th><th data-name="allele.hvrVariantMap['e'] != undefined && 6 == allele.hvrVariantMap['e'].variantId ? 6 : '&nbsp;'" data-hvr-id="e" class="variantId ">6</th>
-                    <th data-name="allele.hvrVariantMap['e'] != undefined && allele.hvrVariantMap['e'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['e'].variantId : '&nbsp;'" data-hvr-id="e" class="variantId indexRight"}">n/a</th>
+                    <th data-name="allele.hvrVariantMap['e'] != undefined && allele.hvrVariantMap['e'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['e'].variantId : '&nbsp;'" data-hvr-id="e" class="variantId indexRight">n/a</th>
                 <th data-name="allele.hvrVariantMap['f'] != undefined && 1 == allele.hvrVariantMap['f'].variantId ? 1 : '&nbsp;'" data-hvr-id="f" class="variantId index">1</th><th data-name="allele.hvrVariantMap['f'] != undefined && 2 == allele.hvrVariantMap['f'].variantId ? 2 : '&nbsp;'" data-hvr-id="f" class="variantId ">2</th><th data-name="allele.hvrVariantMap['f'] != undefined && 3 == allele.hvrVariantMap['f'].variantId ? 3 : '&nbsp;'" data-hvr-id="f" class="variantId ">3</th><th data-name="allele.hvrVariantMap['f'] != undefined && 4 == allele.hvrVariantMap['f'].variantId ? 4 : '&nbsp;'" data-hvr-id="f" class="variantId ">4</th><th data-name="allele.hvrVariantMap['f'] != undefined && 5 == allele.hvrVariantMap['f'].variantId ? 5 : '&nbsp;'" data-hvr-id="f" class="variantId ">5</th><th data-name="allele.hvrVariantMap['f'] != undefined && 6 == allele.hvrVariantMap['f'].variantId ? 6 : '&nbsp;'" data-hvr-id="f" class="variantId ">6</th>
-                    <th data-name="allele.hvrVariantMap['f'] != undefined && allele.hvrVariantMap['f'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['f'].variantId : '&nbsp;'" data-hvr-id="f" class="variantId indexRight"}">n/a</th>
+                    <th data-name="allele.hvrVariantMap['f'] != undefined && allele.hvrVariantMap['f'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['f'].variantId : '&nbsp;'" data-hvr-id="f" class="variantId indexRight">n/a</th>
                 <th data-name="allele.hvrVariantMap['g'] != undefined && 1 == allele.hvrVariantMap['g'].variantId ? 1 : '&nbsp;'" data-hvr-id="g" class="variantId index">1</th><th data-name="allele.hvrVariantMap['g'] != undefined && 2 == allele.hvrVariantMap['g'].variantId ? 2 : '&nbsp;'" data-hvr-id="g" class="variantId ">2</th><th data-name="allele.hvrVariantMap['g'] != undefined && 3 == allele.hvrVariantMap['g'].variantId ? 3 : '&nbsp;'" data-hvr-id="g" class="variantId ">3</th><th data-name="allele.hvrVariantMap['g'] != undefined && 4 == allele.hvrVariantMap['g'].variantId ? 4 : '&nbsp;'" data-hvr-id="g" class="variantId ">4</th><th data-name="allele.hvrVariantMap['g'] != undefined && 5 == allele.hvrVariantMap['g'].variantId ? 5 : '&nbsp;'" data-hvr-id="g" class="variantId ">5</th><th data-name="allele.hvrVariantMap['g'] != undefined && 6 == allele.hvrVariantMap['g'].variantId ? 6 : '&nbsp;'" data-hvr-id="g" class="variantId ">6</th>
-                    <th data-name="allele.hvrVariantMap['g'] != undefined && allele.hvrVariantMap['g'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['g'].variantId : '&nbsp;'" data-hvr-id="g" class="variantId indexRight"}">n/a</th>
+                    <th data-name="allele.hvrVariantMap['g'] != undefined && allele.hvrVariantMap['g'].variantId.match(/[A-Z]+/) ? allele.hvrVariantMap['g'].variantId : '&nbsp;'" data-hvr-id="g" class="variantId indexRight">n/a</th>
             </tr>
             <tr id="hvrVariantSeqs" style="border: 1px solid black;">
                 <th colspan="7" style="text-align: right;">protein sequence(s) &Longrightarrow;</th>
@@ -512,6 +538,21 @@ function setUiState() {
         });
         dfr.resolve();
     }, 1);
+
+    // asynchronously attempt to set CPRAs
+    $("#cpraBead").html("working...");
+    $("#cpraBead").attr("href", "");
+    $("#cpraHvr").html("working...");
+    $("#cpraHvr").attr("href", "");
+    getCpra(getCpraAntigenListBead()).done(function(cpra) {
+        $("#cpraBead").html(cpra);
+        $("#cpraBead").attr("href", "https://www.transplanttoolbox.org/nmdp_cpra/cpra_out/?userinput1=" + getCpraAntigenListBead());
+    });
+    getCpra(getCpraAntigenListHvr()).done(function(cpra) {
+        $("#cpraHvr").html(cpra);
+        $("#cpraHvr").attr("href", "https://www.transplanttoolbox.org/nmdp_cpra/cpra_out/?userinput1=" + getCpraAntigenListHvr());
+    });
+
     return dfr.promise();
 }
 
@@ -711,5 +752,57 @@ $(document).ready(function() {
     });
 
 });
+
+// CPRA integration
+
+function getCpra(antigenList) {
+    if(antigenList == "") {
+        var dfr = $.Deferred();
+        setTimeout(function() { dfr.resolve(new Number(0).toFixed(2)); }, 1);
+        return dfr.promise();
+    }
+    return $.ajax({
+        url: "https://www.transplanttoolbox.org/nmdp_cpra/cpra_rest/",
+        dataType: "json",
+        type: "POST",
+        contentType: "application/x-www-form-urlencoded",
+        data: "antigen_list=" + antigenList,
+        error: function(jqXHR, textStatus, errorMessage) {
+            alert(errorMessage);
+        }
+    }).then(function(response) {
+        if(isNaN(response.CPRA)) {
+            return response.CPRA;
+        }
+        return new Number(response.CPRA).toFixed(2);
+    });
+}
+
+function getCpraAntigenListBead() {
+    antigenList = "";
+    alleles.filter(function(allele) { return allele.recipientAntibodyForCompat; }).forEach(function(allele) {
+        antigenList += " " + allele.alleleName.replace(/HLA-(DPB1\*[^:]+:[^:]+).*/, "$1");
+    });
+    return antigenList.trim();
+}
+
+function getCpraAntigenListHvr() {
+    antigenList = "";
+    hypervariableRegions.forEach(function(hvr) {
+        Object.keys(hvr.variantMap).forEach(function(hvrvId) {
+            var hvrv = hvr.variantMap[hvrvId];
+            if(hvrv.compatAntibodyConsideredPresent) {
+                hvrv.proteinSequenceList.forEach(function(proteinSequence) {
+                    var offset = 0;
+                    antigenList += " DPB1_HVR_" + hvr.hypervariableRegionName.toUpperCase();
+                    hvr.codonNumberList.forEach(function(codonNumber) {
+                        antigenList += "_" + codonNumber + proteinSequence[offset++];
+                    });
+                });
+            }
+        });
+    });
+    return antigenList.trim();
+}
 
 </script>
