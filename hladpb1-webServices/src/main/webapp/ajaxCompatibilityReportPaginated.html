@@ -14,6 +14,7 @@
 body {
     font-family: monospace;
     font-size: medium;
+    margin: 0px;
 }
 table {
     font-family: monospace;
@@ -86,6 +87,8 @@ table.cpraTable th, table.cpraTable td {
 
 <body>
 
+<div style="margin: 8px;">
+
     <div id="working" style="position: fixed; top: 0px; width: 150px; left: 50%; margin-left: -75px; text-align: center; background-color: red; color: white; font-weight: bold;">working...</div>
 
     <h1>HLA-DPB1 Compatibility Report (<a href="https://github.com/ghsmith/hladpb1/blob/master/hladpb1-webServices/src/main/webapp/ajaxCompatibilityReportPaginated.html">source code</a>)</h1>
@@ -143,20 +146,6 @@ table.cpraTable th, table.cpraTable td {
             <td>
             <td style="text-align: right; white-space: nowrap;"><a id="linkNextPage" href="javascript:void(0)">next page &Longrightarrow;</a></td>
         </tr></table>
-    </div>
-
-    <div style="position: fixed; bottom: 0; width: 100%; text-align: center;">
-      <div style="display: inline-block;">
-        <div style="color: white; background-color: #005837; padding: 3px;">
-            <table class="cpraTable">
-                <tr><td rowspan="2" style="font-size: 28pt; border: 1px solid white;">CPRA</td><td>computed from single antigen bead(s):</td><td style="width: 100px;"><a id="cpraBead" href="" style="color: white;">working...</a></td></tr>
-                <tr><td>computed from hypervariable regions(s):</td><td><a id="cpraHvr" href="" style="color: white;">working...</a></td></tr>
-            </table>
-        </div>
-        <div style="color: black; background-color: #00A4D7; padding: 3px;">
-          All CPRA calculations performed by <a href="//www.transplanttoolbox.org/nmdp_cpra/" style="color: white;">NMDP CPRA calculator</a>.
-        </div>
-      </div>
     </div>
     
     <table id="reportTable">
@@ -289,6 +278,21 @@ table.cpraTable th, table.cpraTable td {
 <br/>
 <br/>
 
+</div>
+
+    <div style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 0; margin: 0; border: 0;">
+      <div style="display: inline-block;">
+        <div style="color: white; background-color: #005837; padding: 3px;">
+            <table class="cpraTable">
+                <tr><td rowspan="2" style="font-size: 28pt; border: 1px solid white;">CPRA</td><td>computed from single antigen bead(s):</td><td style="width: 100px;"><a id="cpraBead" href="" style="color: white;">working...</a></td></tr>
+                <tr><td>computed from hypervariable regions(s):</td><td><a id="cpraHvr" href="" style="color: white;">working...</a></td></tr>
+            </table>
+        </div>
+        <div style="color: black; background-color: #00A4D7; padding: 3px;">
+          All CPRA calculations performed by <a href="//www.transplanttoolbox.org/nmdp_cpra/" style="color: white;">NMDP CPRA calculator</a>.
+        </div>
+      </div>
+    </div>
 </body>
 
 </html>
