@@ -769,7 +769,7 @@ $(document).ready(function() {
 function getCpra(antigenList) {
     if(antigenList == "") {
         var dfr = $.Deferred();
-        setTimeout(function() { dfr.resolve(new Number(0).toFixed(2)); }, 1);
+        setTimeout(function() { dfr.resolve(new Number(0).toFixed(4)); }, 1);
         return dfr.promise();
     }
     return $.ajax({
@@ -785,7 +785,7 @@ function getCpra(antigenList) {
         if(isNaN(response.CPRA)) {
             return response.CPRA;
         }
-        return new Number(response.CPRA).toFixed(2);
+        return new Number(response.CPRA).toFixed(4);
     });
 }
 
