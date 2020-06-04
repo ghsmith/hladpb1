@@ -280,8 +280,8 @@ table.cpraTable th, table.cpraTable td {
 
 </div>
 
-    <div style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 0; margin: 0; border: 0;">
-      <div style="display: inline-block;">
+    <div style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 0; margin: 0; border: 0; pointer-events: none;">
+      <div style="display: inline-block; pointer-events: auto;">
         <div style="color: white; background-color: #005837; padding: 3px;">
             <table class="cpraTable">
                 <tr><td rowspan="2" style="font-size: 28pt; border: 1px solid white;">CPRA</td><td>computed from single antigen bead(s):</td><td style="width: 100px;"><a id="cpraBead" href="" style="color: white;">working...</a></td></tr>
@@ -548,6 +548,30 @@ function setUiState() {
                 }
             });
         });
+
+// hide unused HVRV columns
+hypervariableRegions.forEach(function(hvr) {
+    $("th.variantSeq[data-hvr-id='" + hvr.hypervariableRegionName + "']").filter(function(idx) { return $(this).html() == "&nbsp;"; }).each(function() {
+        var colNo = $(this).parent().children().index($(this));
+        $("tr#hvrVariantIds > th:nth-child(" + (colNo + 1) + ")").hide();
+        $("tr#hvrVariantSeqs > th:nth-child(" + (colNo + 1) + ")").hide();
+        $("tr#hvrKnownReactiveEpitopes > th:nth-child(" + (colNo + 1) + ")").hide();
+        $("#hvrRecipientEpitopes > th:nth-child(" + (colNo + 1) + ")").hide();
+        $("tr#hvrPctBeadsPositives > th:nth-child(" + (colNo + 1) + ")").hide();
+        $("tr#hvrAntibodyPresents > th:nth-child(" + (colNo + 1) + ")").hide();
+        $("#reportTable tbody tr > td:nth-child(" + (colNo + 7) + ")").hide();
+        $("tr#hvrVariantIds > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
+        $("tr#hvrVariantSeqs > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
+        $("tr#hvrKnownReactiveEpitopes > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
+        $("#hvrRecipientEpitopes > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
+        $("tr#hvrPctBeadsPositives > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
+        $("tr#hvrAntibodyPresents > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
+        $("#reportTable tbody tr > td:nth-child(" + (colNo + 6) + ")").css("border-right", "3px solid black");
+    });
+    $("tr#columnNames > th[data-hvr-id='" + hvr.hypervariableRegionName + "']").attr("colspan", Object.keys(hvr.variantMap).length);
+    $("tr#codonPositions > th[data-hvr-id='" + hvr.hypervariableRegionName + "']").attr("colspan", Object.keys(hvr.variantMap).length);
+});
+
         dfr.resolve();
     }, 1);
 
