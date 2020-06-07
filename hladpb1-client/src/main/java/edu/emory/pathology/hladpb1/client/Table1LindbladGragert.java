@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -93,7 +95,7 @@ public class Table1LindbladGragert {
     // Loren (Jersey REST client)
     static public class LorenCPRA { @XmlAttribute(name = "CPRA") public float cpra; };
     static public float getLorenCPRA(String nameList) {
-        return client.target("http://transplanttoolbox.org/nmdp_cpra/cpra_rest/")
+        return client.target("https://www.transplanttoolbox.org/nmdp_cpra/cpra_rest/")
             .request(MediaType.APPLICATION_JSON)
             .post(
                 Entity.entity("antigen_list=" + nameList, MediaType.APPLICATION_FORM_URLENCODED),
@@ -103,16 +105,16 @@ public class Table1LindbladGragert {
     
     public static void main(String[] args) throws IOException {
         
-        Map<String, Float> kelsiOverall = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/overall.txt", "Frequency");
-        Map<String, Float> kelsiAsian = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/asian.txt", "Frequency");
-        Map<String, Float> kelsiBlack = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/black.txt", "Frequency");
-        Map<String, Float> kelsiHPI = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/hawaii_pacific_islander.txt", "Frequency");
-        Map<String, Float> kelsiHispanic = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/hispanic.txt", "Frequency");
-        Map<String, Float> kelsiMultiracial = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/multiracial.txt", "Frequency");
-        Map<String, Float> kelsiNativeAmerican = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/native_american.txt", "Frequency");
-        Map<String, Float> kelsiWhite = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/white.txt", "Frequency");
-        Map<String, Float> kelsiUA_n = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/uas.txt", "n");
-        Map<String, Float> kelsiUA_freq = indexKelsi("/home/priam/Downloads/lindblad/all_freq_tables/uas.txt", "Frequency");
+        Map<String, Float> kelsiOverall = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/overall.txt", "Frequency");
+        Map<String, Float> kelsiAsian = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/asian.txt", "Frequency");
+        Map<String, Float> kelsiBlack = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/black.txt", "Frequency");
+        Map<String, Float> kelsiHPI = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/hawaii_pacific_islander.txt", "Frequency");
+        Map<String, Float> kelsiHispanic = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/hispanic.txt", "Frequency");
+        Map<String, Float> kelsiMultiracial = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/multiracial.txt", "Frequency");
+        Map<String, Float> kelsiNativeAmerican = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/native_american.txt", "Frequency");
+        Map<String, Float> kelsiWhite = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/white.txt", "Frequency");
+        Map<String, Float> kelsiUA_n = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/uas.txt", "n");
+        Map<String, Float> kelsiUA_freq = indexKelsi("/home/pyewacket/kelsi/all_freq_tables/uas.txt", "Frequency");
         
         putReagentLot("LABScreen Class II Standard (various lots)");
         //putReagentLot("LABScreen Class II Standard w/combo HVRVs (various lots)");
@@ -139,14 +141,69 @@ public class Table1LindbladGragert {
         
         for(HypervariableRegion hvr : hvrs) {
 
+            Map<String, Integer> hvrSuffixMap = new HashMap<>();
+            Map<String, Integer> hvrOtherMap = new HashMap<>();
+            int otherAlleleCount = 0;
+            for(Allele allele : alleles) {
+                Pattern pat = Pattern.compile("^.*([A-Z])+$");
+                Matcher mat = pat.matcher(allele.getAlleleName());
+                if(mat.matches()) {
+                    hvrSuffixMap.put(mat.group(1), hvrSuffixMap.get(mat.group(1)) == null ? 1 : hvrSuffixMap.get(mat.group(1)) + 1);
+                    if(mat.group(1).equals("N")) {
+                        continue;
+                    }
+                }
+                if(
+                    !allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId().matches("[0-9]")
+                    && !allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId().contains("*")
+                ) {
+                    hvrOtherMap.put(allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId(), hvrOtherMap.get(allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId()) == null ? 1 : hvrOtherMap.get(allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId()) + 1);
+                    otherAlleleCount++;
+                }
+            }
+            
+            float otherKelsiOverallFreq = 0f;
+            float otherKelsiAsianFreq = 0f;
+            float otherKelsiBlackFreq = 0f;
+            float otherKelsiHPIFreq = 0f;
+            float otherKelsiHispanicFreq = 0f;
+            float otherKelsiMultiracialFreq = 0f;
+            float otherKelsiNativeAmericanFreq = 0f;
+            float otherKelsiWhiteFreq = 0f;
+            
+            Set<String> otherUsedKelsiAlleleNameSet = new HashSet<>();
+            for(Allele allele : alleles) {
+                if(
+                    !allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId().matches("[0-9]")
+                    && !allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId().contains("*")
+                ) {
+                    if(allele.getAlleleName().matches("^.*N$")) {
+                        continue;
+                    }
+                    String kelsiAlleleName = allele.getAlleleName().replaceAll("HLA-DPB1\\*([0-9][0-9][0-9]?:[0-9][0-9]).*", "$1");
+                    if(otherUsedKelsiAlleleNameSet.contains(kelsiAlleleName)) {
+                        continue;
+                    }
+                    otherUsedKelsiAlleleNameSet.add(kelsiAlleleName);
+                    otherKelsiOverallFreq += kelsiOverall.get(kelsiAlleleName) != null ? kelsiOverall.get(kelsiAlleleName) : 0f;
+                    otherKelsiAsianFreq += kelsiAsian.get(kelsiAlleleName) != null ? kelsiAsian.get(kelsiAlleleName) : 0f;
+                    otherKelsiBlackFreq += kelsiBlack.get(kelsiAlleleName) != null ? kelsiBlack.get(kelsiAlleleName) : 0f;
+                    otherKelsiHPIFreq += kelsiHPI.get(kelsiAlleleName) != null ? kelsiHPI.get(kelsiAlleleName) : 0f;
+                    otherKelsiHispanicFreq += kelsiHispanic.get(kelsiAlleleName) != null ? kelsiHispanic.get(kelsiAlleleName) : 0f;
+                    otherKelsiMultiracialFreq += kelsiMultiracial.get(kelsiAlleleName) != null ? kelsiMultiracial.get(kelsiAlleleName) : 0f;
+                    otherKelsiNativeAmericanFreq += kelsiNativeAmerican.get(kelsiAlleleName) != null ? kelsiNativeAmerican.get(kelsiAlleleName) : 0f;
+                    otherKelsiWhiteFreq += kelsiWhite.get(kelsiAlleleName) != null ? kelsiWhite.get(kelsiAlleleName) : 0f;
+                }
+            }
+                
             for(HypervariableRegionVariant hvrv : hvr.getVariantMap().values()) {
 
                 int alleleCount = 0;
                 for(Allele allele : alleles) {
+                    if(allele.getAlleleName().matches("^.*N$")) {
+                        continue;
+                    }
                     if(allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId().equals(hvrv.getVariantId())) {
-                        if(allele.getAlleleName().matches("^.*[A-Z]$")) { // reject [N]ull and [Q]uestionable alleles
-                            continue;
-                        }
                         alleleCount++;
                     }
                 }
@@ -162,7 +219,7 @@ public class Table1LindbladGragert {
                 Set<String> usedKelsiAlleleNameSet = new HashSet<>();
                 for(Allele allele : alleles) {
                     if(allele.getHvrVariantMap().get(hvr.getHypervariableRegionName()).getVariantId().equals(hvrv.getVariantId())) {
-                        if(allele.getAlleleName().matches("^.*[A-Z]$")) {
+                        if(allele.getAlleleName().matches("^.*N$")) {
                             continue;
                         }
                         String kelsiAlleleName = allele.getAlleleName().replaceAll("HLA-DPB1\\*([0-9][0-9][0-9]?:[0-9][0-9]).*", "$1");
@@ -215,8 +272,26 @@ public class Table1LindbladGragert {
                     lorenCPRA != null ? String.format("%5.4f", lorenCPRA) : "ERROR",
                     String.join(",", lorenUAList)
                 ));
-
+                
             }
+            
+            System.out.println(String.format("%s\t%s\t%s\t%s\t%d\t%5.4f\t%5.4f\t%5.4f\t%5.4f\t%5.4f\t%5.4f\t%5.4f\t%5.4f\t%s\t%s",
+                hvr.getHypervariableRegionName(),
+                hvr.getCodonNumberList(),
+                hvr.getHypervariableRegionName() + "OTHER",
+                "various", //hvrOtherMap.keySet().toString(),
+                otherAlleleCount,
+                otherKelsiOverallFreq,
+                otherKelsiAsianFreq,
+                otherKelsiBlackFreq,
+                otherKelsiHPIFreq,
+                otherKelsiHispanicFreq,
+                otherKelsiMultiracialFreq,
+                otherKelsiNativeAmericanFreq,
+                otherKelsiWhiteFreq,
+                "",
+                ""
+            ));
 
         }
         
@@ -224,35 +299,7 @@ public class Table1LindbladGragert {
         System.out.println("Using reagent lot #: " + getReagentLot());
         System.out.println("[1] Kelsi Lindblad");
         System.out.println("[2] Loren Gragert");
-
-        {
-            int alleleCount = 0;
-            int alleleCountWithAThroughF = 0;
-            int alleleCountWithAThroughG = 0;
-            for(Allele allele : alleles) {
-                if(allele.getAlleleName().matches("^.*[A-Z]$")) { // reject [N]ull and [Q]uestionable alleles
-                    continue;
-                }
-                alleleCount++;
-                if(
-                    allele.getHvrVariantMap().get("a").getVariantId().matches("^[0-9]")
-                    && allele.getHvrVariantMap().get("b").getVariantId().matches("^[0-9]")
-                    && allele.getHvrVariantMap().get("c").getVariantId().matches("^[0-9]")
-                    && allele.getHvrVariantMap().get("d").getVariantId().matches("^[0-9]")
-                    && allele.getHvrVariantMap().get("e").getVariantId().matches("^[0-9]")
-                    & allele.getHvrVariantMap().get("f").getVariantId().matches("^[0-9]")
-                ) {
-                    alleleCountWithAThroughF++;
-                    if(allele.getHvrVariantMap().get("g").getVariantId().matches("^[0-9]")) {
-                        alleleCountWithAThroughG++;
-                    }
-                }
-            }
-            System.out.println(String.format("not-null allele count: %d", alleleCount));
-            System.out.println(String.format("not-null allele count with HVR a-f defined: %d (%4.2f)", alleleCountWithAThroughF, (float)alleleCountWithAThroughF / alleleCount));
-            System.out.println(String.format("not-null allele count with HVR a-g defined: %d (%4.2f)", alleleCountWithAThroughG, (float)alleleCountWithAThroughG / alleleCount));
-        }
-        
+       
     }
     
 }
