@@ -35,7 +35,7 @@ th.hvrId {
     border-left: 1px solid black;
 }
 th.variantId, th.variantSeq, th.recipientEpitope,
-th.pctBeadsPositive, th.antibodyPresent, th.knownReactiveEpitope {
+th.pctBeadsPositive, th.antibodyPresent, th.knownReactiveEpitope, th.excludeFromCompat {
     text-align: center;
     border: 1px solid black;
 }
@@ -61,6 +61,9 @@ a.filterEnabled {
 }   
 #reportTable td.mismatch, #reportTable th.mismatch {
     background-color: yellow;
+}
+#reportTable td.exclude, #reportTable th.exclude {
+    background-color: red;
 }
 table.statusDescriptionTable td {
     text-align: left;
@@ -212,6 +215,16 @@ table.cpraTable th, table.cpraTable td {
                 <th data-name="hvrMap['e'].variantMap['1'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['1'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq index"></th><th data-name="hvrMap['e'].variantMap['2'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['2'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq "></th><th data-name="hvrMap['e'].variantMap['3'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['3'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq "></th><th data-name="hvrMap['e'].variantMap['4'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['4'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq "></th><th data-name="hvrMap['e'].variantMap['5'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['5'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq "></th><th data-name="hvrMap['e'].variantMap['6'] == undefined ? '&nbsp;' : hvrMap['e'].variantMap['6'].proteinSequenceList.join('<br/>')" data-hvr-id="e" class="variantSeq "></th><th data-hvr-id="e" class="variantSeq indexRight">&nbsp;</th>
                 <th data-name="hvrMap['f'].variantMap['1'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['1'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq index"></th><th data-name="hvrMap['f'].variantMap['2'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['2'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq "></th><th data-name="hvrMap['f'].variantMap['3'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['3'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq "></th><th data-name="hvrMap['f'].variantMap['4'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['4'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq "></th><th data-name="hvrMap['f'].variantMap['5'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['5'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq "></th><th data-name="hvrMap['f'].variantMap['6'] == undefined ? '&nbsp;' : hvrMap['f'].variantMap['6'].proteinSequenceList.join('<br/>')" data-hvr-id="f" class="variantSeq "></th><th data-hvr-id="f" class="variantSeq indexRight">&nbsp;</th>
                 <th data-name="hvrMap['g'].variantMap['1'] == undefined ? '&nbsp;' : hvrMap['g'].variantMap['1'].proteinSequenceList.join('<br/>')" data-hvr-id="g" class="variantSeq index"></th><th data-name="hvrMap['g'].variantMap['2'] == undefined ? '&nbsp;' : hvrMap['g'].variantMap['2'].proteinSequenceList.join('<br/>')" data-hvr-id="g" class="variantSeq "></th><th data-name="hvrMap['g'].variantMap['3'] == undefined ? '&nbsp;' : hvrMap['g'].variantMap['3'].proteinSequenceList.join('<br/>')" data-hvr-id="g" class="variantSeq "></th><th data-name="hvrMap['g'].variantMap['4'] == undefined ? '&nbsp;' : hvrMap['g'].variantMap['4'].proteinSequenceList.join('<br/>')" data-hvr-id="g" class="variantSeq "></th><th data-name="hvrMap['g'].variantMap['5'] == undefined ? '&nbsp;' : hvrMap['g'].variantMap['5'].proteinSequenceList.join('<br/>')" data-hvr-id="g" class="variantSeq "></th><th data-name="hvrMap['g'].variantMap['6'] == undefined ? '&nbsp;' : hvrMap['g'].variantMap['6'].proteinSequenceList.join('<br/>')" data-hvr-id="g" class="variantSeq "></th><th data-hvr-id="g" class="variantSeq indexRight">&nbsp;</th>
+            </tr>
+            <tr id="hvrExcludeEpitopes" style="border: 1px solid black;">
+                <th colspan="7" style="text-align: right;">EXCLUDE this epitope from analysis? &Longrightarrow;</th>
+                <th data-name="hvrMap['a'].variantMap['1'].excludeFromCompat" data-container="hvrMap['a'].variantMap['1']" data-hvr-id="a" class="excludeFromCompat index"><input type="checkbox"></th><th data-name="hvrMap['a'].variantMap['2'].excludeFromCompat" data-container="hvrMap['a'].variantMap['2']" data-hvr-id="a" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['a'].variantMap['3'].excludeFromCompat" data-container="hvrMap['a'].variantMap['3']" data-hvr-id="a" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['a'].variantMap['4'].excludeFromCompat" data-container="hvrMap['a'].variantMap['4']" data-hvr-id="a" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['a'].variantMap['5'].excludeFromCompat" data-container="hvrMap['a'].variantMap['5']" data-hvr-id="a" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['a'].variantMap['6'].excludeFromCompat" data-container="hvrMap['a'].variantMap['6']" data-hvr-id="a" class="excludeFromCompat"><input type="checkbox"></th><th data-hvr-id="a" class="excludeFromCompat indexRight">&nbsp;</th>
+                <th data-name="hvrMap['b'].variantMap['1'].excludeFromCompat" data-container="hvrMap['b'].variantMap['1']" data-hvr-id="b" class="excludeFromCompat index"><input type="checkbox"></th><th data-name="hvrMap['b'].variantMap['2'].excludeFromCompat" data-container="hvrMap['b'].variantMap['2']" data-hvr-id="b" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['b'].variantMap['3'].excludeFromCompat" data-container="hvrMap['b'].variantMap['3']" data-hvr-id="b" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['b'].variantMap['4'].excludeFromCompat" data-container="hvrMap['b'].variantMap['4']" data-hvr-id="b" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['b'].variantMap['5'].excludeFromCompat" data-container="hvrMap['b'].variantMap['5']" data-hvr-id="b" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['b'].variantMap['6'].excludeFromCompat" data-container="hvrMap['b'].variantMap['6']" data-hvr-id="b" class="excludeFromCompat"><input type="checkbox"></th><th data-hvr-id="b" class="excludeFromCompat indexRight">&nbsp;</th>
+                <th data-name="hvrMap['c'].variantMap['1'].excludeFromCompat" data-container="hvrMap['c'].variantMap['1']" data-hvr-id="c" class="excludeFromCompat index"><input type="checkbox"></th><th data-name="hvrMap['c'].variantMap['2'].excludeFromCompat" data-container="hvrMap['c'].variantMap['2']" data-hvr-id="c" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['c'].variantMap['3'].excludeFromCompat" data-container="hvrMap['c'].variantMap['3']" data-hvr-id="c" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['c'].variantMap['4'].excludeFromCompat" data-container="hvrMap['c'].variantMap['4']" data-hvr-id="c" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['c'].variantMap['5'].excludeFromCompat" data-container="hvrMap['c'].variantMap['5']" data-hvr-id="c" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['c'].variantMap['6'].excludeFromCompat" data-container="hvrMap['c'].variantMap['6']" data-hvr-id="c" class="excludeFromCompat"><input type="checkbox"></th><th data-hvr-id="c" class="excludeFromCompat indexRight">&nbsp;</th>
+                <th data-name="hvrMap['d'].variantMap['1'].excludeFromCompat" data-container="hvrMap['d'].variantMap['1']" data-hvr-id="d" class="excludeFromCompat index"><input type="checkbox"></th><th data-name="hvrMap['d'].variantMap['2'].excludeFromCompat" data-container="hvrMap['d'].variantMap['2']" data-hvr-id="d" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['d'].variantMap['3'].excludeFromCompat" data-container="hvrMap['d'].variantMap['3']" data-hvr-id="d" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['d'].variantMap['4'].excludeFromCompat" data-container="hvrMap['d'].variantMap['4']" data-hvr-id="d" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['d'].variantMap['5'].excludeFromCompat" data-container="hvrMap['d'].variantMap['5']" data-hvr-id="d" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['d'].variantMap['6'].excludeFromCompat" data-container="hvrMap['d'].variantMap['6']" data-hvr-id="d" class="excludeFromCompat"><input type="checkbox"></th><th data-hvr-id="d" class="excludeFromCompat indexRight">&nbsp;</th>
+                <th data-name="hvrMap['e'].variantMap['1'].excludeFromCompat" data-container="hvrMap['e'].variantMap['1']" data-hvr-id="e" class="excludeFromCompat index"><input type="checkbox"></th><th data-name="hvrMap['e'].variantMap['2'].excludeFromCompat" data-container="hvrMap['e'].variantMap['2']" data-hvr-id="e" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['e'].variantMap['3'].excludeFromCompat" data-container="hvrMap['e'].variantMap['3']" data-hvr-id="e" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['e'].variantMap['4'].excludeFromCompat" data-container="hvrMap['e'].variantMap['4']" data-hvr-id="e" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['e'].variantMap['5'].excludeFromCompat" data-container="hvrMap['e'].variantMap['5']" data-hvr-id="e" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['e'].variantMap['6'].excludeFromCompat" data-container="hvrMap['e'].variantMap['6']" data-hvr-id="e" class="excludeFromCompat"><input type="checkbox"></th><th data-hvr-id="e" class="excludeFromCompat indexRight">&nbsp;</th>
+                <th data-name="hvrMap['f'].variantMap['1'].excludeFromCompat" data-container="hvrMap['f'].variantMap['1']" data-hvr-id="f" class="excludeFromCompat index"><input type="checkbox"></th><th data-name="hvrMap['f'].variantMap['2'].excludeFromCompat" data-container="hvrMap['f'].variantMap['2']" data-hvr-id="f" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['f'].variantMap['3'].excludeFromCompat" data-container="hvrMap['f'].variantMap['3']" data-hvr-id="f" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['f'].variantMap['4'].excludeFromCompat" data-container="hvrMap['f'].variantMap['4']" data-hvr-id="f" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['f'].variantMap['5'].excludeFromCompat" data-container="hvrMap['f'].variantMap['5']" data-hvr-id="f" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['f'].variantMap['6'].excludeFromCompat" data-container="hvrMap['f'].variantMap['6']" data-hvr-id="f" class="excludeFromCompat"><input type="checkbox"></th><th data-hvr-id="f" class="excludeFromCompat indexRight">&nbsp;</th>
+                <th data-name="hvrMap['g'].variantMap['1'].excludeFromCompat" data-container="hvrMap['g'].variantMap['1']" data-hvr-id="g" class="excludeFromCompat index"><input type="checkbox"></th><th data-name="hvrMap['g'].variantMap['2'].excludeFromCompat" data-container="hvrMap['g'].variantMap['2']" data-hvr-id="g" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['g'].variantMap['3'].excludeFromCompat" data-container="hvrMap['g'].variantMap['3']" data-hvr-id="g" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['g'].variantMap['4'].excludeFromCompat" data-container="hvrMap['g'].variantMap['4']" data-hvr-id="g" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['g'].variantMap['5'].excludeFromCompat" data-container="hvrMap['g'].variantMap['5']" data-hvr-id="g" class="excludeFromCompat"><input type="checkbox"></th><th data-name="hvrMap['g'].variantMap['6'].excludeFromCompat" data-container="hvrMap['g'].variantMap['6']" data-hvr-id="g" class="excludeFromCompat"><input type="checkbox"></th><th data-hvr-id="g" class="excludeFromCompat indexRight">&nbsp;</th>
             </tr>
             <tr id="hvrKnownReactiveEpitopes" style="border: 1px solid black;">
                 <th colspan="7" style="text-align: right;">is recipient known to have an antibody for this epitope? &Longrightarrow;</th>
@@ -527,6 +540,7 @@ function setUiState() {
             $(this).html(eval($(this).data("name")));
         });
         $("#reportTable th, #reportTable td").removeClass("mismatch");
+        $("#reportTable th, #reportTable td").removeClass("exclude");
         $("#hvrAntibodyPresents th.antibodyPresent").each(function() {
             var val = eval($(this).data("name"));
             $(this).html(val);
@@ -536,8 +550,21 @@ function setUiState() {
                 $("#reportTable tbody tr > td:nth-child(" + colNo + ")").addClass("mismatch");
             }
         });
+        $("#hvrExcludeEpitopes th.excludeFromCompat").each(function() {
+            var val = eval($(this).data("container")) != undefined && eval($(this).data("name"));
+            $(this).children("input").prop("checked", val);
+            if(val) {
+                var colNo = $(this).parent().children().index($(this)) + 7;
+                $(this).addClass("exclude");
+                $("#reportTable tbody tr > td:nth-child(" + colNo + ")").addClass("exclude");
+            }
+        });
         $("#hvrKnownReactiveEpitopes th.knownReactiveEpitope").each(function() {
-            $(this).children("input").prop("checked", eval($(this).data("container")) != undefined && eval($(this).data("name")));
+            var val = eval($(this).data("container")) != undefined && eval($(this).data("name"));
+            $(this).children("input").prop("checked", val);
+            if(val) {
+                $(this).addClass("mismatch");
+            }
         });
         $("#reportTable tbody tr").each(function() {
             var alleleName = $(this).data("value");
@@ -558,6 +585,7 @@ hypervariableRegions.forEach(function(hvr) {
         var colNo = $(this).parent().children().index($(this));
         $("tr#hvrVariantIds > th:nth-child(" + (colNo + 1) + ")").hide();
         $("tr#hvrVariantSeqs > th:nth-child(" + (colNo + 1) + ")").hide();
+        $("tr#hvrExcludeEpitopes > th:nth-child(" + (colNo + 1) + ")").hide();
         $("tr#hvrKnownReactiveEpitopes > th:nth-child(" + (colNo + 1) + ")").hide();
         $("#hvrRecipientEpitopes > th:nth-child(" + (colNo + 1) + ")").hide();
         $("tr#hvrPctBeadsPositives > th:nth-child(" + (colNo + 1) + ")").hide();
@@ -565,6 +593,7 @@ hypervariableRegions.forEach(function(hvr) {
         $("#reportTable tbody tr > td:nth-child(" + (colNo + 7) + ")").hide();
         $("tr#hvrVariantIds > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
         $("tr#hvrVariantSeqs > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
+        $("tr#hvrExcludeEpitopes > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
         $("tr#hvrKnownReactiveEpitopes > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
         $("#hvrRecipientEpitopes > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");
         $("tr#hvrPctBeadsPositives > th:nth-child(" + (colNo) + ")").css("border-right", "3px solid black");

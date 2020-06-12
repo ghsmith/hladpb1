@@ -47,6 +47,10 @@ public class HypervariableRegions {
             HypervariableRegion hypervariableRegion = SessionFilter.hypervariableRegionFinder.get().getHypervariableRegion(hypervariableRegionName);
             hypervariableRegion.getVariantMap().values().forEach((hvrVariant) -> {
                 hvrVariant.setKnownReactiveEpitopeForCompat(updateHypervariableRegion.getVariantMap().get(hvrVariant.getVariantId()).getKnownReactiveEpitopeForCompat());
+                hvrVariant.setExcludeFromCompat(updateHypervariableRegion.getVariantMap().get(hvrVariant.getVariantId()).getExcludeFromCompat());
+                if(hvrVariant.getExcludeFromCompat()) {
+                    hvrVariant.setKnownReactiveEpitopeForCompat(false);
+                }
             });
 
             SessionFilter.alleleFinder.get().computeCompatInterpretation(SessionFilter.hypervariableRegionFinder.get());
