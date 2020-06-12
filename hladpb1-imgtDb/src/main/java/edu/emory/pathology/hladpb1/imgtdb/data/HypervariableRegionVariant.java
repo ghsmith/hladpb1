@@ -43,6 +43,7 @@ public class HypervariableRegionVariant implements Serializable {
     private Integer compatPositiveSabCount;
     private Integer compatPositiveSabPct;
     private Boolean compatAntibodyConsideredPresent;
+    private Boolean excludeFromCompat = false;
 
     public String getVariantId() {
         return variantId;
@@ -107,5 +108,13 @@ public class HypervariableRegionVariant implements Serializable {
     public void setCompatAntibodyConsideredPresent(Boolean compatAntibodyConsideredPresent) {
         this.compatAntibodyConsideredPresent = compatAntibodyConsideredPresent;
     }
-   
+
+    public Boolean getExcludeFromCompat() {
+        return excludeFromCompat;
+    }
+
+    public void setExcludeFromCompat(Boolean excludeFromCompat) {
+        this.excludeFromCompat = excludeFromCompat;
+    }
+    
 }

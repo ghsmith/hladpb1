@@ -427,6 +427,7 @@ public class AlleleFinder {
             variant.setCompatAntibodyConsideredPresent(
                 (variant.getCompatPositiveSabPct() != null && variant.getCompatPositiveSabPct().equals(100) || variant.getKnownReactiveEpitopeForCompat())
                 && !variant.getCompatIsRecipientEpitope()
+                && !variant.getExcludeFromCompat()
             );
         }); });
         
