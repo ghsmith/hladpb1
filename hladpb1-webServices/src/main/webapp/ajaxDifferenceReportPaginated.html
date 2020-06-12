@@ -735,8 +735,8 @@ $(document).ready(function() {
     });
 
     $("#uploadHamlButton").click(function() {
-        $("#working").show();
         if($("#hamlFile")[0].files.length > 0) {
+            $("#working").show();
             uploadHaml().done(function() { window.location.reload(); });
         }
     });
