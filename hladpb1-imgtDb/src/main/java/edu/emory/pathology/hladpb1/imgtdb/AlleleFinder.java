@@ -139,7 +139,8 @@ public class AlleleFinder {
                                         || "TGA".equals(imgtAllele.getSequence().getNucsequence().substring(feature.getSequenceCoordinates().getStart().intValueExact() + (cdnaCoordinate - feature.getCDNACoordinates().getStart().intValueExact() - positionInCodon)).substring(0, 3))
                                     )
                                 )) {
-                                    throw new RuntimeException(allele.getAlleleName() + " translation too short");
+                                    //throw new RuntimeException(allele.getAlleleName() + " translation too short");
+				    LOG.info(allele.getAlleleName() + " translation too short"); 
                                 }
                             }
                         }

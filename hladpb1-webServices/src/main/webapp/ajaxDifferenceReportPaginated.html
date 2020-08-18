@@ -393,7 +393,7 @@ function setUiState() {
     var dfr = $.Deferred();
     $("#working").show();
     setTimeout(function() {
-        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil(alleles.filter(isRowVisible).length / pageSize)); x++) { $("#selectPage").append("<option value = " + x + (x == page ? " selected='true'" : "") + ">" + x + (lastSort == null || lastSort == "alleleNameSort" ? " - " + alleles.filter(isRowVisible)[(x - 1) * pageSize + (alleles.find(function(allele){return allele.referenceForMatches;}).sequenceNumber<alleles.filter(isRowVisible)[(x-1)*pageSize].sequenceNumber ? 1 : 0)].alleleName : "") + "</option>"); }
+        $("#selectPage").html(""); for(var x = 1; x <= (Math.ceil((alleles.filter(isRowVisible).length - 1) /* minus one because the ref allele does not count since it appears on every page */ / pageSize)); x++) { $("#selectPage").append("<option value = " + x + (x == page ? " selected='true'" : "") + ">" + x + (lastSort == null || lastSort == "alleleNameSort" ? " - " + alleles.filter(isRowVisible)[(x - 1) * pageSize + (alleles.find(function(allele){return allele.referenceForMatches;}).sequenceNumber<alleles.filter(isRowVisible)[(x-1)*pageSize].sequenceNumber ? 1 : 0)].alleleName : "") + "</option>"); }
         $("#inputPageSize").val(pageSize);
         populateTableRows();
         $("#sessionId").html(sessionId);
