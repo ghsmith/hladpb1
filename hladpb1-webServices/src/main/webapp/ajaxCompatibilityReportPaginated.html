@@ -841,7 +841,7 @@ function getCpra(antigenList) {
         contentType: "application/x-www-form-urlencoded",
         data: "antigen_list=" + antigenList,
         error: function(jqXHR, textStatus, errorMessage) {
-            alert(errorMessage);
+            alert("The CPRA service is not working at the moment. " + errorMessage);
         }
     }).then(function(response) {
         if(isNaN(response.CPRA)) {
