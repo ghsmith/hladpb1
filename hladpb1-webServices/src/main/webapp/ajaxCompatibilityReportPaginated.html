@@ -70,18 +70,6 @@ table.statusDescriptionTable td {
     border: 1px solid black;
 }
 
-table.cpraTable {
-    font-family: monospace;
-    font-size: medium;
-    border-spacing: 0px;
-    border-collapse: collapse;
-}
-table.cpraTable th, table.cpraTable td {
-    text-align: left;
-    white-space: normal;
-    padding: 4px;
-}
-
 </style>
 
 <title>HLA-DPB1 Compatibility Report</title>
@@ -129,12 +117,6 @@ table.cpraTable th, table.cpraTable td {
         <select id="reagentLotNumberSelect"></select>. The session ID is
         <span id="sessionId">...</span>
         (<a id="resetSessionLink" href="javascript:void(0);">reset session</a>).
-    </p>
-    <p>
-        Custom <a href="https://github.com/IHIW/Converters/blob/master/IHIW-haml_version_w0_3_3.xsd">HAML</a> panel:
-        <input id="hamlFile" type="file" name="file" style="border: 1px solid lightgray;"/>
-        <input id="uploadHamlButton" type="button" value="Upload"/>
-        MFI threshold for antibody: <input id="mfiThreshold" type="text" size="5"/>
     </p>
     <p>
         This report is for research use only.
@@ -293,22 +275,6 @@ table.cpraTable th, table.cpraTable td {
 
 </div>
 
-    <div style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 0; margin: 0; border: 0; pointer-events: none;">
-      <div style="display: inline-block; pointer-events: auto;">
-        <div style="color: white; background-color: #005837; padding: 3px;">
-            <table class="cpraTable">
-            <table class="cpraTable">
-                <tr><td rowspan="3" style="font-size: 28pt; border: 1px solid white;">CPRA</td>
-                <td>calculated using single antigen bead(s):</td><td style="width: 100px;"><a id="cpraBead" href="" style="color: white;">working...</a></td></tr>
-                <tr><td>calculated using hypervariable regions(s):</td><td><a id="cpraHvr" href="" style="color: white;">working...</a></td></tr>
-                <tr><td>calculated using both SAB(s) and HVR(s):</td><td><a id="cpraSabHvr" href="" style="color: white;">working...</a></td></tr>
-            </table>
-        </div>
-        <div style="color: black; background-color: #00A4D7; padding: 3px;">
-          All CPRA calculations performed by <a href="//www.transplanttoolbox.org/nmdp_cpra/" style="color: white;">NMDP CPRA calculator</a>.
-        </div>
-      </div>
-    </div>
 </body>
 
 </html>
@@ -432,33 +398,6 @@ function putReagentLot(reagentLot) {
         type: "PUT",
         contentType: "application/json",
         data: reagentLot
-    });
-}
-
-function uploadHaml() {
-    var fd = new FormData();
-    fd.append("file", $("#hamlFile")[0].files[0]);
-    return $.ajax({
-       url: "/hladpb1/resources/session/uploadHaml",
-       type: "PUT",
-       data: fd,
-       processData: false,
-       contentType: false,
-       error: function(jqXHR, textStatus, errorMessage) {
-           alert(errorMessage);
-           $("#working").hide();           
-       }
-    });
-}  
-
-function putMfiThreshold(mfiThreshold) {
-    $("#working").show();
-    return $.ajax({
-        url: "/hladpb1/resources/session/mfiThreshold",
-        dataType: "json",
-        type: "PUT",
-        contentType: "application/json",
-        data: mfiThreshold
     });
 }
 
@@ -606,26 +545,6 @@ hypervariableRegions.forEach(function(hvr) {
 
         dfr.resolve();
     }, 1);
-
-    // asynchronously attempt to set CPRAs
-    $("#cpraBead").html("working...");
-    $("#cpraBead").attr("href", "");
-    $("#cpraHvr").html("working...");
-    $("#cpraHvr").attr("href", "");
-    $("#cpraSabHvr").html("working...");
-    $("#cpraSabHvr").attr("href", "");
-    getCpra(getCpraAntigenListBead()).done(function(cpra) {
-        $("#cpraBead").html(cpra);
-        $("#cpraBead").attr("href", "https://www.transplanttoolbox.org/nmdp_cpra/cpra_out/?userinput1=" + getCpraAntigenListBead());
-    });
-    getCpra(getCpraAntigenListHvr()).done(function(cpra) {
-        $("#cpraHvr").html(cpra);
-        $("#cpraHvr").attr("href", "https://www.transplanttoolbox.org/nmdp_cpra/cpra_out/?userinput1=" + getCpraAntigenListHvr());
-    });
-    getCpra(new String(getCpraAntigenListBead() + " " + getCpraAntigenListHvr()).trim()).done(function(cpra) {
-        $("#cpraSabHvr").html(cpra);
-        $("#cpraSabHvr").attr("href", "https://www.transplanttoolbox.org/nmdp_cpra/cpra_out/?userinput1=" + new String(getCpraAntigenListBead() + " " + getCpraAntigenListHvr()).trim());
-    });
 
     return dfr.promise();
 }
@@ -809,73 +728,6 @@ $(document).ready(function() {
         putReagentLot(reagentLotNumber).done(function() { window.location.reload(); } );
     });
     
-    $("#uploadHamlButton").click(function() {
-        if($("#hamlFile")[0].files.length > 0) {
-            $("#working").show();
-            uploadHaml().done(function() { window.location.reload(); });
-        }
-    });
-
-    $("#mfiThreshold").change(function() {
-        $("#working").show();
-        setTimeout(function() {
-            oldAlleles = alleles;
-            putMfiThreshold($("#mfiThreshold").val()).then(getHypervariableRegions).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); });
-        }, 1);
-    });
-
 });
-
-// CPRA integration
-
-function getCpra(antigenList) {
-    if(antigenList == "") {
-        var dfr = $.Deferred();
-        setTimeout(function() { dfr.resolve(new Number(0).toFixed(4)); }, 1);
-        return dfr.promise();
-    }
-    return $.ajax({
-        url: "https://www.transplanttoolbox.org/nmdp_cpra/cpra_rest/",
-        dataType: "json",
-        type: "POST",
-        contentType: "application/x-www-form-urlencoded",
-        data: "antigen_list=" + antigenList,
-        error: function(jqXHR, textStatus, errorMessage) {
-            alert("The CPRA service is not working at the moment. " + errorMessage);
-        }
-    }).then(function(response) {
-        if(isNaN(response.CPRA)) {
-            return response.CPRA;
-        }
-        return new Number(response.CPRA).toFixed(4);
-    });
-}
-
-function getCpraAntigenListBead() {
-    var antigenList = "";
-    alleles.filter(function(allele) { return allele.recipientAntibodyForCompat; }).forEach(function(allele) {
-        antigenList += " " + allele.alleleName.replace(/HLA-(DPB1\*[^:]+:[^:]+).*/, "$1");
-    });
-    return antigenList.trim();
-}
-
-function getCpraAntigenListHvr() {
-    var antigenList = "";
-    hypervariableRegions.forEach(function(hvr) {
-        Object.keys(hvr.variantMap).forEach(function(hvrvId) {
-            var hvrv = hvr.variantMap[hvrvId];
-            if(hvrv.compatAntibodyConsideredPresent) {
-                hvrv.proteinSequenceList.forEach(function(proteinSequence) {
-                    var offset = 0;
-                    antigenList += " DPB1_HVR_" + hvr.hypervariableRegionName.toUpperCase();
-                    hvr.codonNumberList.forEach(function(codonNumber) {
-                        antigenList += "_" + codonNumber + proteinSequence[offset++];
-                    });
-                });
-            }
-        });
-    });
-    return antigenList.trim();
-}
 
 </script>

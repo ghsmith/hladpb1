@@ -3,8 +3,8 @@ package edu.emory.pathology.hladpb1.imgtdb;
 import edu.emory.pathology.hladpb1.imgtdb.jaxb.emory.ReagentLots;
 import java.io.File;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * This finder class loads the Emory data classes generated from the Emory XML

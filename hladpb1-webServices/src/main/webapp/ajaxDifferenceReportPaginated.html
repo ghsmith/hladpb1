@@ -108,12 +108,6 @@ a.sort {
         (<a id="resetSessionLink" href="javascript:void(0);">reset session</a>).
     </p>
     <p>
-        Custom <a href="https://github.com/IHIW/Converters/blob/master/IHIW-haml_version_w0_3_3.xsd">HAML</a> panel:
-        <input id="hamlFile" type="file" name="file" style="border: 1px solid lightgray;"/>
-        <input id="uploadHamlButton" type="button" value="Upload"/>
-        MFI threshold for selection: <input id="mfiThreshold" type="text" size="5"/>
-    </p>
-    <p>
         This report is for research use only.
     </p>
     <div style="margin-top: 10px; margin-bottom: 10px; border: 1px solid black; width: 100%; background-color: lightgray;">
@@ -281,33 +275,6 @@ function putReagentLot(reagentLot) {
         type: "PUT",
         contentType: "application/json",
         data: reagentLot
-    });
-}
-
-function uploadHaml() {
-    var fd = new FormData();
-    fd.append("file", $("#hamlFile")[0].files[0]);
-    return $.ajax({
-       url: "/hladpb1/resources/session/uploadHaml",
-       type: "PUT",
-       data: fd,
-       processData: false,
-       contentType: false,
-       error: function(jqXHR, textStatus, errorMessage) {
-           alert(errorMessage);
-           $("#working").hide();           
-       }
-    });
-}  
-
-function putMfiThreshold(mfiThreshold) {
-    $("#working").show();
-    return $.ajax({
-        url: "/hladpb1/resources/session/mfiThreshold",
-        dataType: "json",
-        type: "PUT",
-        contentType: "application/json",
-        data: mfiThreshold
     });
 }
 
@@ -732,21 +699,6 @@ $(document).ready(function() {
     $("#reagentLotNumberSelect").change(function() {
         reagentLotNumber = $(this).val();
         putReagentLot(reagentLotNumber).done(function() { window.location.reload(); } );
-    });
-
-    $("#uploadHamlButton").click(function() {
-        if($("#hamlFile")[0].files.length > 0) {
-            $("#working").show();
-            uploadHaml().done(function() { window.location.reload(); });
-        }
-    });
-
-    $("#mfiThreshold").change(function() {
-        $("#working").show();
-        setTimeout(function() {
-            oldAlleles = alleles;
-            putMfiThreshold($("#mfiThreshold").val()).then(getAlleles).then(setUiState).done(function() { $("#working").hide(); });
-        }, 1);
     });
 
 });
