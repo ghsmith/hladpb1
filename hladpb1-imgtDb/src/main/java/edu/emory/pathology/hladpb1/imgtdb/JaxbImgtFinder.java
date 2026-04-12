@@ -1,6 +1,7 @@
 package edu.emory.pathology.hladpb1.imgtdb;
 
 import edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Alleles;
+import edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt.Release;
 import java.io.File;
 import java.util.logging.Logger;
 import jakarta.xml.bind.JAXBContext;
@@ -31,16 +32,19 @@ public class JaxbImgtFinder {
     }
     
     public Alleles getAlleles() {
+        Release release;
         if(alleles == null) {
             try {
                 JAXBContext jc0 = JAXBContext.newInstance("edu.emory.pathology.hladpb1.imgtdb.jaxb.imgt");
-                alleles = (Alleles)jc0.createUnmarshaller().unmarshal(new File(xmlFileName));            
+                release = (Release)jc0.createUnmarshaller().unmarshal(new File(xmlFileName));
+                alleles = release.getAlleles();
             }
             catch(JAXBException e) {
                 throw new RuntimeException(e);
             }
             LOG.info(String.format("%d alleles loaded from IMGT XML database", alleles.getAllele().size()));
-            LOG.info(String.format("IMGT XML database version is %s", alleles.getAllele().get(0).getReleaseversions().getCurrentrelease()));
+            LOG.info(String.format("IMGT XML database version is %s", release.getVersion()));
+            //LOG.info(String.format("IMGT XML database version is %s", alleles.getAllele().get(0).getReleaseversions().getCurrentrelease()));
         }
         return alleles;
     }
